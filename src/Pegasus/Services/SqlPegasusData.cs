@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Pegasus.Entities;
 using TaskStatus = Pegasus.Entities.TaskStatus;
 
@@ -16,19 +14,17 @@ namespace Pegasus.Services
             _context = context;
         }
 
+ // Project related queries
+   
         public IEnumerable<Project> GetAllProjects()
         {
             return _context.Projects;
         }
 
-        public IEnumerable<ProjectTask> GetAllTasks()
+        public void UpdateProject(Project project)
         {
-            return _context.ProjectTasks;
-        }
-
-        public IEnumerable<TaskComment> GetAllComments()
-        {
-            return _context.TaskComments;
+            _context.Projects.Update(project);
+            _context.SaveChanges();
         }
 
         public Project GetProject(int id)
@@ -36,11 +32,17 @@ namespace Pegasus.Services
             return _context.Projects.FirstOrDefault(p => p.Id == id);
         }
 
-        public Project AddProject(Project project)
+        public void AddProject(Project project)
         {
-            var entityEntry = _context.Projects.Add(project);
+            _context.Projects.Add(project);
             _context.SaveChanges();
-            return entityEntry.Entity;
+        }
+
+// Task related queries
+
+        public IEnumerable<ProjectTask> GetAllTasks()
+        {
+            return _context.ProjectTasks.OrderByDescending(t => t.Modified);
         }
 
         public ProjectTask GetTask(int id)
@@ -61,11 +63,18 @@ namespace Pegasus.Services
             AddStatusHistory(projectTask);
         }
 
-        public void EditTask(ProjectTask projectTask)
+        public void UpdateTask(ProjectTask projectTask, int existingTaskStatus)
         {
             _context.ProjectTasks.Update(projectTask);
             _context.SaveChanges();
+
+            if (projectTask.TaskStatusId != existingTaskStatus)
+            {
+                AddStatusHistory(projectTask);
+            }
         }
+
+// Comment related queries
 
         public TaskComment GetComment(int id)
         {
@@ -74,52 +83,43 @@ namespace Pegasus.Services
 
         public IEnumerable<TaskComment> GetComments(int taskId)
         {
-            return _context.TaskComments.Where(c => c.TaskId == taskId);
+            return _context.TaskComments.Where(c => c.TaskId == taskId).OrderByDescending(c => c.Created);
         }
 
-        public TaskComment AddComment(TaskComment taskComment)
+        public void AddComment(TaskComment taskComment)
         {
-            var entityEntry =  _context.TaskComments.Add(taskComment);
+            _context.TaskComments.Add(taskComment);
             _context.SaveChanges();
-            return entityEntry.Entity;
         }
+
+        public void UpdateComment(TaskComment taskComment)
+        {
+            _context.TaskComments.Update(taskComment);
+            _context.SaveChanges();
+        }
+
+// All other queries
 
         public IEnumerable<TaskStatus> GetAllTaskStatuses()
         {
-            return _context.TaskStatus;
+            return _context.TaskStatus.OrderBy(s => s.DisplayOrder);
         }
 
-        public TaskStatus AddTaskStatus(TaskStatus taskStatus)
+        public void AddTaskStatus(TaskStatus taskStatus)
         {
-            var entityEntry = _context.Add(taskStatus);
+            _context.Add(taskStatus);
             _context.SaveChanges();
-            return entityEntry.Entity;
         }
 
         public IEnumerable<TaskType> GetAllTaskTypes()
         {
-            return _context.TaskTypes;
+            return _context.TaskTypes.OrderBy(t => t.DisplayOrder);
         }
 
-        public TaskType AddTaskType(TaskType taskType)
+        public void AddTaskType(TaskType taskType)
         {
-            var entityEntry = _context.Add(taskType);
+            _context.Add(taskType);
             _context.SaveChanges();
-            return entityEntry.Entity;
-        }
-
-        public TaskStatusHistory AddStatusHistory(TaskStatusHistory taskStatusHistory)
-        {
-            var entityEntry = _context.StatusHistory.Add(taskStatusHistory);
-            _context.SaveChanges();
-            return entityEntry.Entity;
-        }
-
-        public TaskStatusHistory GetTaskCurrentStatusHistory(int taskId)
-        {
-            return _context.StatusHistory.Where(h => h.TaskId == taskId)
-                .OrderByDescending(h => h.Created)
-                .FirstOrDefault();
         }
 
         private void AddStatusHistory(ProjectTask task)
