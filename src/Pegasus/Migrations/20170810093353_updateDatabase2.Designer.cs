@@ -8,8 +8,8 @@ using Pegasus.Entities;
 namespace Pegasus.Migrations
 {
     [DbContext(typeof(PegasusDbContext))]
-    [Migration("20170809161111_seedData")]
-    partial class seedData
+    [Migration("20170810093353_updateDatabase2")]
+    partial class updateDatabase2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,7 +44,7 @@ namespace Pegasus.Migrations
 
                     b.Property<int>("ProjectId");
 
-                    b.Property<string>("TaskId");
+                    b.Property<string>("TaskRef");
 
                     b.Property<int>("TaskStatusId");
 
