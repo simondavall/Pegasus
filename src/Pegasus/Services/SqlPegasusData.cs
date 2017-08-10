@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Pegasus.Entities;
+using TaskStatus = Pegasus.Entities.TaskStatus;
 
 namespace Pegasus.Services
 {
@@ -29,7 +31,7 @@ namespace Pegasus.Services
             return _context.TaskComments;
         }
 
-        public Project GeProject(int id)
+        public Project GetProject(int id)
         {
             return _context.Projects.FirstOrDefault(p => p.Id == id);
         }
@@ -51,11 +53,12 @@ namespace Pegasus.Services
             return _context.ProjectTasks.Where(t => t.ProjectId == projectId);
         }
 
-        public ProjectTask AddTask(ProjectTask projectTask)
+        public void AddTask(ProjectTask projectTask)
         {
-            var entityEntry = _context.ProjectTasks.Add(projectTask);
+            _context.ProjectTasks.Add(projectTask);
             _context.SaveChanges();
-            return entityEntry.Entity;
+
+            AddStatusHistory(projectTask);
         }
 
         public void EditTask(ProjectTask projectTask)
@@ -81,11 +84,21 @@ namespace Pegasus.Services
             return entityEntry.Entity;
         }
 
+        public IEnumerable<TaskStatus> GetAllTaskStatuses()
+        {
+            return _context.TaskStatus;
+        }
+
         public TaskStatus AddTaskStatus(TaskStatus taskStatus)
         {
             var entityEntry = _context.Add(taskStatus);
             _context.SaveChanges();
             return entityEntry.Entity;
+        }
+
+        public IEnumerable<TaskType> GetAllTaskTypes()
+        {
+            return _context.TaskTypes;
         }
 
         public TaskType AddTaskType(TaskType taskType)
@@ -109,7 +122,7 @@ namespace Pegasus.Services
                 .FirstOrDefault();
         }
 
-        public void AddStatusHistory(ProjectTask task)
+        private void AddStatusHistory(ProjectTask task)
         {
             var taskStatusHistory = new TaskStatusHistory
             {
@@ -118,6 +131,7 @@ namespace Pegasus.Services
                 Created = task.Modified
             };
             _context.StatusHistory.Add(taskStatusHistory);
+            _context.SaveChanges();
         }
     }
 }
