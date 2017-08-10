@@ -8,8 +8,8 @@ using Pegasus.Entities;
 namespace Pegasus.Migrations
 {
     [DbContext(typeof(PegasusDbContext))]
-    [Migration("20170809163651_updateDatabase2")]
-    partial class updateDatabase2
+    [Migration("20170810093452_seedData")]
+    partial class seedData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
