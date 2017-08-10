@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{58FDBBC3-CBAF-48B6-B218-5B382A5F7420}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{121945D5-9F6B-4F24-9EFD-D28BF07014D5}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Pegasus", "src\Pegasus\Pegasus.xproj", "{F45B8F16-D2EF-4DE5-81A5-09298BA033AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{266B607D-DCF8-4BF4-88F2-3156081FEF68}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Pegasus.Tests", "test\Pegasus.Tests\Pegasus.Tests.xproj", "{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F45B8F16-D2EF-4DE5-81A5-09298BA033AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F45B8F16-D2EF-4DE5-81A5-09298BA033AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F45B8F16-D2EF-4DE5-81A5-09298BA033AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F45B8F16-D2EF-4DE5-81A5-09298BA033AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F45B8F16-D2EF-4DE5-81A5-09298BA033AB} = {58FDBBC3-CBAF-48B6-B218-5B382A5F7420}
+		{EB2A1C72-23C0-4615-8665-40D1E6EA9DE5} = {266B607D-DCF8-4BF4-88F2-3156081FEF68}
+	EndGlobalSection
+EndGlobal

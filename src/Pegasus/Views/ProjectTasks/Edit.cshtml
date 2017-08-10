@@ -1,0 +1,82 @@
+@model Pegasus.Entities.ProjectTask
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<form asp-action="Edit">
+    <div class="form-horizontal">
+        <h4>ProjectTask</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="Created" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Created" class="form-control" />
+                <span asp-validation-for="Created" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Modified" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Modified" class="form-control" />
+                <span asp-validation-for="Modified" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ProjectId" class="form-control" />
+                <span asp-validation-for="ProjectId" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="TaskRef" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="TaskRef" class="form-control" />
+                <span asp-validation-for="TaskRef" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="TaskStatusId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="TaskStatusId" class="form-control" />
+                <span asp-validation-for="TaskStatusId" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="TaskTypeId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="TaskTypeId" class="form-control" />
+                <span asp-validation-for="TaskTypeId" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
