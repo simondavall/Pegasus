@@ -6,6 +6,10 @@ namespace Pegasus.ViewModels.Home
 {
     public class DetailsViewModel
     {
+        public ProjectTaskExt ProjectTask { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
+        public IEnumerable<TaskStatus> TaskStatuses { get; set; }
+        public IEnumerable<TaskType> TaskTypes { get; set; }
     }
 
     public class ProjectTaskExt : ProjectTask
@@ -21,8 +25,8 @@ namespace Pegasus.ViewModels.Home
             TaskRef = task.TaskRef;
             TaskStatusId = task.TaskStatusId;
             TaskTypeId = task.TaskTypeId;
-            
         }
+
         public IEnumerable<TaskStatusHistory> StatusHistory { get; set; }
         public IEnumerable<TaskComment> Comments { get; set; }
         public Project Project { get; set; }

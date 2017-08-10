@@ -47,13 +47,13 @@
                     <tr>
                         <td>
                             <div class="table-row-condensed">
-                                @Html.ActionLink(task.TaskRef, "Edit", "ProjectTasks", new { id = @task.Id })
+                                @Html.ActionLink(task.TaskRef, "Details", "Home", new { id = @task.Id })
                             </div>
                         </td>
 
                         <td>
                             <div class="table-row-condensed">
-                                @Html.ActionLink(@task.Name, "Edit", "ProjectTasks", new {id = @task.Id})
+                                @Html.ActionLink(@task.Name, "Details", "Home", new {id = @task.Id})
                             </div>
                         </td>
                         <td>

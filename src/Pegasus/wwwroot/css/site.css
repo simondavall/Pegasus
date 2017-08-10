@@ -47,3 +47,11 @@ textarea {
 .table-font-sm {
     font-size: 0.9em
 }
+
+.form-small-control {
+    width: 75px;
+}
+
+.form-no-max-control {
+    max-width: 100%;
+}
