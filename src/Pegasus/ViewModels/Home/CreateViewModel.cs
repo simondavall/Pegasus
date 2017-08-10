@@ -12,5 +12,6 @@ namespace Pegasus.ViewModels.Home
         public IEnumerable<SelectListItem> TaskStatuses { get; set; }
         public IEnumerable<SelectListItem> TaskTypes { get; set; }
         public Project Project { get; set; }
+        public int ExistingTaskStatus { get; set; }
     }
 }
