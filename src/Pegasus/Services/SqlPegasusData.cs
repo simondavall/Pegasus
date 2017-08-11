@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Pegasus.Entities;
 using TaskStatus = Pegasus.Entities.TaskStatus;
 
@@ -36,6 +37,7 @@ namespace Pegasus.Services
         {
             _context.Projects.Add(project);
             _context.SaveChanges();
+            AddTaskIndexer(new ProjectTaskIndexer {NextIndex = 1, ProjectId = project.Id});
         }
 
 // Task related queries
@@ -72,6 +74,26 @@ namespace Pegasus.Services
             {
                 AddStatusHistory(projectTask);
             }
+        }
+
+        public async Task<string> GetNextTaskRef(int projectId, string projectPrefix)
+        {
+            var taskIndexer = _context.TaskIndexers.FirstOrDefault(ti => ti.ProjectId == projectId);
+            if (taskIndexer == null || string.IsNullOrWhiteSpace(projectPrefix))
+            {
+                return "###-##";
+            }
+            int nextIndex = taskIndexer.NextIndex++;
+            _context.TaskIndexers.Update(taskIndexer);
+            await _context.SaveChangesAsync();
+
+            return string.Format("{0}-{1}", projectPrefix, nextIndex);
+        }
+
+        public void AddTaskIndexer(ProjectTaskIndexer projectTaskIndexer)
+        {
+            _context.TaskIndexers.Add(projectTaskIndexer);
+            _context.SaveChanges();
         }
 
 // Comment related queries

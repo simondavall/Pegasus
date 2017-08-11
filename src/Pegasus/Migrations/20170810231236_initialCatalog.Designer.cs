@@ -8,8 +8,8 @@ using Pegasus.Entities;
 namespace Pegasus.Migrations
 {
     [DbContext(typeof(PegasusDbContext))]
-    [Migration("20170809161051_updateDatabase1")]
-    partial class updateDatabase1
+    [Migration("20170810231236_initialCatalog")]
+    partial class initialCatalog
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,8 @@ namespace Pegasus.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
+
+                    b.Property<string>("ProjectPrefix");
 
                     b.HasKey("Id");
 
@@ -44,7 +46,7 @@ namespace Pegasus.Migrations
 
                     b.Property<int>("ProjectId");
 
-                    b.Property<string>("TaskId");
+                    b.Property<string>("TaskRef");
 
                     b.Property<int>("TaskStatusId");
 
@@ -53,6 +55,20 @@ namespace Pegasus.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProjectTasks");
+                });
+
+            modelBuilder.Entity("Pegasus.Entities.ProjectTaskIndexer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("NextIndex");
+
+                    b.Property<int>("ProjectId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskIndexers");
                 });
 
             modelBuilder.Entity("Pegasus.Entities.TaskComment", b =>

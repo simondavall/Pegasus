@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Entities
 {
@@ -17,6 +14,7 @@ namespace Pegasus.Entities
         public DbSet<TaskStatusHistory> StatusHistory { get; set; }
         public DbSet<TaskStatus> TaskStatus { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
+        public DbSet<ProjectTaskIndexer> TaskIndexers { get; set; }
 
         // The following is required for migrations
         public PegasusDbContext() /* Required for migrations */{ }

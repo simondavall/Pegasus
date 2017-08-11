@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Pegasus.Entities;
 using TaskStatus = Pegasus.Entities.TaskStatus;
 
@@ -16,6 +17,9 @@ namespace Pegasus.Services
         IEnumerable<ProjectTask> GetTasks(int projectId);
         void AddTask(ProjectTask projectTask);
         void UpdateTask(ProjectTask projectTask, int existingTaskStatus);
+
+        Task<string> GetNextTaskRef(int projectId, string projectPrefix);
+        void AddTaskIndexer(ProjectTaskIndexer projectTaskIndexer);
 
         TaskComment GetComment(int id);
         IEnumerable<TaskComment> GetComments(int taskId);
