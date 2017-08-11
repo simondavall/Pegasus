@@ -7,7 +7,8 @@
     <title>Pegasus - @ViewData["Title"]</title>
 
     <environment names="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css"/>
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment names="Staging,Production">
@@ -27,7 +28,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Pegasus</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" asp-route-id="@Model.ProjectId" class="navbar-brand">Pegasus</a>
                 <div class="navbar-btn navbar-left">
                     <a id="createButton" class="btn btn-primary" asp-controller="Home" asp-action="Create" asp-route-id="@Model.ProjectId">Create Issue</a>
                 </div>

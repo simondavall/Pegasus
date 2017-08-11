@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,7 +23,7 @@ namespace Pegasus.Controllers
             IndexViewModel model = new IndexViewModel
             {
                 ProjectId = id,
-                ProjectTasks = id > 0 ? _db.GetTasks(id) : _db.GetAllTasks(),
+                ProjectTasks = ProjectTaskExt.Convert(id > 0 ? _db.GetTasks(id) : _db.GetAllTasks()),
                 Projects = _db.GetAllProjects(),
                 Project = id > 0 ? _db.GetProject(id) : new Project { Id = 0, Name = "All" }
             };
@@ -76,7 +77,7 @@ namespace Pegasus.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId")] ProjectTask projectTask, int existingTaskStatus)
+        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId")] ProjectTask projectTask, int existingTaskStatus)
         {
             projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)

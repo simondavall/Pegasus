@@ -17,18 +17,6 @@ textarea {
     max-width: 280px;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"]
-{
-    width: 100%;
-}
-
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
   /* Hide captions */
@@ -43,15 +31,36 @@ textarea {
     height: 20px;
     overflow: hidden;
 }
-
 .table-font-sm {
     font-size: 0.9em
 }
-
 .form-small-control {
     width: 75px;
 }
-
 .form-no-max-control {
     max-width: 100%;
+}
+
+.task-completed-strike a {
+    color: lightgrey;
+    text-decoration: line-through;
+}
+.task-completed a {
+    color: lightgrey;
+}
+.task-completed {
+    color: lightgrey;
+}
+.task-in-progress a {
+    color: #337ab7;
+}
+.task-in-progress i {
+    color: #337ab7;
+    padding-right: 4px;
+}
+.task-time {
+    text-align: right;
+}
+.form-control {
+    font-size: 12px;
 }

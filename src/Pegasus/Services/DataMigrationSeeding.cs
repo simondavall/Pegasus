@@ -13,7 +13,7 @@ namespace Pegasus.Services
 
             _db.AddTaskStatus(new TaskStatus { Name = "Submitted", DisplayOrder = 0 });
             _db.AddTaskStatus(new TaskStatus { Name = "In Progress", DisplayOrder = 10 });
-            _db.AddTaskStatus(new TaskStatus { Name = "Submitted", DisplayOrder = 99 });
+            _db.AddTaskStatus(new TaskStatus { Name = "Completed", DisplayOrder = 99 });
 
             _db.AddTaskType(new TaskType { Name = "Task", DisplayOrder = 1 });
             _db.AddTaskType(new TaskType { Name = "Bug", DisplayOrder = 5 });
