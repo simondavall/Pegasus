@@ -9,7 +9,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <_PublishTargetUrl>C:\Users\Simon\Documents\Visual Studio 2015\Projects\Pegasus\builds\local</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
-    <DestinationConnectionStrings Include="PegasusLive">
+    <DestinationConnectionStrings Include="Pegasus">
       <Value>Server=HEREFORD\SQLEXPRESS;Database=Pegasus;Trusted_Connection=True;MultipleActiveResultSets=true</Value>
     </DestinationConnectionStrings>
   </ItemGroup>
