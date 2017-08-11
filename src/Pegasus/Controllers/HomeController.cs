@@ -17,12 +17,14 @@ namespace Pegasus.Controllers
             _db = pegasusData;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
             IndexViewModel model = new IndexViewModel
             {
-                ProjectTasks = _db.GetAllTasks(),
-                Projects = _db.GetAllProjects()
+                ProjectId = id,
+                ProjectTasks = id > 0 ? _db.GetTasks(id) : _db.GetAllTasks(),
+                Projects = _db.GetAllProjects(),
+                Project = id > 0 ? _db.GetProject(id) : new Project { Id = 0, Name = "All" }
             };
 
             return View(model);
@@ -33,17 +35,16 @@ namespace Pegasus.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int id)
         {
-            CreateViewModel model = new CreateViewModel();
-            model.TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1);
-            model.TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1);
-            // todo activate the following with a real project id
-            model.Project = _db.GetProject(1);
+            var project = _db.GetProject(id);
+            var projectTask = new ProjectTask
+            {
+                ProjectId = id,
+                TaskRef = await _db.GetNextTaskRef(id, project.ProjectPrefix)
+            };
+            var model = CreateTaskViewModel(projectTask, project);
 
-            var projectTask = new ProjectTask();
-            projectTask.ProjectId = model.Project.Id;
-            projectTask.TaskRef = await _db.GetNextTaskRef(model.Project.Id, model.Project.ProjectPrefix);
             model.ProjectTask = projectTask;
 
             return View(model);
@@ -57,25 +58,18 @@ namespace Pegasus.Controllers
             if (ModelState.IsValid)
             {
                 _db.AddTask(projectTask);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { id = projectTask.ProjectId });
             }
-            CreateViewModel model = new CreateViewModel();
-            model.TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1);
-            model.TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1);
-            model.ProjectTask = projectTask;
+            var model = CreateTaskViewModel(projectTask, _db.GetProject(projectTask.ProjectId));
             return View(model);
         }
 
         public IActionResult Edit(int id)
         {
             var projectTask = _db.GetTask(id);
+            var project = _db.GetProject(projectTask.ProjectId);
 
-            CreateViewModel model = new CreateViewModel();
-            model.TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1);
-            model.TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1);
-            model.Project = _db.GetProject(projectTask.ProjectId);
-            model.ProjectTask = projectTask;
-            model.ExistingTaskStatus = projectTask.TaskStatusId;
+            TaskViewModel model = CreateTaskViewModel(projectTask, project);
 
             return View(model);
         }
@@ -89,8 +83,9 @@ namespace Pegasus.Controllers
             {
                 _db.UpdateTask(projectTask, existingTaskStatus);
             }
-
-            return Edit(projectTask.Id);
+            var project = _db.GetProject(projectTask.ProjectId);
+            TaskViewModel model = CreateTaskViewModel(projectTask, project, existingTaskStatus);
+            return View(model);
         }
         public IActionResult About()
         {
@@ -110,5 +105,26 @@ namespace Pegasus.Controllers
         {
             return View();
         }
+
+
+        private TaskViewModel CreateTaskViewModel(ProjectTask projectTask, Project project)
+        {
+            return CreateTaskViewModel(projectTask, project, projectTask.TaskStatusId);
+        }
+
+        private TaskViewModel CreateTaskViewModel(ProjectTask projectTask, Project project, int existingTaskStatus)
+        {
+            return
+                new TaskViewModel
+                {
+                    ProjectId = projectTask.ProjectId,
+                    TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1),
+                    TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1),
+                    ProjectTask = projectTask,
+                    Project = project,
+                    ExistingTaskStatus = existingTaskStatus
+                };
+        }
+
     }
 }
