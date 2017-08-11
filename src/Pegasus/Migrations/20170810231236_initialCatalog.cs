@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Pegasus.Migrations
 {
-    public partial class initialCreate : Migration
+    public partial class initialCatalog : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,8 @@ namespace Pegasus.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    ProjectPrefix = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -33,13 +34,27 @@ namespace Pegasus.Migrations
                     Modified = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     ProjectId = table.Column<int>(nullable: false),
-                    TaskId = table.Column<string>(nullable: true),
+                    TaskRef = table.Column<string>(nullable: true),
                     TaskStatusId = table.Column<int>(nullable: false),
                     TaskTypeId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProjectTasks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TaskIndexers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    NextIndex = table.Column<int>(nullable: false),
+                    ProjectId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskIndexers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,6 +73,20 @@ namespace Pegasus.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TaskStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    DisplayOrder = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StatusHistory",
                 columns: table => new
                 {
@@ -71,6 +100,20 @@ namespace Pegasus.Migrations
                 {
                     table.PrimaryKey("PK_StatusHistory", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "TaskTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    DisplayOrder = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskTypes", x => x.Id);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -82,10 +125,19 @@ namespace Pegasus.Migrations
                 name: "ProjectTasks");
 
             migrationBuilder.DropTable(
+                name: "TaskIndexers");
+
+            migrationBuilder.DropTable(
                 name: "TaskComments");
 
             migrationBuilder.DropTable(
+                name: "TaskStatus");
+
+            migrationBuilder.DropTable(
                 name: "StatusHistory");
+
+            migrationBuilder.DropTable(
+                name: "TaskTypes");
         }
     }
 }

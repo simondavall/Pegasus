@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -31,18 +30,21 @@ namespace Pegasus.Controllers
 
         public IActionResult Details()
         {
-            
-
             return View();
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             CreateViewModel model = new CreateViewModel();
             model.TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1);
             model.TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1);
             // todo activate the following with a real project id
             model.Project = _db.GetProject(1);
+
+            var projectTask = new ProjectTask();
+            projectTask.ProjectId = model.Project.Id;
+            projectTask.TaskRef = await _db.GetNextTaskRef(model.Project.Id, model.Project.ProjectPrefix);
+            model.ProjectTask = projectTask;
 
             return View(model);
         }

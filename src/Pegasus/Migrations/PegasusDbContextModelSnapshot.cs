@@ -23,6 +23,8 @@ namespace Pegasus.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("ProjectPrefix");
+
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
@@ -52,6 +54,20 @@ namespace Pegasus.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProjectTasks");
+                });
+
+            modelBuilder.Entity("Pegasus.Entities.ProjectTaskIndexer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("NextIndex");
+
+                    b.Property<int>("ProjectId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskIndexers");
                 });
 
             modelBuilder.Entity("Pegasus.Entities.TaskComment", b =>
