@@ -44,7 +44,7 @@ namespace Pegasus.Services
 
         public IEnumerable<ProjectTask> GetAllTasks()
         {
-            return _context.ProjectTasks.OrderByDescending(t => t.Modified);
+            return _context.ProjectTasks.OrderByDescending(t => t.Created);
         }
 
         public ProjectTask GetTask(int id)
@@ -54,7 +54,8 @@ namespace Pegasus.Services
 
         public IEnumerable<ProjectTask> GetTasks(int projectId)
         {
-            return _context.ProjectTasks.Where(t => t.ProjectId == projectId);
+            return _context.ProjectTasks.Where(t => t.ProjectId == projectId)
+                .OrderByDescending(t => t.Created);
         }
 
         public void AddTask(ProjectTask projectTask)

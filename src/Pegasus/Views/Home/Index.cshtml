@@ -7,16 +7,16 @@
 <div class="row">
     <div class="col-md-3">
         <div class="section">
-            <input type="hidden" asp-for="Project.Id"/>
+            <input type="hidden" asp-for="Project.Id" />
             <h4>Projects</h4>
             <div>
                 <a asp-action="Index" asp-route-id="0">All</a>
             </div>
             @foreach (var project in Model.Projects)
             {
-                <div>
-                    <a asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
-                </div>
+            <div>
+                <a asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
+            </div>
             }
         </div>
         <div class="section">
@@ -52,18 +52,27 @@
                                     <tr>
                                         <td>
                                             <div class="table-row-condensed">
-                                                @Html.ActionLink(task.TaskRef, "Edit", "Home", new { id = @task.Id })
+                                                <span class="@task.TaskProfile.TaskRefStyle">
+                                                    @Html.ActionLink(task.TaskRef, "Edit", "Home", new { id = @task.Id })
+                                                </span>
                                             </div>
                                         </td>
 
                                         <td>
                                             <div class="table-row-condensed">
-                                                @Html.ActionLink(@task.Name, "Edit", "Home", new { id = @task.Id })
+                                                <span class="@task.TaskProfile.TaskTextStyle">
+                                                    @Html.Raw(task.TaskProfile.TaskIcon)
+                                                    @Html.ActionLink(@task.Name, "Edit", "Home", new { id = @task.Id })
+                                                </span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="table-row-condensed">
-                                                @task.Modified.ToTaskDate()
+                                                <div class="@task.TaskProfile.TaskTimeStyle">
+                                                    <span>
+                                                        @task.Modified.ToTaskDate()
+                                                    </span>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
