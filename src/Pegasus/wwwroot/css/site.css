@@ -26,6 +26,23 @@ textarea {
 }
 
 /* Actual site css*/
+html {
+    overflow-y: scroll;
+}
+
+.body-content {
+    padding-top: 20px;
+}
+
+.form-control {
+    font-size: 12px;
+}
+.form-no-max-control {
+    max-width: 100%;
+}
+.form-small-control {
+    width: 75px;
+}
 
 .table-row-condensed {
     height: 20px;
@@ -34,11 +51,9 @@ textarea {
 .table-font-sm {
     font-size: 0.9em
 }
-.form-small-control {
-    width: 75px;
-}
-.form-no-max-control {
-    max-width: 100%;
+
+.project-list i {
+    padding-right: 4px;
 }
 
 .task-completed-strike a {
@@ -55,12 +70,11 @@ textarea {
     color: #337ab7;
 }
 .task-in-progress i {
-    color: #337ab7;
-    padding-right: 4px;
+    padding-right: 6px;
+}
+.task-list {
+    min-height: 400px;
 }
 .task-time {
     text-align: right;
-}
-.form-control {
-    font-size: 12px;
 }

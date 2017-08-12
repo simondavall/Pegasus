@@ -4,37 +4,59 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="row">
+<div class="row task-list">
     <div class="col-md-3">
-        <div class="section">
-            <input type="hidden" asp-for="Project.Id" />
-            <h4>Projects</h4>
-            <div>
-                <a asp-action="Index" asp-route-id="0">All</a>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <input id="projectId" type="hidden" asp-for="Project.Id" />
+                <h4>Projects</h4>
             </div>
-            @foreach (var project in Model.Projects)
-            {
-            <div>
-                <a asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
+            <div class="panel-body project-list">
+                <div>
+                    <a class="projectListItem" asp-action="Index" asp-route-id="0">All</a>
+                </div>
+                @foreach (var project in Model.Projects)
+                {
+                    <div>
+                        <a class="projectListItem" asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
+                    </div>
+                }
             </div>
-            }
         </div>
-        <div class="section">
-            <h4>Saved Searches</h4>
-            <ul>
-                <li>Pegasus</li>
-                <li>Hereford Securities Ltd</li>
-                <li>Project 3</li>
-            </ul>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>Saved Searches</h4>
+            </div>
+            <div class="panel-body project-list">
+                <div>
+                    <a class="savedSearch" asp-action="Index" asp-route-id="0">Open Tasks</a>
+                </div>
+                <div>
+                    <a class="savedSearch" asp-action="Index" asp-route-id="0">Open & Submitted</a>
+                </div>
+                <div>
+                    <a class="savedSearch" asp-action="Index" asp-route-id="0">High Priority Only</a>
+                </div>
+            </div>
         </div>
-        <div class="section">
-            <h4>Filters</h4>
-            <ul>
-                <li>Pegasus</li>
-                <li>Hereford Securities Ltd</li>
-                <li>Project 3</li>
-            </ul>
+        
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>Filters</h4>
+            </div>
+            <div class="panel-body project-list">
+                <div>
+                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 1</a>
+                </div>
+                <div>
+                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 2</a>
+                </div>
+                <div>
+                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 3</a>
+                </div>
+            </div>
         </div>
+
     </div>
     <div class="col-md-9">
         <div class="panel">
@@ -49,33 +71,32 @@
                             <tbody>
                                 @foreach (var task in Model.ProjectTasks)
                                 {
-                                    <tr>
-                                        <td>
-                                            <div class="table-row-condensed">
-                                                <span class="@task.TaskProfile.TaskRefStyle">
-                                                    @Html.ActionLink(task.TaskRef, "Edit", "Home", new { id = @task.Id })
-                                                </span>
-                                            </div>
-                                        </td>
+                                <tr>
+                                    <td>
+                                        <div class="table-row-condensed">
+                                            <span class="@task.TaskProfile.TaskRefStyle">
+                                                <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
+                                            </span>
+                                        </div>
+                                    </td>
 
-                                        <td>
-                                            <div class="table-row-condensed">
-                                                <span class="@task.TaskProfile.TaskTextStyle">
-                                                    @Html.Raw(task.TaskProfile.TaskIcon)
-                                                    @Html.ActionLink(@task.Name, "Edit", "Home", new { id = @task.Id })
+                                    <td>
+                                        <div class="table-row-condensed">
+                                            <span class="@task.TaskProfile.TaskTextStyle">
+                                                <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile.TaskIcon)@task.Name</a>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-row-condensed">
+                                            <div class="@task.TaskProfile.TaskTimeStyle">
+                                                <span>
+                                                    @task.Modified.ToTaskDate()
                                                 </span>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <div class="table-row-condensed">
-                                                <div class="@task.TaskProfile.TaskTimeStyle">
-                                                    <span>
-                                                        @task.Modified.ToTaskDate()
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                </tr>
                                 }
                             </tbody>
                         </table>
