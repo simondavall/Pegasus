@@ -32,6 +32,7 @@ namespace Pegasus.Services
         IEnumerable<TaskType> GetAllTaskTypes();
         void AddTaskType(TaskType taskType);
 
-
+        IEnumerable<TaskPriority> GetAllTaskPriorities();
+        void AddTaskPriority(TaskPriority taskPriority);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Pegasus.Entities.Enumerations;
 
 namespace Pegasus.Entities
 {
@@ -18,9 +19,14 @@ namespace Pegasus.Entities
         public int TaskStatusId { get; set; }
         [Display(Name = "Project")]
         public int ProjectId { get; set; }
+        [Display(Name = "Priority")]
+        public int TaskPriorityId { get; set; }
+        [Display(Name = "Fixed In Release")]
+        public string FixedInRelease { get; set; }
         public DateTime Modified { get; set; }
         public DateTime Created { get; set; }
 
+        public bool IsClosed => TaskStatusId == (int) TaskStatusEnum.Completed || TaskStatusId == (int) TaskStatusEnum.Obsolete;
     }
 
 }

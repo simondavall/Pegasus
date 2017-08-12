@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities;
 using Pegasus.Services;
+using Pegasus.ViewModels;
 using Pegasus.ViewModels.Home;
 
 namespace Pegasus.Controllers
@@ -47,13 +47,14 @@ namespace Pegasus.Controllers
             var model = CreateTaskViewModel(projectTask, project);
 
             model.ProjectTask = projectTask;
+            model.ButtonText = model.Action = "Create";
 
-            return View(model);
+            return View("Edit", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId")] ProjectTask projectTask)
+        public IActionResult Create([Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask)
         {
             projectTask.Created = projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
@@ -62,7 +63,9 @@ namespace Pegasus.Controllers
                 return RedirectToAction("Index", new { id = projectTask.ProjectId });
             }
             var model = CreateTaskViewModel(projectTask, _db.GetProject(projectTask.ProjectId));
-            return View(model);
+            model.ButtonText = model.Action = "Create";
+
+            return View("Edit", model);
         }
 
         public IActionResult Edit(int id)
@@ -71,50 +74,52 @@ namespace Pegasus.Controllers
             var project = _db.GetProject(projectTask.ProjectId);
 
             TaskViewModel model = CreateTaskViewModel(projectTask, project);
+            model.Action = "Edit";
+            model.ButtonText = "Update";
 
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId")] ProjectTask projectTask, int existingTaskStatus)
+        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask, int existingTaskStatus)
         {
             projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
                 _db.UpdateTask(projectTask, existingTaskStatus);
-
-                // if the status has changed to 'completed' then redirect back to project list.
-                if (projectTask.TaskStatusId == 3 && existingTaskStatus != projectTask.TaskStatusId)
-                {
-                    return Index(projectTask.ProjectId);
-                }
-
-                // update the existingStatus to current status
-                existingTaskStatus = projectTask.TaskStatusId;
+                return RedirectToAction("Index", new {id = projectTask.ProjectId});
             }
 
             var project = _db.GetProject(projectTask.ProjectId);
             TaskViewModel model = CreateTaskViewModel(projectTask, project, existingTaskStatus);
+            model.Action = "Edit";
+            model.ButtonText = "Update";
+
             return View(model);
         }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
 
-            return View();
+            var model = new BaseViewModel {ProjectId = 0};
+
+            return View(model);
         }
 
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
+            var model = new BaseViewModel { ProjectId = 0 };
 
-            return View();
+            return View(model);
         }
 
         public IActionResult Error()
         {
-            return View();
+            var model = new BaseViewModel { ProjectId = 0 };
+            return View(model);
         }
 
 
@@ -131,6 +136,7 @@ namespace Pegasus.Controllers
                     ProjectId = projectTask.ProjectId,
                     TaskTypes = new SelectList(_db.GetAllTaskTypes(), "Id", "Name", 1),
                     TaskStatuses = new SelectList(_db.GetAllTaskStatuses(), "Id", "Name", 1),
+                    TaskPriorities = new SelectList(_db.GetAllTaskPriorities(), "Id", "Name", 1),
                     ProjectTask = projectTask,
                     Project = project,
                     ExistingTaskStatus = existingTaskStatus

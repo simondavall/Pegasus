@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -18,6 +16,7 @@ namespace Pegasus.Entities
         public DbSet<TaskStatus> TaskStatus { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<ProjectTaskIndexer> TaskIndexers { get; set; }
+        public DbSet<TaskPriority> TaskPriorities { get; set; }
 
         // The following is required for migrations
         public PegasusDbContext() /* Required for migrations */{ }
@@ -29,7 +28,7 @@ namespace Pegasus.Entities
                 optionsBuilder.UseSqlServer(
                     new ConfigurationBuilder()
                         .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .Build()
                         .GetConnectionString("Pegasus")
                 );

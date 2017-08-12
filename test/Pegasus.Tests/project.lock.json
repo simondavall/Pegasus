@@ -4425,7 +4425,7 @@
           "lib/dotnet/xunit.runner.utility.dotnet.dll": {}
         }
       },
-      "Pegasus/1.0.0": {
+      "Pegasus/1.0.0-8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v1.0",
         "dependencies": {
@@ -11188,7 +11188,7 @@
         "xunit.runner.utility.nuspec"
       ]
     },
-    "Pegasus/1.0.0": {
+    "Pegasus/1.0.0-8": {
       "type": "project",
       "path": "../../src/Pegasus/project.json",
       "msbuildProject": "../../src/Pegasus/Pegasus.xproj"

@@ -69,12 +69,14 @@ html {
 .task-in-progress a {
     color: #337ab7;
 }
-.task-in-progress i {
-    padding-right: 6px;
-}
+
 .task-list {
     min-height: 400px;
 }
+.task-list i {
+    padding-right: 6px;
+}
+
 .task-time {
     text-align: right;
 }
