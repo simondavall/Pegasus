@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Entities
 {
@@ -20,31 +24,16 @@ namespace Pegasus.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-      
-            if (optionsBuilder.IsConfigured) return;
-
-            // sdv - The following commented out code will allow the Package Mgr Console to 
-            // be debugged during update-database. Need to do that to figure out how to get 
-            // the connedtion string from appsettings rather than hard-coded.
-            // Note must have some actual db changes in order to trigger this.
-            //if (System.Diagnostics.Debugger.IsAttached == false)
-            //{
-
-            //    System.Diagnostics.Debugger.Launch();
-
-            //}
-            //Thread.Sleep(5000);
-            //Called by parameterless ctor Usually Migrations
-            //var environmentName = Environment.GetEnvironmentVariable("EnvironmentName") ?? "local";
-
-            //optionsBuilder.UseSqlServer(
-            //    new ConfigurationBuilder()
-            //        .SetBasePath(Path.GetDirectoryName(GetType().GetTypeInfo().Assembly.Location))
-            //        .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
-            //        .Build()
-            //        .GetConnectionString("Pegasus")
-            //);
-            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB2;Database=Pegasus;Trusted_Connection=True;MultipleActiveResultSets=true");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(
+                    new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+                        .Build()
+                        .GetConnectionString("Pegasus")
+                );
+            }
         }
     }
 }
