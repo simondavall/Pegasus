@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Profiles;
 
 namespace Pegasus.Entities
@@ -11,32 +12,24 @@ namespace Pegasus.Entities
     {
         public ProjectTaskExt(ProjectTask projectTask)
         {
-            var fields = projectTask.GetType().GetRuntimeProperties();
-            foreach (var field in fields)
+            var properties = projectTask.GetType().GetRuntimeProperties();
+            foreach (var property in properties)
             {
-                field.SetValue(this, field.GetValue(projectTask));
+                if (property.CanWrite)
+                {
+                    property.SetValue(this, property.GetValue(projectTask));
+                }
             }
-            SetTaskProfile(TaskStatusId);
+            TaskProfile = TaskProfileResolver.SetTaskProfile((TaskStatusEnum)TaskStatusId);
         }
+
         public ITaskProfile TaskProfile { get; set; }
 
-        private void SetTaskProfile(int taskStatusId)
-        {
-            switch (taskStatusId)
-            {
-                case 3:
-                    TaskProfile = new CompletedTaskProfile();
-                    break;
-                case 2:
-                    TaskProfile = new InProgressTaskProfile();
-                    break;
-                default:
-                    TaskProfile = new DefaultTaskProfile();
-                    break;
-            }
-
-        }
-
+        /// <summary>
+        /// Convert a list of ProjectTask to a list of ProjectTaskExt 
+        /// </summary>
+        /// <param name="projectTasks"></param>
+        /// <returns></returns>
         public static IEnumerable<ProjectTaskExt> Convert(IEnumerable<ProjectTask> projectTasks)
         {
             var result = new List<ProjectTaskExt>();

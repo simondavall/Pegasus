@@ -8,9 +8,10 @@ using Pegasus.Entities;
 namespace Pegasus.Migrations
 {
     [DbContext(typeof(PegasusDbContext))]
-    partial class PegasusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170812174031_addedTaskPriority")]
+    partial class addedTaskPriority
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
@@ -88,20 +89,6 @@ namespace Pegasus.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TaskComments");
-                });
-
-            modelBuilder.Entity("Pegasus.Entities.TaskPriority", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DisplayOrder");
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaskPriorities");
                 });
 
             modelBuilder.Entity("Pegasus.Entities.TaskStatus", b =>

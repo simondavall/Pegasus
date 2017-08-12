@@ -4,7 +4,7 @@
     ViewData["Title"] = "Task";
 }
 
-<form asp-action="Edit">
+<form asp-action="@Model.Action">
     <div class="form-horizontal">
         <h3>@Model.Project.Name Task</h3>
         <hr />
@@ -37,23 +37,37 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input id="taskUpdateSubmit" type="submit" value="Update" class="btn btn-primary" />
+                        <input type="submit" value="@Model.ButtonText" class="btn btn-primary" />
                     </div>
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="form-group">
+                    <label asp-for="ProjectTask.TaskPriorityId" class="col-md-4 control-label"></label>
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(m => m.ProjectTask.TaskPriorityId, Model.TaskPriorities, new { @class = "form-control" })
+                        <span asp-validation-for="ProjectTask.TaskPriorityId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label asp-for="ProjectTask.TaskTypeId" class="col-md-4 control-label"></label>
                     <div class="col-md-8">
-                        @Html.DropDownListFor(m => m.ProjectTask.TaskTypeId, Model.TaskTypes, new { @class = "form-control" })
-                        <span asp-validation-for="ProjectTask.TaskTypeId" class="text-danger" ></span>
+                        @Html.DropDownListFor(m => m.ProjectTask.TaskTypeId, Model.TaskTypes, new { @class = "form-control"})
+                        <span asp-validation-for="ProjectTask.TaskTypeId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label asp-for="ProjectTask.TaskStatusId" class="col-md-4 control-label"></label>
                     <div class="col-md-8">
-                        @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new { @id="editTaskId", @class = "form-control"})
+                        @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new { @class = "form-control"})
                         <span asp-validation-for="ProjectTask.TaskStatusId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ProjectTask.FixedInRelease" class="col-md-4 control-label"></label>
+                    <div class="col-md-8">
+                        <input asp-for="ProjectTask.FixedInRelease" class="form-control" />
+                        <span asp-validation-for="ProjectTask.FixedInRelease" class="text-danger"></span>
                     </div>
                 </div>
 

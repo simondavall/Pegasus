@@ -145,6 +145,17 @@ namespace Pegasus.Services
             _context.SaveChanges();
         }
 
+        public IEnumerable<TaskPriority> GetAllTaskPriorities()
+        {
+            return _context.TaskPriorities.OrderBy(tp => tp.DisplayOrder);
+        }
+
+        public void AddTaskPriority(TaskPriority taskPriority)
+        {
+            _context.Add(taskPriority);
+            _context.SaveChanges();
+        }
+
         private void AddStatusHistory(ProjectTask task)
         {
             var taskStatusHistory = new TaskStatusHistory
