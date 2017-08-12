@@ -13,12 +13,12 @@
             </div>
             <div class="panel-body project-list">
                 <div>
-                    <a class="projectListItem" asp-action="Index" asp-route-id="0">All</a>
+                    <a class="project-list-item" asp-action="Index" asp-route-id="0">All</a>
                 </div>
                 @foreach (var project in Model.Projects)
                 {
                     <div>
-                        <a class="projectListItem" asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
+                        <a class="project-list-item" asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
                     </div>
                 }
             </div>

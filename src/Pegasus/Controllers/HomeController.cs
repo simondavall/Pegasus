@@ -28,7 +28,7 @@ namespace Pegasus.Controllers
                 Project = id > 0 ? _db.GetProject(id) : new Project { Id = 0, Name = "All" }
             };
 
-            return View(model);
+            return View("Index", model);
         }
 
         public IActionResult Details()
@@ -83,7 +83,17 @@ namespace Pegasus.Controllers
             if (ModelState.IsValid)
             {
                 _db.UpdateTask(projectTask, existingTaskStatus);
+
+                // if the status has changed to 'completed' then redirect back to project list.
+                if (projectTask.TaskStatusId == 3 && existingTaskStatus != projectTask.TaskStatusId)
+                {
+                    return Index(projectTask.ProjectId);
+                }
+
+                // update the existingStatus to current status
+                existingTaskStatus = projectTask.TaskStatusId;
             }
+
             var project = _db.GetProject(projectTask.ProjectId);
             TaskViewModel model = CreateTaskViewModel(projectTask, project, existingTaskStatus);
             return View(model);
