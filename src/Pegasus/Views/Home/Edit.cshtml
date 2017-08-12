@@ -37,7 +37,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Update" class="btn btn-primary" />
+                        <input id="taskUpdateSubmit" type="submit" value="Update" class="btn btn-primary" />
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                 <div class="form-group">
                     <label asp-for="ProjectTask.TaskStatusId" class="col-md-4 control-label"></label>
                     <div class="col-md-8">
-                        @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new {@class = "form-control"})
+                        @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new { @id="editTaskId", @class = "form-control"})
                         <span asp-validation-for="ProjectTask.TaskStatusId" class="text-danger"></span>
                     </div>
                 </div>
