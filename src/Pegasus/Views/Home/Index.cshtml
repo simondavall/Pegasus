@@ -1,110 +1,62 @@
-﻿@using Pegasus.Extensions
-@model Pegasus.ViewModels.Home.IndexViewModel
+﻿@model Pegasus.ViewModels.Home.IndexViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="row task-list">
-    <div class="col-md-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <input id="projectId" type="hidden" asp-for="Project.Id" />
-                <h4>Projects</h4>
-            </div>
-            <div class="panel-body project-list">
-                <div>
-                    <a class="project-list-item" asp-action="Index" asp-route-id="0">All</a>
+<form method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
+    <div class="row task-list">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <input id="projectId" type="hidden" asp-for="Project.Id" />
+                    <h4>Projects</h4>
                 </div>
-                @foreach (var project in Model.Projects)
+                <div class="panel-body project-list">
+                    <div>
+                        <a class="project-list-item" asp-action="Index" value="0"><i class="project-list-icon fa fa-angle-right"></i>All</a>
+                    </div>
+                    @foreach (var project in Model.Projects)
                 {
                     <div>
-                        <a class="project-list-item" asp-action="Index" asp-route-id="@project.Id">@project.Name</a>
+                        <a class="project-list-item" asp-action="Index" value="@project.Id"><i class="project-list-icon fa fa-angle-right"></i>@project.Name</a>
                     </div>
                 }
-            </div>
-        </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4>Saved Searches</h4>
-            </div>
-            <div class="panel-body project-list">
-                <div>
-                    <a class="savedSearch" asp-action="Index" asp-route-id="0">Open Tasks</a>
-                </div>
-                <div>
-                    <a class="savedSearch" asp-action="Index" asp-route-id="0">Open & Submitted</a>
-                </div>
-                <div>
-                    <a class="savedSearch" asp-action="Index" asp-route-id="0">High Priority Only</a>
                 </div>
             </div>
-        </div>
-        
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4>Filters</h4>
-            </div>
-            <div class="panel-body project-list">
-                <div>
-                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 1</a>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Saved Searches</h4>
                 </div>
-                <div>
-                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 2</a>
-                </div>
-                <div>
-                    <a class="filterItem" asp-action="Index" asp-route-id="0">Filter 3</a>
+                <div class="panel-body project-list">
+                    <div>
+                        <a class="savedSearch" asp-action="Index">Open Tasks</a>
+                    </div>
+                    <div>
+                        <a class="savedSearch" asp-action="Index">Open & Submitted</a>
+                    </div>
+                    <div>
+                        <a class="savedSearch" asp-action="Index">High Priority Only</a>
+                    </div>
                 </div>
             </div>
-        </div>
-
-    </div>
-    <div class="col-md-9">
-        <div class="panel">
-            <div class="panel-heading">
-                <h4>Project: @Model.Project.Name</h4>
-            </div>
-            <div class="panel-body">
-                <div class="section table-font-sm">
-                    <div class="table-responsive">
-
-                        <table class="table table-striped table-condensed table-hover">
-                            <tbody>
-                                @foreach (var task in Model.ProjectTasks)
-                                {
-                                <tr>
-                                    <td>
-                                        <div class="table-row-condensed">
-                                            <span class="@task.TaskProfile.TaskRefStyle">
-                                                <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
-                                            </span>
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <div class="table-row-condensed">
-                                            <span class="@task.TaskProfile.TaskTextStyle">
-                                                <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile.TaskIcon)@task.Name</a>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="table-row-condensed">
-                                            <div class="@task.TaskProfile.TaskTimeStyle">
-                                                <span>
-                                                    @task.Modified.ToTaskDate()
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Filters</h4>
+                </div>
+                <div class="panel-body project-list">
+                    <div>
+                        <a class="filterItem" asp-action="Index">Filter 1</a>
+                    </div>
+                    <div>
+                        <a class="filterItem" asp-action="Index">Filter 2</a>
+                    </div>
+                    <div>
+                        <a class="filterItem" asp-action="Index">Filter 3</a>
                     </div>
                 </div>
             </div>
         </div>
-
+        <div class="col-md-9">
+            @Html.Partial("_ProjectTaskList", Model)
+        </div>
     </div>
-</div>
+</form>

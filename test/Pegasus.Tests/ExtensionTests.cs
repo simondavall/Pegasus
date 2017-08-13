@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Pegasus.Extensions;
 using Xunit;
 
-namespace Tests
+namespace Pegasus.Tests
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Tests
