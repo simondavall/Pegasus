@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities;
+using Pegasus.Extensions;
 using Pegasus.Services;
 using Pegasus.ViewModels;
 using Pegasus.ViewModels.Home;
@@ -18,22 +20,25 @@ namespace Pegasus.Controllers
             _db = pegasusData;
         }
 
-        public IActionResult Index(int id)
+        public IActionResult Index()
         {
+            var projectId = GetProjectId(Request);
+            WriteCookie("Project.Id", projectId.ToString());
+
             IndexViewModel model = new IndexViewModel
             {
-                ProjectId = id,
-                ProjectTasks = ProjectTaskExt.Convert(id > 0 ? _db.GetTasks(id) : _db.GetAllTasks()),
+                ProjectId = projectId,
+                ProjectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks()),
                 Projects = _db.GetAllProjects(),
-                Project = id > 0 ? _db.GetProject(id) : new Project { Id = 0, Name = "All" }
+                Project = projectId > 0 ? _db.GetProject(projectId) : new Project { Id = 0, Name = "All" }
             };
 
-            return View("Index", model);
-        }
+            if (Request != null && Request.IsAjaxRequest())
+            {
+                return PartialView("_ProjectTaskList", model);
+            }
 
-        public IActionResult Details()
-        {
-            return View();
+            return View("Index", model);
         }
 
         public async Task<IActionResult> Create(int id)
@@ -60,7 +65,7 @@ namespace Pegasus.Controllers
             if (ModelState.IsValid)
             {
                 _db.AddTask(projectTask);
-                return RedirectToAction("Index", new { id = projectTask.ProjectId });
+                return RedirectToAction("Index");
             }
             var model = CreateTaskViewModel(projectTask, _db.GetProject(projectTask.ProjectId));
             model.ButtonText = model.Action = "Create";
@@ -88,7 +93,7 @@ namespace Pegasus.Controllers
             if (ModelState.IsValid)
             {
                 _db.UpdateTask(projectTask, existingTaskStatus);
-                return RedirectToAction("Index", new {id = projectTask.ProjectId});
+                return RedirectToAction("Index");
             }
 
             var project = _db.GetProject(projectTask.ProjectId);
@@ -143,5 +148,29 @@ namespace Pegasus.Controllers
                 };
         }
 
+        private int GetProjectId(HttpRequest request)
+        {
+            int projectId = 0;
+
+            if (request == null)
+                return projectId;
+
+            string fromRequest =  request.Query["Project.Id"];
+            if (!string.IsNullOrWhiteSpace(fromRequest) && int.TryParse(fromRequest, out projectId))
+                return projectId;
+
+            string fromCookie = request.Cookies["Project.Id"];
+            if (!string.IsNullOrWhiteSpace(fromCookie) && int.TryParse(fromCookie, out projectId))
+                return projectId;
+
+            return 0;
+        }
+
+        private void WriteCookie(string setting, string settingVaue)
+        {
+            //todo get expiry from config
+            CookieOptions options = new CookieOptions {Expires = new DateTimeOffset(DateTime.Now.AddDays(30))};
+            Response.Cookies.Append(setting, settingVaue, options);
+        }
     }
 }
