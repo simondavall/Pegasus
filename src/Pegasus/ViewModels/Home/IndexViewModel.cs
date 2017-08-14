@@ -8,5 +8,6 @@ namespace Pegasus.ViewModels.Home
         public IEnumerable<ProjectTaskExt> ProjectTasks { get; set; }
         public IEnumerable<Project> Projects { get; set; }
         public Project Project { get; set; }
+        public int TaskFilterId { get; set; }
     }
 }
