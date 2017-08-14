@@ -7,38 +7,39 @@
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <input id="projectId" type="hidden" asp-for="Project.Id" />
+                    <input id="projectId" type="hidden" asp-for="Project.Id"/>
                     <h4>Projects</h4>
                 </div>
                 <div class="panel-body project-list">
                     <div>
-                        <a class="project-list-item" asp-action="Index" value="0"><i class="project-list-icon fa fa-angle-right"></i>All</a>
+                        <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
                     </div>
                     @foreach (var project in Model.Projects)
-                {
-                    <div>
-                        <a class="project-list-item" asp-action="Index" value="@project.Id"><i class="project-list-icon fa fa-angle-right"></i>@project.Name</a>
-                    </div>
-                }
+                    {
+                        <div>
+                            <a class="project-list-item" asp-action="Index" value="@project.Id"><i class="fa fa-angle-right"></i>@project.Name</a>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4>Saved Searches</h4>
+                    <h4>Task Filters</h4>
                 </div>
+                <input id="taskFilterId" type="hidden" asp-for="TaskFilterId"/>
                 <div class="panel-body project-list">
                     <div>
-                        <a class="savedSearch" asp-action="Index">Open Tasks</a>
+                        <a class="task-filter" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All Tasks</a>
                     </div>
                     <div>
-                        <a class="savedSearch" asp-action="Index">Open & Submitted</a>
+                        <a class="task-filter" asp-action="Index" value="1"><i class="fa fa-angle-right"></i>Open Tasks</a>
                     </div>
                     <div>
-                        <a class="savedSearch" asp-action="Index">High Priority Only</a>
+                        <a class="task-filter" asp-action="Index" value="2"><i class="fa fa-angle-right"></i>High Priority</a>
                     </div>
                 </div>
             </div>
-            <div class="panel panel-default">
+            @*<div class="panel panel-default">
                 <div class="panel-heading">
                     <h4>Filters</h4>
                 </div>
@@ -53,7 +54,7 @@
                         <a class="filterItem" asp-action="Index">Filter 3</a>
                     </div>
                 </div>
-            </div>
+            </div>*@
         </div>
         <div class="col-md-9">
             @Html.Partial("_ProjectTaskList", Model)
