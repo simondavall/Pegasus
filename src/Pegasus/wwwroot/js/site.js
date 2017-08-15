@@ -25,7 +25,9 @@ $(function() {
     var taskFilterList = $(".task-filter");
     $(function () {
         $(projectListItems).find("i").addClass("hide");
-        $(projectListItems[currentSettings.projectId]).find("i").removeClass("hide");
+        $(projectListItems).filter(function() {
+            return $(this).attr("value") === currentSettings.projectId;
+        }).find("i").removeClass("hide");
         $(taskFilterList).find("i").addClass("hide");
         $(taskFilterList[currentSettings.taskFilterId]).find("i").removeClass("hide");
     });
