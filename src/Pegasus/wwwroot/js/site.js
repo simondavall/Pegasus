@@ -20,12 +20,6 @@ $(function() {
         setCreateIssueButton();
     });
 
-    //$(function () {
-    //    $("textarea").each(function () {
-    //        $(this).height($(this).prop("scrollHeight"));
-    //    });
-    //});
-
     // hide all sidebar icons, then show the selected sidebar icon
     var projectListItems = $(".project-list-item");
     var taskFilterList = $(".task-filter");
@@ -86,4 +80,9 @@ $(function() {
             .find("textarea").val($(taskComment).find("p").html());
     });
 
+    $(".body-content").on('click', ".comment-delete-button", function() {
+        $(this).prev().val(true);
+        updateList();
+    });
+    
 })

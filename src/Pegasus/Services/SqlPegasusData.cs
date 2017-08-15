@@ -106,7 +106,7 @@ namespace Pegasus.Services
 
         public IEnumerable<TaskComment> GetComments(int taskId)
         {
-            return _context.TaskComments.Where(c => c.TaskId == taskId).OrderBy(c => c.Created);
+            return _context.TaskComments.Where(c => c.TaskId == taskId && !c.IsDeleted).OrderBy(c => c.Created);
         }
 
         public void AddComment(TaskComment taskComment)

@@ -10,5 +10,6 @@ namespace Pegasus.Entities
         public string Comment { get; set; }
         public DateTime Created { get; set; }
         public int TaskId { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

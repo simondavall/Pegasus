@@ -86,6 +86,11 @@ namespace Pegasus.Controllers
             WriteCookie("Project.Id", projectTask.ProjectId.ToString());
             var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
 
+            if (Request != null && Request.IsAjaxRequest())
+            {
+                return PartialView("_EditTaskContent", model);
+            }
+
             return View(model);
         }
 
@@ -113,6 +118,7 @@ namespace Pegasus.Controllers
                 {
                     return RedirectToAction("Index");
                 }
+
                 return RedirectToAction("Edit", projectTask.Id);
             }
 

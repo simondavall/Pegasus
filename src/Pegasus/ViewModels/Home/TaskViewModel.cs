@@ -31,7 +31,7 @@ namespace Pegasus.ViewModels.Home
                     Comments = args.Comments ?? args.PegasusData.GetComments(args.ProjectTask.Id),
                     ProjectTask = args.ProjectTask,
                     Project = args.Project ?? args.PegasusData.GetProject(args.ProjectTask.ProjectId),
-                    ExistingTaskStatus = args.ExistingStatusId,
+                    ExistingTaskStatus = args.ExistingStatusId != 0 ? args.ExistingStatusId : args.ProjectTask.TaskStatusId,
                     NewComment = args.NewComment
                 };
         }
