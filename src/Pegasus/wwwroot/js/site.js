@@ -20,6 +20,12 @@ $(function() {
         setCreateIssueButton();
     });
 
+    //$(function () {
+    //    $("textarea").each(function () {
+    //        $(this).height($(this).prop("scrollHeight"));
+    //    });
+    //});
+
     // hide all sidebar icons, then show the selected sidebar icon
     var projectListItems = $(".project-list-item");
     var taskFilterList = $(".task-filter");
@@ -61,6 +67,23 @@ $(function() {
     $(".body-content").on("click", ".task-filter", function () {
         sidebarAction($(this), $("#taskFilterId"), $(taskFilterList));
         return false;
+    });
+
+    $(".body-content").on('click', ".comment-edit-button", function () {
+        $(this).addClass("hide").next().removeClass("hide");
+        var editSection = $(this).parents(".edit-comment-section");
+        $(editSection).find(".task-comment").addClass("hide").next().removeClass("hide");
+        $(".task-comment-text").each(function () {
+            $(this).css("height", "auto").css("height", this.scrollHeight + this.offsetHeight);
+        });
+    });
+    $(".body-content").on('click', ".comment-cancel-button", function () {
+        $(this).addClass("hide").prev().removeClass("hide");
+        var editSection = $(this).parents(".edit-comment-section");
+        var taskComment = $(editSection).find(".task-comment");
+
+        $(taskComment).removeClass("hide").next().addClass("hide")
+            .find("textarea").val($(taskComment).find("p").html());
     });
 
 })

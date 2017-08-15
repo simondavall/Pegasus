@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities;
-using Pegasus.Services;
 
 namespace Pegasus.ViewModels.Home
 {
@@ -12,29 +12,27 @@ namespace Pegasus.ViewModels.Home
         public IEnumerable<SelectListItem> TaskTypes { get; set; }
         public IEnumerable<SelectListItem> TaskPriorities { get; set; }
         public Project Project { get; set; }
-        public string FixedInRelease { get; set; }
-        public string Action { get; set; }
-        public string ButtonText { get; set; }
+        public IEnumerable<TaskComment> Comments { get; set; }
+        [Display(Name="Add Comment")]
+        [DataType(DataType.MultilineText)]
+        public string NewComment { get; set; }
 
         public int ExistingTaskStatus { get; set; }
 
-        public static TaskViewModel Create(IPegasusData db, ProjectTask projectTask, Project project)
-        {
-            return Create(db, projectTask, project, projectTask.TaskStatusId);
-        }
-
-        public static TaskViewModel Create(IPegasusData db, ProjectTask projectTask, Project project, int existingTaskStatus)
+        public static TaskViewModel Create(TaskViewModelArgs args)
         {
             return
                 new TaskViewModel
                 {
-                    ProjectId = projectTask.ProjectId,
-                    TaskTypes = new SelectList(db.GetAllTaskTypes(), "Id", "Name", 1),
-                    TaskStatuses = new SelectList(db.GetAllTaskStatuses(), "Id", "Name", 1),
-                    TaskPriorities = new SelectList(db.GetAllTaskPriorities(), "Id", "Name", 1),
-                    ProjectTask = projectTask,
-                    Project = project,
-                    ExistingTaskStatus = existingTaskStatus
+                    ProjectId = args.ProjectTask.ProjectId,
+                    TaskTypes = new SelectList(args.PegasusData.GetAllTaskTypes(), "Id", "Name", 1),
+                    TaskStatuses = new SelectList(args.PegasusData.GetAllTaskStatuses(), "Id", "Name", 1),
+                    TaskPriorities = new SelectList(args.PegasusData.GetAllTaskPriorities(), "Id", "Name", 1),
+                    Comments = args.Comments ?? args.PegasusData.GetComments(args.ProjectTask.Id),
+                    ProjectTask = args.ProjectTask,
+                    Project = args.Project ?? args.PegasusData.GetProject(args.ProjectTask.ProjectId),
+                    ExistingTaskStatus = args.ExistingStatusId,
+                    NewComment = args.NewComment
                 };
         }
     }

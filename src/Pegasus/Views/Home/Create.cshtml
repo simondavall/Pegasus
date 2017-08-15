@@ -4,7 +4,7 @@
     ViewData["Title"] = "Task";
 }
 
-<form asp-action="Edit">
+<form asp-action="Create">
     <div class="form-horizontal">
         <h3>@Model.Project.Name Task</h3>
         <hr />
@@ -36,18 +36,9 @@
                     </div>
                 </div>
                 
-                @Html.Partial("_CommentList", Model.Comments.ToList())
-
-                <div class="form-group">
-                    <label asp-for="@Model.NewComment" class="col-md-2 control-label"></label>
-                    <div class="col-md-8">
-                        <input type="text" asp-for="@Model.NewComment" class="form-control form-no-max-control"/>
-                        <span asp-validation-for="@Model.NewComment" class="text-danger"></span>
-                    </div>
-                </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Update" class="btn btn-primary" />
+                        <input type="submit" value="Create" class="btn btn-primary" />
                     </div>
                 </div>
             </div>

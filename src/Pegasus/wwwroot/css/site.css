@@ -55,6 +55,20 @@ html {
 .project-list i {
     padding-right: 4px;
 }
+.task-comment {
+    font-size: 11px;
+    padding-left: 12px;
+}
+/*.task-comment textarea {
+    border: 0;
+    resize: none;
+    box-shadow: none;
+}*/
+.task-comment-date {
+    padding-left: 12px;
+    color: #8c8c8c;
+    font-size: 11px;
+}
 
 .task-completed-strike a {
     color: lightgrey;
