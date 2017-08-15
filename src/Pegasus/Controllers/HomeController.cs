@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -57,12 +58,11 @@ namespace Pegasus.Controllers
                 ProjectId = projectId,
                 TaskRef = await _db.GetNextTaskRef(projectId, project.ProjectPrefix)
             };
-            var model = TaskViewModel.Create(_db, projectTask, project);
+            var model = TaskViewModel.Create(new TaskViewModelArgs {PegasusData = _db, ProjectTask = projectTask, Project = project});
 
             model.ProjectTask = projectTask;
-            model.ButtonText = model.Action = "Create";
 
-            return View("Edit", model);
+            return View(model);
         }
 
         [HttpPost]
@@ -75,39 +75,63 @@ namespace Pegasus.Controllers
                 _db.AddTask(projectTask);
                 return RedirectToAction("Index");
             }
-            var model = TaskViewModel.Create(_db, projectTask, _db.GetProject(projectTask.ProjectId));
-            model.ButtonText = model.Action = "Create";
+            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
 
-            return View("Edit", model);
+            return View(model);
         }
 
         public IActionResult Edit(int id)
         {
             var projectTask = _db.GetTask(id);
-            var project = _db.GetProject(projectTask.ProjectId);
+            WriteCookie("Project.Id", projectTask.ProjectId.ToString());
+            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
 
-            var model = TaskViewModel.Create(_db, projectTask, project);
-            model.Action = "Edit";
-            model.ButtonText = "Update";
+            if (Request != null && Request.IsAjaxRequest())
+            {
+                return PartialView("_EditTaskContent", model);
+            }
 
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask, int existingTaskStatus)
+        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask, 
+            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskComment> comments)
         {
-            projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
+                projectTask.Modified = DateTime.Now;
                 _db.UpdateTask(projectTask, existingTaskStatus);
-                return RedirectToAction("Index");
+                _db.UpdateComments(comments);
+                if (!string.IsNullOrWhiteSpace(newComment))
+                {
+                    _db.AddComment(
+                        new TaskComment
+                        {
+                            Comment = newComment,
+                            Created = DateTime.Now,
+                            TaskId = projectTask.Id
+                        });
+                }
+                if (projectTask.IsClosed && projectTask.TaskStatusId != existingTaskStatus)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                return RedirectToAction("Edit", projectTask.Id);
             }
 
-            var project = _db.GetProject(projectTask.ProjectId);
-            var model = TaskViewModel.Create(_db, projectTask, project, existingTaskStatus);
-            model.Action = "Edit";
-            model.ButtonText = "Update";
+            var taskViewModelArgs =
+                new TaskViewModelArgs
+                {
+                    PegasusData = _db,
+                    ProjectTask = projectTask,
+                    ExistingStatusId = existingTaskStatus,
+                    Comments = comments,
+                    NewComment = newComment
+                };
+            var model = TaskViewModel.Create(taskViewModelArgs);
 
             return View(model);
         }

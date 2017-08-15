@@ -25,6 +25,7 @@ namespace Pegasus.Services
         IEnumerable<TaskComment> GetComments(int taskId);
         void AddComment(TaskComment taskComment);
         void UpdateComment(TaskComment taskComment);
+        void UpdateComments(IEnumerable<TaskComment> taskComments);
 
         IEnumerable<TaskStatus> GetAllTaskStatuses();
         void AddTaskStatus(TaskStatus taskStatus);

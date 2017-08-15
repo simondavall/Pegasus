@@ -106,7 +106,7 @@ namespace Pegasus.Services
 
         public IEnumerable<TaskComment> GetComments(int taskId)
         {
-            return _context.TaskComments.Where(c => c.TaskId == taskId).OrderByDescending(c => c.Created);
+            return _context.TaskComments.Where(c => c.TaskId == taskId && !c.IsDeleted).OrderBy(c => c.Created);
         }
 
         public void AddComment(TaskComment taskComment)
@@ -121,7 +121,16 @@ namespace Pegasus.Services
             _context.SaveChanges();
         }
 
-// All other queries
+        public void UpdateComments(IEnumerable<TaskComment> taskComments)
+        {
+            foreach (var taskComment in taskComments)
+            {
+                _context.TaskComments.Update(taskComment);
+            }
+            _context.SaveChanges();
+        }
+
+        // All other queries
 
         public IEnumerable<TaskStatus> GetAllTaskStatuses()
         {
