@@ -17,18 +17,6 @@ textarea {
     max-width: 280px;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"]
-{
-    width: 100%;
-}
-
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
   /* Hide captions */
@@ -38,12 +26,84 @@ textarea {
 }
 
 /* Actual site css*/
+html {
+    overflow-y: scroll;
+}
+
+.body-content {
+    padding-top: 20px;
+}
+
+.edit-task {
+    margin-top: 15px;
+}
+
+.form-control {
+    font-size: 12px;
+}
+.form-no-max-control {
+    max-width: 100%;
+}
+.form-small-control {
+    width: 75px;
+}
 
 .table-row-condensed {
     height: 20px;
     overflow: hidden;
 }
-
 .table-font-sm {
     font-size: 0.9em
+}
+.priority-icon-4 {
+    color: orange;
+}
+.priority-icon-5 {
+    color: red;
+}
+.priority-icon-closed {
+    color: lightgrey;
+}
+
+.project-list i {
+    padding-right: 4px;
+}
+.task-comment {
+    font-size: 11px;
+    padding-left: 12px;
+}
+/*.task-comment textarea {
+    border: 0;
+    resize: none;
+    box-shadow: none;
+}*/
+.task-comment-date {
+    padding-left: 12px;
+    color: #8c8c8c;
+    font-size: 11px;
+}
+
+.task-completed-strike a {
+    color: lightgrey;
+    text-decoration: line-through;
+}
+.task-completed a {
+    color: lightgrey;
+}
+.task-completed {
+    color: lightgrey;
+}
+.task-in-progress a {
+    color: #337ab7;
+}
+
+.task-list {
+    min-height: 400px;
+}
+.task-list i {
+    padding-right: 6px;
+}
+
+.task-time {
+    text-align: right;
 }

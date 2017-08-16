@@ -1,28 +1,45 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Pegasus.Entities;
+using TaskStatus = Pegasus.Entities.TaskStatus;
 
 namespace Pegasus.Services
 {
     public interface IPegasusData
     {
-        IEnumerable<Project> GetAllProjects();
+        IQueryable<Project> GetAllProjects();
+        Project GetProject(int id);
+        Task<Project> GetProjectAsync(int? id);
+        void AddProject(Project project);
+        Task AddProjectAsync(Project project);
+        void UpdateProject(Project project);
+        Task UpdateProjectAsync(Project project);
+        Task DeleteProjectAsync(Project project);
+
         IEnumerable<ProjectTask> GetAllTasks();
-        IEnumerable<TaskComment> GetAllComments();
-
-        Project GeProject(int id);
-        Project AddProject(Project project);
-
         ProjectTask GetTask(int id);
         IEnumerable<ProjectTask> GetTasks(int projectId);
-        ProjectTask AddTask(ProjectTask projectTask);
+        void AddTask(ProjectTask projectTask);
+        void UpdateTask(ProjectTask projectTask, int existingTaskStatus);
+
+        Task<string> GetNextTaskRef(int projectId, string projectPrefix);
+        void AddTaskIndexer(ProjectTaskIndexer projectTaskIndexer);
+        Task AddTaskIndexerAsync(ProjectTaskIndexer projectTaskIndexer);
 
         TaskComment GetComment(int id);
         IEnumerable<TaskComment> GetComments(int taskId);
-        TaskComment AddComment(TaskComment taskComment);
+        void AddComment(TaskComment taskComment);
+        void UpdateComment(TaskComment taskComment);
+        void UpdateComments(IEnumerable<TaskComment> taskComments);
 
-        TaskStatus AddTaskStatus(TaskStatus taskStatus);
-        TaskType AddTaskType(TaskType taskType);
+        IEnumerable<TaskStatus> GetAllTaskStatuses();
+        void AddTaskStatus(TaskStatus taskStatus);
 
-        TaskStatusHistory AddStatusHistory(TaskStatusHistory statusHistory);
+        IEnumerable<TaskType> GetAllTaskTypes();
+        void AddTaskType(TaskType taskType);
+
+        IEnumerable<TaskPriority> GetAllTaskPriorities();
+        void AddTaskPriority(TaskPriority taskPriority);
     }
 }

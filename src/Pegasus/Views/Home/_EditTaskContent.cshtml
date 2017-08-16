@@ -1,0 +1,83 @@
+@model Pegasus.ViewModels.Home.TaskViewModel
+
+<div id="editTaskContent" class="row">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="ProjectTask.ProjectId" />
+    <input type="hidden" asp-for="ProjectTask.Id" />
+    <input type="hidden" asp-for="ProjectTask.Created" />
+    <input type="hidden" asp-for="ExistingTaskStatus" value="@Model.ExistingTaskStatus" />
+    <div class="col-sm-9">
+        <div class="form-group">
+            <label asp-for="ProjectTask.TaskRef" class="col-md-2 control-label"></label>
+            <div class="col-md-2">
+                <input asp-for="ProjectTask.TaskRef" class="form-control" readonly/>
+                <span asp-validation-for="ProjectTask.TaskRef" class="text-danger"></span>
+            </div>
+
+            <label asp-for="ProjectTask.Name" class="col-md-1 control-label"></label>
+            <div class="col-md-7">
+                <input asp-for="ProjectTask.Name" class="form-control form-no-max-control"/>
+                <span asp-validation-for="ProjectTask.Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectTask.Description" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea rows="5" asp-for="ProjectTask.Description" class="form-control form-no-max-control"></textarea>
+                <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
+            </div>
+        </div>
+
+        @Html.Partial("_CommentList", Model.Comments.ToList())
+
+        <div class="form-group">
+            <label asp-for="@Model.NewComment" class="col-md-2 control-label"></label>
+            <div class="col-md-8">
+                <textarea rows="3" asp-for="@Model.NewComment" class="form-control form-no-max-control"></textarea>
+                <span asp-validation-for="@Model.NewComment" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="editTaskButton" type="submit" value="Update" class="btn btn-primary"/>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="form-group">
+            <label class="col-md-4 control-label">Project</label>
+            <div class="col-md-8">
+                <input asp-for="Project.Name" class="form-control" readonly/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectTask.TaskPriorityId" class="col-md-4 control-label"></label>
+            <div class="col-md-8">
+                @Html.DropDownListFor(m => m.ProjectTask.TaskPriorityId, Model.TaskPriorities, new {@class = "form-control"})
+                <span asp-validation-for="ProjectTask.TaskPriorityId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectTask.TaskTypeId" class="col-md-4 control-label"></label>
+            <div class="col-md-8">
+                @Html.DropDownListFor(m => m.ProjectTask.TaskTypeId, Model.TaskTypes, new {@class = "form-control"})
+                <span asp-validation-for="ProjectTask.TaskTypeId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectTask.TaskStatusId" class="col-md-4 control-label"></label>
+            <div class="col-md-8">
+                @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new {@class = "form-control"})
+                <span asp-validation-for="ProjectTask.TaskStatusId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectTask.FixedInRelease" class="col-md-4 control-label"></label>
+            <div class="col-md-8">
+                <input asp-for="ProjectTask.FixedInRelease" class="form-control"/>
+                <span asp-validation-for="ProjectTask.FixedInRelease" class="text-danger"></span>
+            </div>
+        </div>
+
+    </div>
+</div>

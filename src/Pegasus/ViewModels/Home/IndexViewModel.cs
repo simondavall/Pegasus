@@ -1,14 +1,23 @@
 ﻿using System.Collections.Generic;
 using Pegasus.Entities;
-using TaskStatus = Pegasus.Entities.TaskStatus;
 
 namespace Pegasus.ViewModels.Home
 {
-    public class IndexViewModel
+    public class IndexViewModel : BaseViewModel
     {
-        public IEnumerable<ProjectTask> ProjectTasks { get; set; }
+        private readonly IEnumerable<ProjectTaskExt> _projectTasks;
+
+        public IndexViewModel(IEnumerable<ProjectTaskExt> projectTasks)
+        {
+            _projectTasks = projectTasks;
+        }
+
         public IEnumerable<Project> Projects { get; set; }
-        public IEnumerable<TaskStatus> TaskStatuses { get; set; }
-        public IEnumerable<TaskType> TaskTypes { get; set; }
+        public Project Project { get; set; }
+        public int TaskFilterId { get; set; }
+
+        public IEnumerable<ProjectTaskExt> ProjectTasks => _projectTasks.FilteredProjects(TaskFilterId);
     }
+
+    
 }

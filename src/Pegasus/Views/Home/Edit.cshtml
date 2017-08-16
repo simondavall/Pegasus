@@ -1,0 +1,16 @@
+@model Pegasus.ViewModels.Home.TaskViewModel
+
+@{
+    ViewData["Title"] = "Task";
+}
+
+<form asp-action="Edit" data-pgs-ajax="true" data-pgs-target="#editTaskContent">
+    <div class="edit-task form-horizontal">
+        @Html.Partial("_EditTaskContent", Model)
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

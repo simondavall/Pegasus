@@ -23,6 +23,8 @@ namespace Pegasus.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("ProjectPrefix");
+
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
@@ -37,11 +39,15 @@ namespace Pegasus.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<string>("FixedInRelease");
+
                     b.Property<DateTime>("Modified");
 
                     b.Property<string>("Name");
 
                     b.Property<int>("ProjectId");
+
+                    b.Property<int>("TaskPriorityId");
 
                     b.Property<string>("TaskRef");
 
@@ -54,6 +60,20 @@ namespace Pegasus.Migrations
                     b.ToTable("ProjectTasks");
                 });
 
+            modelBuilder.Entity("Pegasus.Entities.ProjectTaskIndexer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("NextIndex");
+
+                    b.Property<int>("ProjectId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskIndexers");
+                });
+
             modelBuilder.Entity("Pegasus.Entities.TaskComment", b =>
                 {
                     b.Property<int>("Id")
@@ -63,11 +83,27 @@ namespace Pegasus.Migrations
 
                     b.Property<DateTime>("Created");
 
+                    b.Property<bool>("IsDeleted");
+
                     b.Property<int>("TaskId");
 
                     b.HasKey("Id");
 
                     b.ToTable("TaskComments");
+                });
+
+            modelBuilder.Entity("Pegasus.Entities.TaskPriority", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("DisplayOrder");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskPriorities");
                 });
 
             modelBuilder.Entity("Pegasus.Entities.TaskStatus", b =>

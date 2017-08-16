@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -17,25 +15,24 @@ namespace Pegasus.Entities
         public DbSet<TaskStatusHistory> StatusHistory { get; set; }
         public DbSet<TaskStatus> TaskStatus { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
+        public DbSet<ProjectTaskIndexer> TaskIndexers { get; set; }
+        public DbSet<TaskPriority> TaskPriorities { get; set; }
 
         // The following is required for migrations
         public PegasusDbContext() /* Required for migrations */{ }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (optionsBuilder.IsConfigured) return;
-
-            //Called by parameterless ctor Usually Migrations
-            var environmentName = Environment.GetEnvironmentVariable("EnvironmentName") ?? "local";
-
-            //optionsBuilder.UseSqlServer(
-            //    new ConfigurationBuilder()
-            //        .SetBasePath(Path.GetDirectoryName(GetType().GetTypeInfo().Assembly.Location))
-            //        .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
-            //        .Build()
-            //        .GetConnectionString("Pegasus")
-            //);
-            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=Pegasus;Trusted_Connection=True;MultipleActiveResultSets=true");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(
+                    new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                        .Build()
+                        .GetConnectionString("Pegasus")
+                );
+            }
         }
     }
 }

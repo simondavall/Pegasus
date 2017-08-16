@@ -1,109 +1,50 @@
-﻿@using Pegasus.Extensions
-@model Pegasus.ViewModels.Home.IndexViewModel
+﻿@model Pegasus.ViewModels.Home.IndexViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="row">
-    <div class="col-md-3">
-        <div class="section">
-            <h4>Projects</h4>
-            <ul>
-                @foreach (var project in Model.Projects)
-                {
-                    <li>@project.Name</li>
-                }
-                <li>Pegasus</li>
-                <li>Hereford Securities Ltd</li>
-                <li>Project 3</li>
-            </ul>
+<form method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
+    <div class="row task-list">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <input id="projectId" type="hidden" asp-for="Project.Id"/>
+                    <h4>Projects</h4>
+                </div>
+                <div class="panel-body project-list">
+                    <div>
+                        <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
+                    </div>
+                    @foreach (var project in Model.Projects)
+                    {
+                        <div>
+                            <a class="project-list-item" asp-action="Index" value="@project.Id"><i class="fa fa-angle-right"></i>@project.Name</a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Task Filters</h4>
+                </div>
+                <input id="taskFilterId" type="hidden" asp-for="TaskFilterId"/>
+                <div class="panel-body project-list">
+                    <div>
+                        <a class="task-filter" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All Tasks</a>
+                    </div>
+                    <div>
+                        <a class="task-filter" asp-action="Index" value="1"><i class="fa fa-angle-right"></i>Open Tasks</a>
+                    </div>
+                    <div>
+                        <a class="task-filter" asp-action="Index" value="2"><i class="fa fa-angle-right"></i>High Priority</a>
+                    </div>
+                    <div>
+                        <a class="task-filter" asp-action="Index" value="3"><i class="fa fa-angle-right"></i>Obsolete Tasks</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="section">
-            <h4>Saved Searches</h4>
-            <ul>
-                <li>Pegasus</li>
-                <li>Hereford Securities Ltd</li>
-                <li>Project 3</li>
-            </ul>
-        </div>
-        <div class="section">
-            <h4>Filters</h4>
-            <ul>
-                <li>Pegasus</li>
-                <li>Hereford Securities Ltd</li>
-                <li>Project 3</li>
-            </ul>
-        </div>
-    </div>
-    <div class="col-md-9">
-        <div class="section table-font-sm">
-        <div class="table-responsive">
-
-            <table class="table table-striped table-condensed table-hover">
-
-                <tbody>
-                @foreach (var task in Model.ProjectTasks)
-                {
-                    <tr>
-                        <td>
-                            <div class="table-row-condensed">
-                                @Html.ActionLink(task.TaskRef, "Edit", "ProjectTasks", new { id = @task.Id })
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="table-row-condensed">
-                                @Html.ActionLink(@task.Name, "Edit", "ProjectTasks", new {id = @task.Id})
-                            </div>
-                        </td>
-                        <td>
-                            <div class="table-row-condensed">
-                                @task.Modified.ToTaskDate()
-                            </div>
-                        </td>
-                    </tr>
-                }
-                <tr>
-                    <td>
-                        <div class="table-row-condensed">
-                            PGS-1
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="table-row-condensed">
-                            Add initial project framework
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="table-row-condensed">
-                            17:12
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="table-row-condensed">
-                            PGS-2
-                        </div>
-                    </td>
-                    <td>
-                        <div class="table-row-condensed">
-                            Style task table
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="table-row-condensed">
-                            Aug 7
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="col-md-9">
+            @Html.Partial("_ProjectTaskList", Model)
         </div>
     </div>
-
-    </div>
-</div>
+</form>
