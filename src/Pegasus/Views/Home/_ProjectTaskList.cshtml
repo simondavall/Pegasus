@@ -21,7 +21,12 @@
                                         </span>
                                     </div>
                                 </td>
-
+                                <td class="fa-fw">
+                                    @if (!string.IsNullOrWhiteSpace(task.PriorityIconClass))
+                                    {
+                                        <span><i class="fa fa-bolt @task.PriorityIconClass"></i></span>
+                                    }
+                                </td>
                                 <td>
                                     <div class="table-row-condensed">
                                         <span class="@task.TaskProfile.TaskTextStyle">
