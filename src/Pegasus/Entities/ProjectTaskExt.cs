@@ -25,6 +25,22 @@ namespace Pegasus.Entities
 
         public ITaskProfile TaskProfile { get; set; }
 
+        public string PriorityIconClass
+        {
+            get
+            {
+                if (TaskPriorityId > 3)
+                {
+                    if (IsClosed)
+                    {
+                        return "priority-icon-closed";
+                    }
+                    return $"priority-icon-{TaskPriorityId.ToString().ToLower()}";
+                }
+                return string.Empty;
+            }
+        }
+
         /// <summary>
         /// Convert a list of ProjectTask to a list of ProjectTaskExt 
         /// </summary>

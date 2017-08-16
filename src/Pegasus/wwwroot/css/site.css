@@ -55,6 +55,15 @@ html {
 .table-font-sm {
     font-size: 0.9em
 }
+.priority-icon-4 {
+    color: orange;
+}
+.priority-icon-5 {
+    color: red;
+}
+.priority-icon-closed {
+    color: lightgrey;
+}
 
 .project-list i {
     padding-right: 4px;
