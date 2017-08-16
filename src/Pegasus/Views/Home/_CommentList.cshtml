@@ -8,7 +8,6 @@
             <input type="hidden" asp-for="@Model[i].TaskId" />
             <input type="hidden" asp-for="@Model[i].Created"/>
             <div class="comment-edit-buttons pull-right btn-group-xs">
-
                 <a class="btn btn-xs comment-edit-button"><i class="fa fa-pencil"></i></a>
                 <a class="btn btn-xs comment-cancel-button hide"><i class="fa fa-times"></i></a>
                 <input type="hidden" asp-for="@Model[i].IsDeleted"/>
@@ -20,12 +19,10 @@
             <div class="task-comment">
                 <p>@Html.Raw(Model[i].Comment.Replace(Environment.NewLine, "<br/>"))</p>
             </div>
-            <div class="hide">
+            <div class="task-comment-edit hide">
                 <textarea data-autoresize rows="1" asp-for="@Model[i].Comment" class="task-comment-text form-control form-no-max-control"></textarea>
                 <span asp-validation-for="@Model[i].Comment" class="text-danger"></span>
             </div>
         </div>
-
     }
-
 </div>

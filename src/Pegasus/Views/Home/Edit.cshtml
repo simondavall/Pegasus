@@ -5,10 +5,7 @@
 }
 
 <form asp-action="Edit" data-pgs-ajax="true" data-pgs-target="#editTaskContent">
-    <div class="form-horizontal">
-        <h3>@Model.Project.Name Task</h3>
-        <hr />
-
+    <div class="edit-task form-horizontal">
         @Html.Partial("_EditTaskContent", Model)
     </div>
 </form>

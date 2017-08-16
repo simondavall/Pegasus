@@ -82,11 +82,6 @@
             @:<a asp-action="Delete" asp-route-id="@@item.@pkName">Delete</a>
         @:</div>
         @:</td>
-        @:<td>
-        @:<div class="table-row-condensed">
-            @pkName
-        @:</div>
-        @:</td>
     }
     else
     {
@@ -111,6 +106,12 @@
             </div>
         </td>
     }
+
+    <td>
+        <div class="table-row-condensed">
+            @@Html.DisplayFor(modelItem => item.Id)
+        </div>
+    </td>
 
     foreach (PropertyMetadata property in properties)
     {

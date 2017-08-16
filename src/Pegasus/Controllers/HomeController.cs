@@ -24,10 +24,12 @@ namespace Pegasus.Controllers
         public IActionResult Index()
         {
             var projectId = GetSettingId(Request, "Project.Id");
-            WriteCookie("Project.Id", projectId.ToString());
 
             var taskFilterId = GetSettingId(Request, "taskFilterId");
             WriteCookie("taskFilterId", taskFilterId.ToString());
+
+            Project project = _db.GetProject(projectId) ?? new Project {Id = 0, Name = "All"};
+            WriteCookie("Project.Id", projectId.ToString());
 
             IndexViewModel model = new IndexViewModel
             {
@@ -35,7 +37,7 @@ namespace Pegasus.Controllers
                 TaskFilterId = taskFilterId,
                 ProjectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks()),
                 Projects = _db.GetAllProjects(),
-                Project = projectId > 0 ? _db.GetProject(projectId) : new Project { Id = 0, Name = "All" }
+                Project = project
             };
 
             Func<ProjectTaskExt, bool> whereClause = SetWhereClause(taskFilterId);

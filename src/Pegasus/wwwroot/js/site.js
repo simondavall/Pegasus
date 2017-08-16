@@ -66,25 +66,24 @@ $(function() {
     });
 
     $(".body-content").on('click', ".comment-edit-button", function () {
-        $(this).addClass("hide").next().removeClass("hide");
+        $(this).addClass("hide").siblings(".comment-cancel-button").removeClass("hide");
         var editSection = $(this).parents(".edit-comment-section");
-        $(editSection).find(".task-comment").addClass("hide").next().removeClass("hide");
+        $(editSection).find(".task-comment").addClass("hide");
+        $(editSection).find(".task-comment-edit").removeClass("hide");
         $(".task-comment-text").each(function () {
             $(this).css("height", "auto").css("height", this.scrollHeight + this.offsetHeight);
         });
     });
     $(".body-content").on('click', ".comment-cancel-button", function () {
-        $(this).addClass("hide").prev().removeClass("hide");
+        $(this).addClass("hide").siblings(".comment-edit-button").removeClass("hide");
         var editSection = $(this).parents(".edit-comment-section");
         var taskComment = $(editSection).find(".task-comment");
-
-        $(taskComment).removeClass("hide").next().addClass("hide")
+        $(taskComment).removeClass("hide").siblings(".task-comment-edit").addClass("hide")
             .find("textarea").val($(taskComment).find("p").html());
     });
 
     $(".body-content").on('click', ".comment-delete-button", function() {
-        $(this).prev().val(true);
+        $(this).siblings("input").val(true);
         updateList();
     });
-    
 })
