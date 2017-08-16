@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,20 +27,19 @@ namespace Pegasus.Controllers
             var taskFilterId = GetSettingId(Request, "taskFilterId");
             WriteCookie("taskFilterId", taskFilterId.ToString());
 
-            Project project = _db.GetProject(projectId) ?? new Project {Id = 0, Name = "All"};
+            Project project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
             WriteCookie("Project.Id", projectId.ToString());
 
-            IndexViewModel model = new IndexViewModel
-            {
-                ProjectId = projectId,
-                TaskFilterId = taskFilterId,
-                ProjectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks()),
-                Projects = _db.GetAllProjects(),
-                Project = project
-            };
+            var projectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks());
 
-            Func<ProjectTaskExt, bool> whereClause = SetWhereClause(taskFilterId);
-            model.ProjectTasks = model.ProjectTasks.Where(whereClause);
+            IndexViewModel model =
+                new IndexViewModel(projectTasks)
+                {
+                    ProjectId = projectId,
+                    TaskFilterId = taskFilterId,
+                    Projects = _db.GetAllProjects(),
+                    Project = project
+                };
 
             if (Request != null && Request.IsAjaxRequest())
             {
@@ -60,7 +58,7 @@ namespace Pegasus.Controllers
                 ProjectId = projectId,
                 TaskRef = await _db.GetNextTaskRef(projectId, project.ProjectPrefix)
             };
-            var model = TaskViewModel.Create(new TaskViewModelArgs {PegasusData = _db, ProjectTask = projectTask, Project = project});
+            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask, Project = project });
 
             model.ProjectTask = projectTask;
 
@@ -98,7 +96,7 @@ namespace Pegasus.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask, 
+        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask,
             int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskComment> comments)
         {
             if (ModelState.IsValid)
@@ -142,7 +140,7 @@ namespace Pegasus.Controllers
         {
             ViewData["Message"] = "Your application description page.";
 
-            var model = new BaseViewModel {ProjectId = 0};
+            var model = new BaseViewModel { ProjectId = 0 };
 
             return View(model);
         }
@@ -179,23 +177,11 @@ namespace Pegasus.Controllers
             return defaultReturnVal;
         }
 
-        private Func<ProjectTaskExt, bool> SetWhereClause(int taskFilterId)
-        {
-            switch (taskFilterId)
-            {
-                case 1:
-                    return pt => !pt.IsClosed;
-                case 2:
-                    return pt => pt.TaskPriorityId > 3;
-                default:
-                    return pt => true; 
-            }
-        }
 
         private void WriteCookie(string setting, string settingVaue)
         {
             //todo get expiry from config
-            CookieOptions options = new CookieOptions {Expires = new DateTimeOffset(DateTime.Now.AddDays(30))};
+            CookieOptions options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(30)) };
             Response.Cookies.Append(setting, settingVaue, options);
         }
 

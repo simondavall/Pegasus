@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Pegasus.Entities;
 using Project = Pegasus.Entities.Project;
@@ -129,7 +128,7 @@ namespace Pegasus.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteTasksAsync(int projectId)
+        private async Task DeleteTasksAsync(int projectId)
         {
             //todo turn this into an async call with ToListAsync() i.e. change return type to IQueryable
             var tasksToDelete = GetTasks(projectId).ToList();
