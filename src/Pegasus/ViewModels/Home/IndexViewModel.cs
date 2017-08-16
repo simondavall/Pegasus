@@ -5,9 +5,19 @@ namespace Pegasus.ViewModels.Home
 {
     public class IndexViewModel : BaseViewModel
     {
-        public IEnumerable<ProjectTaskExt> ProjectTasks { get; set; }
+        private readonly IEnumerable<ProjectTaskExt> _projectTasks;
+
+        public IndexViewModel(IEnumerable<ProjectTaskExt> projectTasks)
+        {
+            _projectTasks = projectTasks;
+        }
+
         public IEnumerable<Project> Projects { get; set; }
         public Project Project { get; set; }
         public int TaskFilterId { get; set; }
+
+        public IEnumerable<ProjectTaskExt> ProjectTasks => _projectTasks.FilteredProjects(TaskFilterId);
     }
+
+    
 }
