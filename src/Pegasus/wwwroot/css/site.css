@@ -34,6 +34,10 @@ html {
     padding-top: 20px;
 }
 
+.edit-task {
+    margin-top: 15px;
+}
+
 .form-control {
     font-size: 12px;
 }

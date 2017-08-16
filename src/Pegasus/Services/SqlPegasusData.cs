@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Pegasus.Entities;
+using Project = Pegasus.Entities.Project;
 using TaskStatus = Pegasus.Entities.TaskStatus;
 
 namespace Pegasus.Services
@@ -17,7 +20,7 @@ namespace Pegasus.Services
 
  // Project related queries
    
-        public IEnumerable<Project> GetAllProjects()
+        public IQueryable<Project> GetAllProjects()
         {
             return _context.Projects;
         }
@@ -27,10 +30,27 @@ namespace Pegasus.Services
             _context.Projects.Update(project);
             _context.SaveChanges();
         }
+        public async Task UpdateProjectAsync(Project project)
+        {
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteProjectAsync(Project project)
+        {
+            _context.TaskIndexers.RemoveRange(_context.TaskIndexers.Where(ti => ti.ProjectId == project.Id));
+            await DeleteTasksAsync(project.Id);
+            _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+        }
 
         public Project GetProject(int id)
         {
             return _context.Projects.FirstOrDefault(p => p.Id == id);
+        }
+        public async Task<Project> GetProjectAsync(int? id)
+        {
+            return await _context.Projects.SingleOrDefaultAsync(p => p.Id == id);
         }
 
         public void AddProject(Project project)
@@ -39,6 +59,13 @@ namespace Pegasus.Services
             _context.SaveChanges();
             AddTaskIndexer(new ProjectTaskIndexer {NextIndex = 1, ProjectId = project.Id});
         }
+        public async Task AddProjectAsync(Project project)
+        {
+            _context.Projects.Add(project);
+            await _context.SaveChangesAsync();
+            await AddTaskIndexerAsync(new ProjectTaskIndexer { NextIndex = 1, ProjectId = project.Id });
+        }
+
 
 // Task related queries
 
@@ -96,8 +123,26 @@ namespace Pegasus.Services
             _context.TaskIndexers.Add(projectTaskIndexer);
             _context.SaveChanges();
         }
+        public async Task AddTaskIndexerAsync(ProjectTaskIndexer projectTaskIndexer)
+        {
+            _context.TaskIndexers.Add(projectTaskIndexer);
+            await _context.SaveChangesAsync();
+        }
 
-// Comment related queries
+        public async Task DeleteTasksAsync(int projectId)
+        {
+            //todo turn this into an async call with ToListAsync() i.e. change return type to IQueryable
+            var tasksToDelete = GetTasks(projectId).ToList();
+            foreach (var task in tasksToDelete)
+            {
+                _context.TaskComments.RemoveRange(GetComments(task.Id));
+                _context.StatusHistory.RemoveRange(await GetStatusHistory(task.Id).ToListAsync());
+            }
+            _context.ProjectTasks.RemoveRange(tasksToDelete);
+            await _context.SaveChangesAsync();
+        }
+
+        // Comment related queries
 
         public TaskComment GetComment(int id)
         {
@@ -175,6 +220,11 @@ namespace Pegasus.Services
             };
             _context.StatusHistory.Add(taskStatusHistory);
             _context.SaveChanges();
+        }
+
+        public IQueryable<TaskStatusHistory> GetStatusHistory(int taskId)
+        {
+            return _context.StatusHistory.Where(sh => sh.TaskId == taskId);
         }
     }
 }
