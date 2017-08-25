@@ -4,7 +4,7 @@
 }
 <form method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
     <div class="row task-list">
-        <div class="col-md-3">
+        <div class="col-sm-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <input id="projectId" type="hidden" asp-for="Project.Id"/>
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-sm-9">
             @Html.Partial("_ProjectTaskList", Model)
         </div>
     </div>
