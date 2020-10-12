@@ -1,0 +1,35 @@
+@model Pegasus.Entities.Project
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<form asp-action="Create">
+    <h3>New Project</h3>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Name" class="col-md-2 col-form-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProjectPrefix" class="col-md-2 col-form-label"></label>
+        <div class="col-md-10">
+            <input asp-for="ProjectPrefix" class="form-control" />
+            <span asp-validation-for="ProjectPrefix" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="offset-md-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
