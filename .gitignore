@@ -1,7 +1,8 @@
-.vs
+*.user
+/.vs
+obj
 bin
 
-obj
-/src/Pegasus/Pegasus.xproj.user
+/Pegasus/wwwroot/css/site.min.css
 
-builds
+/Pegasus/wwwroot/js/site.min.js
