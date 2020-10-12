@@ -12,5 +12,40 @@ namespace Pegasus.Extensions
             }
             return value.ToString("MMM dd");
         }
+
+        public static string LapsedTime(this DateTime value)
+        {
+            var timeNow = DateTime.Now.ToUniversalTime();
+            var lapsedTime = timeNow - value.ToUniversalTime();
+
+            if (lapsedTime < timeNow - timeNow.AddHours(-1))
+            {
+                return FormatLapsedTime(lapsedTime.Minutes, "min");
+            }
+            if (lapsedTime < timeNow - timeNow.AddDays(-1))
+            {
+                return FormatLapsedTime(lapsedTime.Hours, "hr");
+            }
+            if (lapsedTime < timeNow - timeNow.AddMonths(-1))
+            {
+                return FormatLapsedTime(lapsedTime.Days, "day");
+            }
+            if (lapsedTime < timeNow - timeNow.AddYears(-1))
+            {
+                return FormatLapsedTime(lapsedTime.ApproxMonths(), "mth");
+            }
+
+            return FormatLapsedTime(lapsedTime.ApproxYears(), "yr");
+        }
+
+        private static string FormatLapsedTime(int lapsedTime, string timeUnit)
+        {
+            return $"{lapsedTime} {timeUnit}{Pluralize(lapsedTime)}";
+        }
+
+        private static string Pluralize(int value)
+        {
+            return value > 1 ? "s" : string.Empty;
+        }
     }
 }
