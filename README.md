@@ -1,2 +1,2 @@
-# Pegasus
-Lightweight .Net Core Task Manager - Limited basic essential features - no bloat features.
+# Pegasus2
+Update of Pegasus to .Net Core 3.1
