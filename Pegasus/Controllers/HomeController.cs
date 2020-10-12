@@ -147,7 +147,7 @@ namespace Pegasus.Controllers
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "For more information, please contact:";
             var model = new BaseViewModel { ProjectId = 0 };
 
             return View(model);
