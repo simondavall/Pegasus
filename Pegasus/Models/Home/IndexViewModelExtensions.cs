@@ -16,7 +16,7 @@ namespace Pegasus.Models.Home
             return projectTasks.Where(pt => pt.TaskStatusId == (int)TaskStatusEnum.Obsolete);
         }
 
-        internal static IEnumerable<ProjectTaskExt> FilteredProjects(this IEnumerable<ProjectTaskExt> projectTasks, int taskFilterId)
+        internal static IEnumerable<ProjectTaskExt> Filtered(this IEnumerable<ProjectTaskExt> projectTasks, int taskFilterId)
         {
             switch (taskFilterId)
             {
