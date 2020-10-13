@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Pegasus.Entities;
+using Pegasus.Entities.Sorters.ProjectTask;
 
 namespace Pegasus.Models.Home
 {
@@ -14,10 +15,9 @@ namespace Pegasus.Models.Home
 
         public IEnumerable<Project> Projects { get; set; }
         public Project Project { get; set; }
+        public ISorter Sorter { get; set; } = new ModifiedDescSorter();
         public int TaskFilterId { get; set; }
 
-        public IEnumerable<ProjectTaskExt> ProjectTasks => _projectTasks.FilteredProjects(TaskFilterId);
+        public IEnumerable<ProjectTaskExt> ProjectTasks => _projectTasks.Filtered(TaskFilterId).Sorted(Sorter);
     }
-
-    
 }
