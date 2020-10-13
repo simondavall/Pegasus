@@ -29,7 +29,7 @@ namespace Pegasus.Entities
         {
             get
             {
-                if (TaskPriorityId > 3)
+                if (TaskPriorityId > (int)TaskPriorityEnum.Normal)
                 {
                     if (IsClosed)
                     {
