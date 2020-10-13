@@ -18,17 +18,13 @@ namespace Pegasus.Models.Home
 
         internal static IEnumerable<ProjectTaskExt> Filtered(this IEnumerable<ProjectTaskExt> projectTasks, int taskFilterId)
         {
-            switch (taskFilterId)
+            return (TaskFilters)taskFilterId switch
             {
-                case 1:
-                    return projectTasks.Where(pt => !pt.IsClosed).IsNotObsolete();
-                case 2:
-                    return projectTasks.Where(pt => pt.TaskPriorityId > 3).IsNotObsolete();
-                case 3:
-                    return projectTasks.IsObsolete();
-                default:
-                    return projectTasks.IsNotObsolete();
-            }
+                TaskFilters.Open => projectTasks.Where(pt => !pt.IsClosed).IsNotObsolete(),
+                TaskFilters.HighPriority => projectTasks.Where(pt => pt.TaskPriorityId > 3).IsNotObsolete(),
+                TaskFilters.Obsolete => projectTasks.IsObsolete(),
+                _ => projectTasks.IsNotObsolete()
+            };
         }
     }
 }
