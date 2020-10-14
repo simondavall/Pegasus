@@ -6,6 +6,6 @@
         Low,
         Normal,
         High,
-        Critiacal
+        Critical
     }
 }

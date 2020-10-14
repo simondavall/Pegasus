@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Pegasus.Domain;
 using Pegasus.Entities;
 using Pegasus.Extensions;
 using Pegasus.Models;
@@ -13,22 +14,26 @@ namespace Pegasus.Controllers
 {
     public class HomeController : Controller
     {
-        private IPegasusData _db;
+        private readonly IPegasusData _db;
+        private readonly Settings _settings;
+        private readonly Cookies _cookies;
 
-        public HomeController(IPegasusData pegasusData)
+        public HomeController(IPegasusData pegasusData, IConfiguration configuration)
         {
             _db = pegasusData;
+            _settings = new Settings(configuration);
+            _cookies = new Cookies(configuration);
         }
 
         public IActionResult Index()
         {
-            var projectId = GetSettingId(Request, "Project.Id");
+            var projectId = _settings.GetSetting(Request, "Project.Id");
 
-            var taskFilterId = GetSettingId(Request, "taskFilterId");
-            WriteCookie("taskFilterId", taskFilterId.ToString());
+            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
+            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
 
             Project project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
-            WriteCookie("Project.Id", projectId.ToString());
+            _cookies.WriteCookie(Response,"Project.Id", projectId.ToString());
 
             var projectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks());
 
@@ -51,7 +56,7 @@ namespace Pegasus.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var projectId = GetSettingId(Request, "Project.Id");
+            var projectId = _settings.GetSetting(Request, "Project.Id");
             var project = _db.GetProject(projectId);
             var projectTask = new ProjectTask
             {
@@ -83,7 +88,8 @@ namespace Pegasus.Controllers
         public IActionResult Edit(int id)
         {
             var projectTask = _db.GetTask(id);
-            WriteCookie("Project.Id", projectTask.ProjectId.ToString());
+
+            _cookies.WriteCookie(Response,"Project.Id", projectTask.ProjectId.ToString());
             var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
 
             if (Request != null && Request.IsAjaxRequest())
@@ -147,7 +153,7 @@ namespace Pegasus.Controllers
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "For more information, please contact:";
             var model = new BaseViewModel { ProjectId = 0 };
 
             return View(model);
@@ -158,32 +164,5 @@ namespace Pegasus.Controllers
             var model = new BaseViewModel { ProjectId = 0 };
             return View(model);
         }
-
-        private int GetSettingId(HttpRequest request, string settingName, int defaultReturnVal = 0)
-        {
-            int id = defaultReturnVal;
-
-            if (request == null)
-                return id;
-
-            string fromRequest = request.Query[settingName];
-            if (!string.IsNullOrWhiteSpace(fromRequest) && int.TryParse(fromRequest, out id))
-                return id;
-
-            string fromCookie = request.Cookies[settingName];
-            if (!string.IsNullOrWhiteSpace(fromCookie) && int.TryParse(fromCookie, out id))
-                return id;
-
-            return defaultReturnVal;
-        }
-
-
-        private void WriteCookie(string setting, string settingVaue)
-        {
-            //todo get expiry from config
-            CookieOptions options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(30)) };
-            Response.Cookies.Append(setting, settingVaue, options);
-        }
-
     }
 }
