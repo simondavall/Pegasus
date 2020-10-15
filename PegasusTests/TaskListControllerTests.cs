@@ -2,10 +2,10 @@
 
 namespace PegasusTests
 {
-    class HomeControllerTests
+    class TaskListControllerTests
     {
         [Test]
-        public void HomeController_IsValidSetting_ReturnsTrue()
+        public void TaskListController_IsValidSetting_ReturnsTrue()
         {
             var fromRequest = "123";
 
@@ -15,14 +15,14 @@ namespace PegasusTests
         }
 
         [Test]
-        public void HomeController_InputStringIsNull_ReturnsFalse()
+        public void TaskListController_InputStringIsNull_ReturnsFalse()
         {
             var result = int.TryParse(null, out _);
             Assert.IsFalse(result);
         }
 
         [Test]
-        public void HomeController_InputStringIsEmpty_ReturnsFalse()
+        public void TaskListController_InputStringIsEmpty_ReturnsFalse()
         {
             string fromRequest = string.Empty;
 
@@ -31,7 +31,7 @@ namespace PegasusTests
         }
 
         [Test]
-        public void HomeController_InputStringIsWhitespace_ReturnsFalse()
+        public void TaskListController_InputStringIsWhitespace_ReturnsFalse()
         {
             string fromRequest = "   ";
 
