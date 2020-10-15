@@ -18,6 +18,8 @@ namespace Pegasus.Models.TaskList
         public ISorter Sorter { get; set; } = new ModifiedDescSorter();
         public int TaskFilterId { get; set; }
 
+        public IEnumerable<TaskFilter> TaskFilters { get; set; }
+
         public IEnumerable<ProjectTaskExt> ProjectTasks => _projectTasks.Filtered(TaskFilterId).Sorted(Sorter);
     }
 }

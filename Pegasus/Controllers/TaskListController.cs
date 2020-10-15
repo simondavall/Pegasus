@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +33,7 @@ namespace Pegasus.Controllers
             var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
             _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
 
-            Project project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
+            var project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
             _cookies.WriteCookie(Response,"Project.Id", projectId.ToString());
 
             var projectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks());
@@ -43,12 +44,13 @@ namespace Pegasus.Controllers
                     ProjectId = projectId,
                     TaskFilterId = taskFilterId,
                     Projects = _db.GetAllProjects(),
+                    TaskFilters = TaskFilter.GetAllTaskFilters(),
                     Project = project
                 };
 
             if (Request != null && Request.IsAjaxRequest())
             {
-                return PartialView("_ProjectTaskList", model);
+                return PartialView("../TaskList/_ProjectTaskList", model);
             }
 
             return View("../TaskList/Index", model);
