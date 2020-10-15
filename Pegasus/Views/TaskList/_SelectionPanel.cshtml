@@ -1,0 +1,34 @@
+﻿@model Pegasus.Models.TaskList.IndexViewModel
+
+<div class="card card-default">
+    <div class="card-header">
+        <input id="projectId" type="hidden" asp-for="Project.Id" />
+        <h5>Projects</h5>
+    </div>
+    <div class="card-body project-list">
+        <div>
+            <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
+        </div>
+        @foreach (var project in Model.Projects)
+        {
+            <div>
+                <a class="project-list-item" asp-action="Index" value="@project.Id"><i class="fa fa-angle-right"></i>@project.Name</a>
+            </div>
+        }
+    </div>
+</div>
+<div class="card card-default">
+    <div class="card-header">
+        <h5>Task Filters</h5>
+    </div>
+    <input id="taskFilterId" type="hidden" asp-for="TaskFilterId" />
+
+    <div class="card-body project-list">
+        @foreach (var taskFilter in Model.TaskFilters)
+        {
+            <div>
+                <a class="task-filter" asp-action="Index" value="@taskFilter.Value"><i class="fa fa-angle-right"></i>@taskFilter.Name</a>
+            </div>
+        }
+    </div>
+</div>
