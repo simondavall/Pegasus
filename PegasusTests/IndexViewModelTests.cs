@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Pegasus.Entities;
 using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Sorters.ProjectTask;
+using Pegasus.Models.TaskList;
 
 namespace PegasusTests
 {
@@ -19,7 +20,7 @@ namespace PegasusTests
                 new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.Critical })
             };
 
-            var sut = new Pegasus.Models.Home.IndexViewModel(taskList)
+            var sut = new IndexViewModel(taskList)
             {
                 Sorter = new PriorityDescSorter()
             };
@@ -37,7 +38,7 @@ namespace PegasusTests
                 new ProjectTaskExt(new ProjectTask { Modified = new DateTime(2020, 2, 1) })
             };
 
-            var sut = new Pegasus.Models.Home.IndexViewModel(taskList)
+            var sut = new IndexViewModel(taskList)
             {
                 Sorter = new ModifiedDescSorter()
             };
@@ -55,7 +56,7 @@ namespace PegasusTests
                 new ProjectTaskExt(new ProjectTask { Modified = new DateTime(2020, 2, 1) })
             };
 
-            var sut = new Pegasus.Models.Home.IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList);
 
             Assert.IsNotEmpty(sut.ProjectTasks);
             Assert.AreEqual(sut.ProjectTasks.ToArray()[0].Modified, new DateTime(2020, 2, 1));

@@ -2,7 +2,7 @@
 using Pegasus.Entities;
 using Pegasus.Entities.Sorters.ProjectTask;
 
-namespace Pegasus.Models.Home
+namespace Pegasus.Models.TaskList
 {
     public class IndexViewModel : BaseViewModel
     {

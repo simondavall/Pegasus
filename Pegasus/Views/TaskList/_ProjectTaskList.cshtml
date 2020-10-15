@@ -1,5 +1,5 @@
 @using Pegasus.Extensions
-@model Pegasus.Models.Home.IndexViewModel
+@model Pegasus.Models.TaskList.IndexViewModel
 
 <div id="projectTaskList" class="card no-border">
     <div class="card-header no-background no-border">
@@ -17,7 +17,7 @@
                                 <td>
                                     <div class="table-row-condensed">
                                         <span class="@task.TaskProfile.TaskRefStyle">
-                                            <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
+                                            <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
                                         </span>
                                     </div>
                                 </td>
@@ -30,7 +30,7 @@
                                 <td>
                                     <div class="table-row-condensed">
                                         <span class="@task.TaskProfile.TaskTextStyle">
-                                            <a asp-controller="Home" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile.TaskIcon)@task.Name</a>
+                                            <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile.TaskIcon)@task.Name</a>
                                         </span>
                                     </div>
                                 </td>

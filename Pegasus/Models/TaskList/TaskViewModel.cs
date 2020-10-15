@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities;
 
-namespace Pegasus.Models.Home
+namespace Pegasus.Models.TaskList
 {
     public class TaskViewModel : BaseViewModel
     {

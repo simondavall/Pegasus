@@ -1,6 +1,6 @@
-﻿@model Pegasus.Models.Home.IndexViewModel
+﻿@model Pegasus.Models.TaskList.IndexViewModel
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Task List";
 }
 <form method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
     <div class="row task-list">
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="col-sm-9">
-            <partial name="_ProjectTaskList" model="Model" />
+            <partial name="../TaskList/_ProjectTaskList" model="Model" />
         </div>
     </div>
 </form>
