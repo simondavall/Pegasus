@@ -151,14 +151,6 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "For more information, please contact:";
-            var model = new BaseViewModel { ProjectId = 0 };
-
-            return View(model);
-        }
-
         public IActionResult Error()
         {
             var model = new BaseViewModel { ProjectId = 0 };
