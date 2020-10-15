@@ -8,9 +8,9 @@ $(function () {
         taskFilterId: $("#taskFilterId").val()
     }
 
-    // disable the CreateIssues button when showing All Projects
+    // disable the CreateTask button when showing All Projects
     var createButton = $("#createButton");
-    var setCreateIssueButton = function () {
+    var setCreateTaskButton = function () {
         if (currentSettings.projectId === "0") {
             $(createButton).addClass("disabled");
         } else {
@@ -20,7 +20,7 @@ $(function () {
 
     // set initial Create button state
     $(function () {
-        setCreateIssueButton();
+        setCreateTaskButton();
     });
 
     // hide all sidebar icons, then show the selected sidebar icon
@@ -59,7 +59,7 @@ $(function () {
     $(".body-content").on("click", ".project-list-item", function () {
         currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectListItems));
         // need to disable Create button if All projects selected
-        setCreateIssueButton();
+        setCreateTaskButton();
         return false;
     });
 
