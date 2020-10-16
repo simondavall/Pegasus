@@ -58,6 +58,7 @@ namespace Pegasus.Domain.ProjectTask
                 .SetAbsoluteExpiration(TimeSpan.FromDays(expiryDays));
 
             _cache.Set(CacheKeys.TaskFilters, filters, cacheEntryOptions);
+            _cache.Set(CacheKeys.TaskFiltersExpiryDays, expiryDays, cacheEntryOptions);
         }
     }
 }
