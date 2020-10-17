@@ -2,33 +2,26 @@
 using NUnit.Framework;
 using Pegasus.Extensions;
 
-namespace PegasusTests
+namespace PegasusTests.ExtensionTests
 {
-    public class ExtensionTests
+    class DateTimeExtensionTests
     {
-        [Test]
-        public void IsToDay_IsValidForTodayDate()
-        {
-            var sut = DateTime.Now;
-            Assert.AreEqual(DateTime.Today, sut.Date);
-        }
-
         [Test]
         public void ToTaskDate_IsTimeValue_ForTodayDate()
         {
             var sut = DateTime.Now.Date.Date
                 .AddHours(7)
-                .AddMinutes(45)
-                .ToTaskDate();
-            Assert.AreEqual("07:45", sut);
+                .AddMinutes(45);
+
+            Assert.AreEqual("07:45", sut.ToTaskDate());
         }
 
         [Test]
-        public void ToTaskDate_IsDateValue_ForYesterdaysDate()
+        public void ToTaskDate_IsDateFormatValue_ForMoreThanADayAgo()
         {
-            var sut = new DateTime(2017,7,15).ToTaskDate();
+            var sut = new DateTime(2017, 7, 15);
 
-            Assert.AreEqual("Jul 15", sut);
+            Assert.AreEqual("Jul 15", sut.ToTaskDate());
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
 using Pegasus.Entities.Sorters.ProjectTask;
 

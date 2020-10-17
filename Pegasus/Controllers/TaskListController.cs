@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain;
+using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
 using Pegasus.Extensions;
 using Pegasus.Models;
@@ -15,38 +15,35 @@ namespace Pegasus.Controllers
 {
     public class TaskListController : Controller
     {
+        private readonly Cookies _cookies;
         private readonly IPegasusData _db;
         private readonly Settings _settings;
-        private readonly Cookies _cookies;
+        private readonly ITaskFilterService _taskFilterService;
 
-        public TaskListController(IPegasusData pegasusData, IConfiguration configuration)
+        public TaskListController(IPegasusData pegasusData, IConfiguration configuration, ITaskFilterService taskFilterService)
         {
             _db = pegasusData;
+            _taskFilterService = taskFilterService;
             _settings = new Settings(configuration);
             _cookies = new Cookies(configuration);
         }
 
         public IActionResult Index()
         {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
-
-            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
-            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
+            var taskFilterId = GetTaskFilterIdAndUpdateCookie();
+            var projectId = GetProjectIdAndUpdateCookie();
 
             var project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
-            _cookies.WriteCookie(Response,"Project.Id", projectId.ToString());
-
             var projectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks());
 
-            IndexViewModel model =
-                new IndexViewModel(projectTasks)
-                {
-                    ProjectId = projectId,
-                    TaskFilterId = taskFilterId,
-                    Projects = _db.GetAllProjects(),
-                    TaskFilters = TaskFilter.GetAllTaskFilters(),
-                    Project = project
-                };
+            var model = new IndexViewModel(projectTasks)
+            {
+                ProjectId = projectId,
+                TaskFilterId = taskFilterId,
+                Projects = _db.GetAllProjects(),
+                TaskFilters = _taskFilterService.GetTaskFilters(),
+                Project = project
+            };
 
             if (Request != null && Request.IsAjaxRequest())
             {
@@ -54,6 +51,20 @@ namespace Pegasus.Controllers
             }
 
             return View("../TaskList/Index", model);
+        }
+
+        private int GetProjectIdAndUpdateCookie()
+        {
+            var projectId = _settings.GetSetting(Request, "Project.Id");
+            _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
+            return projectId;
+        }
+
+        private int GetTaskFilterIdAndUpdateCookie()
+        {
+            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
+            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
+            return taskFilterId;
         }
 
         public async Task<IActionResult> Create()
