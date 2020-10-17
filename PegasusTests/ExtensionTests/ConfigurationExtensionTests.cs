@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Pegasus.Extensions;
 
-namespace PegasusTests
+namespace PegasusTests.ExtensionTests
 {
     class ConfigurationExtensionTests
     {

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using PegasusService;
+using PegasusTests.TestUtilities;
 
 namespace PegasusTests
 {
@@ -18,7 +19,7 @@ namespace PegasusTests
     {
         private HttpClient _client;
         private IConfiguration _configuration;
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public KeepAliveServiceTests(ILogger logger)
         {
@@ -85,30 +86,6 @@ namespace PegasusTests
             }
             
             return new HttpClient(fakeResponseHandler);
-        }
-    }
-
-
-
-    public class FakeResponseHandler : DelegatingHandler
-    {
-        private readonly Dictionary<Uri, HttpResponseMessage> _fakeResponses = new Dictionary<Uri, HttpResponseMessage>();
-
-        public void AddFakeResponse(Uri uri, HttpResponseMessage responseMessage)
-        {
-            _fakeResponses.Add(uri, responseMessage);
-        }
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            if (_fakeResponses.ContainsKey(request.RequestUri))
-            {
-                return await Task.Run(() => _fakeResponses[request.RequestUri], cancellationToken);
-            }
-            else
-            {
-                return new HttpResponseMessage(HttpStatusCode.NotFound) { RequestMessage = request };
-            }
         }
     }
 }

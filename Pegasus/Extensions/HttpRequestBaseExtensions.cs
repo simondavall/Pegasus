@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Pegasus.Extensions
 {
-    public static class HttpRequestBaseExtensions
+    public static class HttpRequestExtensions
     {
         public static bool IsAjaxRequest(this HttpRequest request)
         {
