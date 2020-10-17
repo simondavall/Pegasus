@@ -6,85 +6,57 @@ namespace PegasusTests.ExtensionTests
 {
     class TimespanExtensionTests
     {
+        private DateTime _date1;
 
-        [Test]
-        public void TimeLapsed_For5mins()
+        [SetUp]
+        public void TestSetup()
         {
-            var sut = DateTime.Now.AddMinutes(-5);
-
-            Assert.AreEqual("5 mins", sut.LapsedTime());
+            _date1 = new DateTime(2020, 1, 1);
         }
 
         [Test]
-        public void TimeLapsed_For10mins()
+        public void ApproxMonths_OneDateTimeMonth_ReturnsOneMonth()
         {
-            var sut = DateTime.Now.AddMinutes(-10);
+            var date2 = _date1.AddMonths(1);
+            var sut = date2 - _date1;
 
-            Assert.AreEqual("10 mins", sut.LapsedTime());
+            Assert.AreEqual(1, sut.ApproxMonths());
         }
 
         [Test]
-        public void TimeLapsed_For10hours()
+        public void ApproxMonths_TwoDateTimeMonth_ReturnsTwoMonth()
         {
-            var sut = DateTime.Now.AddHours(-10).AddMinutes(-10);
+            var date2 = _date1.AddMonths(2);
+            var sut = date2 - _date1;
 
-            Assert.AreEqual("10 hrs", sut.LapsedTime());
+            Assert.AreEqual(2, sut.ApproxMonths());
         }
 
         [Test]
-        public void TimeLapsed_For1hours()
+        public void ApproxMonths_OneDateTimeYear_ReturnsTwelveMonth()
         {
-            var sut = DateTime.Now.AddHours(-1).AddMinutes(-10);
+            var date2 = _date1.AddYears(1);
+            var sut = date2 - _date1;
 
-            Assert.AreEqual("1 hr", sut.LapsedTime());
+            Assert.AreEqual(12, sut.ApproxMonths());
         }
 
         [Test]
-        public void TimeLapsed_For3days()
+        public void ApproxYears_OneDateTimeYear_ReturnsOneYear()
         {
-            var sut = DateTime.Now.AddDays(-3).AddHours(-10).AddMinutes(-10);
+            var date2 = _date1.AddYears(1);
+            var sut = date2 - _date1;
 
-            Assert.AreEqual("3 days", sut.LapsedTime());
+            Assert.AreEqual(1, sut.ApproxYears());
         }
 
         [Test]
-        public void TimeLapsed_For29days_Returns29days()
+        public void ApproxYears_TenDateTimeYears_ReturnsTenYears()
         {
-            var sut = DateTime.Now.AddMonths(-0).AddDays(-30).AddHours(-10).AddMinutes(-0);
+            var date2 = _date1.AddYears(10);
+            var sut = date2 - _date1;
 
-            Assert.AreEqual("1 mth", sut.LapsedTime());
-        }
-
-        [Test]
-        public void TimeLapsed_For30days_Returns1month()
-        {
-            var sut = DateTime.Now.AddMonths(-0).AddDays(-30).AddHours(-10).AddMinutes(-0);
-
-            Assert.AreEqual("1 mth", sut.LapsedTime());
-        }
-
-        [Test]
-        public void TimeLapsed_For4months()
-        {
-            var sut = DateTime.Now.AddMonths(-4).AddDays(-3).AddHours(-10).AddMinutes(-10);
-
-            Assert.AreEqual("4 mths", sut.LapsedTime());
-        }
-
-        [Test]
-        public void TimeLapsed_For11months()
-        {
-            var sut = DateTime.Now.AddMonths(-11).AddDays(-3).AddHours(-10).AddMinutes(-10);
-
-            Assert.AreEqual("11 mths", sut.LapsedTime());
-        }
-
-        [Test]
-        public void TimeLapsed_For12months()
-        {
-            var sut = DateTime.Now.AddMonths(-12).AddDays(-0).AddHours(-0).AddMinutes(-0);
-
-            Assert.AreEqual("1 yr", sut.LapsedTime());
+            Assert.AreEqual(10, sut.ApproxYears());
         }
 
     }
