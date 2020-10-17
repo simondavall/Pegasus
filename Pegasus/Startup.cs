@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
 using Pegasus.Services;
 
@@ -22,6 +23,8 @@ namespace Pegasus
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IPegasusData, SqlPegasusData>();
+            services.AddScoped<ITaskFilterService, TaskFilterService>();
+
             services.AddDbContext<PegasusDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("Pegasus")));
@@ -37,7 +40,7 @@ namespace Pegasus
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Shared/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
