@@ -74,5 +74,10 @@
     <Build Include="dbo\Tables\TaskPriorities.sql" />
     <Build Include="dbo\Tables\TaskStatus.sql" />
     <Build Include="dbo\Tables\TaskTypes.sql" />
+    <Build Include="dbo\Stored Procedures\spProjects_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spProjects_Add.sql" />
+    <Build Include="dbo\Stored Procedures\spProjects_Get.sql" />
+    <Build Include="dbo\Stored Procedures\spProjects_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spProjects_Delete.sql" />
   </ItemGroup>
 </Project>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
+using Pegasus.Library.Api;
 using Pegasus.Services;
 
 namespace Pegasus
@@ -25,9 +26,15 @@ namespace Pegasus
             services.AddScoped<IPegasusData, SqlPegasusData>();
             services.AddScoped<ITaskFilterService, TaskFilterService>();
 
+            services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
+
+            services.AddSingleton<IApiHelper, ApiHelper>();
+            //TODO Add loggedInUser Singleton here
+
             services.AddDbContext<PegasusDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("Pegasus")));
+
             services.AddControllersWithViews();
         }
 
