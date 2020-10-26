@@ -111,7 +111,7 @@ namespace PegasusApi.Controllers
             //    await _context.SaveChangesAsync();
         }
 
-        private async Task DeleteTasksAsync(int projectId)
+        internal static async Task DeleteTasksAsync(int projectId)
         {
             // this is a private member used internally only
             await Task.Delay(1);

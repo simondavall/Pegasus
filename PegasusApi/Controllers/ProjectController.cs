@@ -46,12 +46,12 @@ namespace PegasusApi.Controllers
 
         [Route("/DeleteProjectAsync")]
         [HttpDelete]
-        public void DeleteProjectAsync(ProjectModel project)
+        public async Task DeleteProjectAsync(ProjectModel project)
         {
 
             // old code
             //    _context.TaskIndexers.RemoveRange(_context.TaskIndexers.Where(ti => ti.ProjectId == project.Id));
-            //    await DeleteTasksAsync(project.Id);
+                await TaskController.DeleteTasksAsync(project.Id);
             //    _context.Projects.Remove(project);
             //    await _context.SaveChangesAsync();
         }
