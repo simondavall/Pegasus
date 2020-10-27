@@ -79,5 +79,16 @@
     <Build Include="dbo\Stored Procedures\spProjects_Get.sql" />
     <Build Include="dbo\Stored Procedures\spProjects_Update.sql" />
     <Build Include="dbo\Stored Procedures\spProjects_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetAllForProject.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetAllTaskTypes.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetAllTaskStatuses.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetAllTaskPriorities.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_Add.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_Get.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spComments_Add.sql" />
+    <Build Include="dbo\Stored Procedures\spComments_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spComments_GetAllForTask.sql" />
   </ItemGroup>
 </Project>

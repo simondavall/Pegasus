@@ -1,4 +1,4 @@
-﻿namespace PegasusApi.Models
+﻿namespace PegasusApi.Library.Models
 {
     public class TaskTypeModel
     {

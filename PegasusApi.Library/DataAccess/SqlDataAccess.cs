@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace PegasusApi.Library.DataAccess
 {
-    internal class SqlDataAccess
+    public class SqlDataAccess : IDataAccess
     {
         private readonly IConfiguration _configuration;
 

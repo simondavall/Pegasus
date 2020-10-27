@@ -1,6 +1,6 @@
-﻿namespace PegasusApi.Models
+﻿namespace Pegasus.Library.Models
 {
-    public class TaskStatusModel
+    public class TaskPriorityModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

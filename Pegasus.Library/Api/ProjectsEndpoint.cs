@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using Pegasus.Library.Models;
 
@@ -16,19 +14,12 @@ namespace Pegasus.Library.Api
             _apiHelper = apiHelper;
         }
 
-        public async Task Add(ProjectModel project)
+        public async Task AddProject(ProjectModel project)
         {
-            HttpContent content = new ObjectContent<ProjectModel>(project, new JsonMediaTypeFormatter());
-            using (var response = await _apiHelper.ApiClient.PostAsync("api/Project/AddProject", content))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
-            }
+            await _apiHelper.PostAsync(project, "api/Project/AddProject");
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteProject(int id)
         {
             using (var response = await _apiHelper.ApiClient.DeleteAsync($"api/Project/DeleteProject/{id}"))
             {
@@ -39,44 +30,19 @@ namespace Pegasus.Library.Api
             }
         }
 
-        public async Task<ProjectModel> Get(int id)
+        public async Task<ProjectModel> GetProject(int id)
         {
-            using (var response = await _apiHelper.ApiClient.GetAsync($"api/Project/GetProject/{id}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<ProjectModel>();
-                    return result;
-                }
-
-                throw new Exception(response.ReasonPhrase);
-            }
+            return await _apiHelper.GetFromUri<ProjectModel>($"api/Project/GetProject/{id}");
         }
 
-        public async Task<List<ProjectModel>> GetAll()
+        public async Task<List<ProjectModel>> GetAllProjects()
         {
-            using (var response = await _apiHelper.ApiClient.GetAsync("api/Project/GetAllProjects"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<ProjectModel>>();
-                    return result;
-                }
-
-                throw new Exception(response.ReasonPhrase);
-            }
+            return await _apiHelper.GetListFromUri<ProjectModel>("api/Project/GetAllProjects");
         }
 
-        public async Task Update(ProjectModel project)
+        public async Task UpdateProject(ProjectModel project)
         {
-            HttpContent content = new ObjectContent<ProjectModel>(project, new JsonMediaTypeFormatter());
-            using (var response = await _apiHelper.ApiClient.PostAsync("api/Project/UpdateProject", content))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
-            }
+            await _apiHelper.PostAsync(project, "api/Project/UpdateProject");
         }
     }
 }

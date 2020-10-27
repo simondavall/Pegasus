@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PegasusApi.Models;
@@ -10,14 +8,10 @@ namespace PegasusApi.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -25,7 +19,7 @@ namespace PegasusApi.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Privacy()
+        public IActionResult Privacy()
         {
             // // List roles
             // var roles = new[] {"Admin", "Manager", "Reports", "Projects"};
@@ -45,7 +39,7 @@ namespace PegasusApi.Controllers
             //     await _userManager.AddToRoleAsync(user, "Admin");
             //     await _userManager.AddToRoleAsync(user, "Projects");
             // }
-
+            _logger.LogInformation("Viewed provacy page.");
             return View();
         }
 

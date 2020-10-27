@@ -18,7 +18,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var projects = await _projectsEndpoint.GetAll();
+            var projects = await _projectsEndpoint.GetAllProjects();
             return View(projects);
         }
 
@@ -37,7 +37,7 @@ namespace Pegasus.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _projectsEndpoint.Add(project);
+                await _projectsEndpoint.AddProject(project);
                 return RedirectToAction("Index");
             }
 
@@ -49,7 +49,7 @@ namespace Pegasus.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _projectsEndpoint.Get((int) id);
+            var project = await _projectsEndpoint.GetProject((int) id);
             if (project == null) return NotFound();
             return View(project);
         }
@@ -67,7 +67,7 @@ namespace Pegasus.Controllers
             {
                 try
                 {
-                    await _projectsEndpoint.Update(project);
+                    await _projectsEndpoint.UpdateProject(project);
                 }
                 catch (Exception)
                 {
@@ -88,7 +88,7 @@ namespace Pegasus.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _projectsEndpoint.Get((int) id);
+            var project = await _projectsEndpoint.GetProject((int) id);
 
             if (project == null) return NotFound();
 
@@ -101,13 +101,13 @@ namespace Pegasus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _projectsEndpoint.Delete(id);
+            await _projectsEndpoint.DeleteProject(id);
             return RedirectToAction("Index");
         }
 
         private async Task<bool> ProjectExists(int id)
         {
-            var projectFound = await _projectsEndpoint.Get(id);
+            var projectFound = await _projectsEndpoint.GetProject(id);
             return projectFound?.Id > 0;
         }
     }

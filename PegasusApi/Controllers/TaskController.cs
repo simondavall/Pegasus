@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.Models;
 using PegasusApi.Models;
 
 namespace PegasusApi.Controllers
@@ -9,67 +11,75 @@ namespace PegasusApi.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        [Route("/GetAllTasks")]
-        [HttpGet]
-        public IEnumerable<ProjectTaskModel> GetAllTasks()
-        {
-            return new[] { new ProjectTaskModel(), new ProjectTaskModel() };
+        private readonly ITasksData _taskData;
 
-            //old code
-            //return _context.ProjectTasks.OrderByDescending(t => t.Created);
+        public TaskController(ITasksData taskData)
+        {
+            _taskData = taskData;
         }
 
-        [Route("/GetTask")]
+        [Route("GetTask/{taskId}")]
         [HttpGet]
-        public ProjectTaskModel GetTask(int id)
+        public TaskModel GetTask(int taskId)
         {
-            return new ProjectTaskModel();
-
-            //old code
-            //    return _context.ProjectTasks.FirstOrDefault(t => t.Id == id);
+            return _taskData.GetTask(taskId);
         }
 
-        [Route("/GetTasks")]
+        [Route("GetTasks/{projectId}")]
         [HttpGet]
-        public IEnumerable<ProjectTaskModel> GetTasks(int projectId)
+        public IEnumerable<TaskModel> GetTasks(int projectId)
         {
-            return new[] { new ProjectTaskModel(), new ProjectTaskModel() };
-
-            //old code
-            //    return _context.ProjectTasks.Where(t => t.ProjectId == projectId)
-            //        .OrderByDescending(t => t.Created);
+            return _taskData.GetTasks(projectId);
         }
 
-        [Route("/AddTask")]
+        [Route("GetAllTasks")]
+        [HttpGet]
+        public IEnumerable<TaskModel> GetAllTasks()
+        {
+            return _taskData.GetAllTasks();
+        }
+
+        [Route("AddTask")]
         [HttpPost]
-        public void AddTask(ProjectTaskModel projectTask)
+        public void AddTask(TaskModel task)
         {
-            
-
-            //old code
-            //    _context.ProjectTasks.Add(projectTask);
-            //    _context.SaveChanges();
-
-            //    AddStatusHistory(projectTask);
+            _taskData.AddTask(task);
         }
 
-        [Route("/UpdateTask")]
+        [Route("UpdateTask")]
         [HttpPost]
-        public void UpdateTask(ProjectTaskModel projectTask, int existingTaskStatus)
+        public void UpdateTask(TaskModel task)
         {
-
-
-            //old code
-            //    _context.ProjectTasks.Update(projectTask);
-            //    _context.SaveChanges();
-
-            //    if (projectTask.TaskStatusId != existingTaskStatus)
-            //    {
-            //        AddStatusHistory(projectTask);
-            //    }
+            _taskData.UpdateTask(task);
         }
 
-        [Route("/GetNextTaskRef")]
+        [Route("GetAllTaskPriorities")]
+        [HttpGet]
+        public IEnumerable<TaskPriorityModel> GetAllTaskPriorities()
+        {
+            return _taskData.GetAllTaskPriorities();
+        }
+
+        [Route("GetAllTaskStatuses")]
+        [HttpGet]
+        public IEnumerable<TaskStatusModel> GetAllTaskStatuses()
+        {
+            return _taskData.GetAllTaskStatuses();
+        }
+
+        [Route("GetAllTaskTypes")]
+        [HttpGet]
+        public IEnumerable<TaskTypeModel> GetAllTaskTypes()
+        {
+            return _taskData.GetAllTaskTypes();
+        }
+
+
+
+
+        #region Not yet implemented
+
+        [Route("GetNextTaskRef")]
         [HttpGet]
         public async Task<string> GetNextTaskRef(int projectId, string projectPrefix)
         {
@@ -89,7 +99,7 @@ namespace PegasusApi.Controllers
             //    return string.Format("{0}-{1}", projectPrefix, nextIndex);
         }
 
-        [Route("/AddTaskIndexer")]
+        [Route("AddTaskIndexer")]
         [HttpPost]
         public void AddTaskIndexer(ProjectTaskIndexerModel projectTaskIndexer)
         {
@@ -100,7 +110,7 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-        [Route("/AddTaskIndexerAsync")]
+        [Route("AddTaskIndexerAsync")]
         [HttpPost]
         public async Task AddTaskIndexerAsync(ProjectTaskIndexerModel projectTaskIndexer)
         {
@@ -128,17 +138,7 @@ namespace PegasusApi.Controllers
             //    await _context.SaveChangesAsync();;
         }
 
-        [Route("/GetAllTaskStatuses")]
-        [HttpGet]
-        public IEnumerable<TaskStatusModel> GetAllTaskStatuses()
-        {
-            return new[] { new TaskStatusModel(), new TaskStatusModel() };
-
-            //old code
-            //    return _context.TaskStatus.OrderBy(s => s.DisplayOrder);
-        }
-
-        [Route("/AddTaskStatus")]
+        [Route("AddTaskStatus")]
         [HttpPost]
         public void AddTaskStatus(TaskStatusModel taskStatus)
         {
@@ -148,17 +148,8 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-        [Route("/GetAllTaskTypes")]
-        [HttpGet]
-        public IEnumerable<TaskTypeModel> GetAllTaskTypes()
-        {
-            return new[] { new TaskTypeModel(), new TaskTypeModel() };
 
-            //old code
-            //    return _context.TaskTypes.OrderBy(t => t.DisplayOrder);
-        }
-
-        [Route("/AddTaskType")]
+        [Route("AddTaskType")]
         [HttpPost]
         public void AddTaskType(TaskTypeModel taskType)
         {
@@ -168,17 +159,8 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-        [Route("/GetAllTaskPriorities")]
-        [HttpGet]
-        public IEnumerable<TaskPriorityModel> GetAllTaskPriorities()
-        {
-            return new[] { new TaskPriorityModel(), new TaskPriorityModel() };
 
-            //old code
-            //    return _context.TaskPriorities.OrderBy(tp => tp.DisplayOrder);
-        }
-
-        [Route("/AddTaskPriority")]
+        [Route("AddTaskPriority")]
         [HttpPost]
         public void AddTaskPriority(TaskPriorityModel taskPriority)
         {
@@ -188,21 +170,21 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-        private void AddStatusHistory(ProjectTaskModel task)
-        {
+        //private void AddStatusHistory(ProjectTaskModel task)
+        //{
 
-            //old code
-            //    var taskStatusHistory = new TaskStatusHistory
-            //    {
-            //        TaskId = task.Id,
-            //        TaskStatusId = task.TaskStatusId,
-            //        Created = task.Modified
-            //    };
-            //    _context.StatusHistory.Add(taskStatusHistory);
-            //    _context.SaveChanges();
-        }
+        //    //old code
+        //    //    var taskStatusHistory = new TaskStatusHistory
+        //    //    {
+        //    //        TaskId = task.Id,
+        //    //        TaskStatusId = task.TaskStatusId,
+        //    //        Created = task.Modified
+        //    //    };
+        //    //    _context.StatusHistory.Add(taskStatusHistory);
+        //    //    _context.SaveChanges();
+        //}
 
-        [Route("/GetStatusHistory")]
+        [Route("GetStatusHistory")]
         [HttpGet]
         public IEnumerable<TaskStatusHistoryModel> GetStatusHistory(int taskId)
         {
@@ -211,5 +193,9 @@ namespace PegasusApi.Controllers
             //old code
             //    return _context.StatusHistory.Where(sh => sh.TaskId == taskId);
         }
+
+        #endregion
+
+
     }
 }

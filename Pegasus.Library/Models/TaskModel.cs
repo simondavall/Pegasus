@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace PegasusApi.Models
+namespace Pegasus.Library.Models
 {
-    public class ProjectTaskModel
+    public class TaskModel
     {
         public int Id { get; set; }
         public string TaskRef { get; set; }
@@ -17,7 +17,6 @@ namespace PegasusApi.Models
         public DateTime Created { get; set; }
 
         //public bool IsClosed => TaskStatusId == (int) TaskStatusEnum.Completed || TaskStatusId == (int) TaskStatusEnum.Obsolete;
-        public bool IsClosed => TaskStatusId == 3 || TaskStatusId == 5;
     }
 
 }

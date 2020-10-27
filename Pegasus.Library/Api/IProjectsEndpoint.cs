@@ -6,11 +6,11 @@ namespace Pegasus.Library.Api
 {
     public interface IProjectsEndpoint
     {
-        Task Add(ProjectModel project);
-        Task Delete(int id);
-        Task<ProjectModel> Get(int id);
-        Task<List<ProjectModel>> GetAll();
-        Task Update(ProjectModel project);
+        Task AddProject(ProjectModel project);
+        Task DeleteProject(int id);
+        Task<ProjectModel> GetProject(int id);
+        Task<List<ProjectModel>> GetAllProjects();
+        Task UpdateProject(ProjectModel project);
 
     }
 }

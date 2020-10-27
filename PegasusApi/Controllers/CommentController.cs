@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using PegasusApi.Models;
+using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.Models;
 
 namespace PegasusApi.Controllers
 {
@@ -8,7 +9,38 @@ namespace PegasusApi.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        [Route("/getcomment")]
+        private readonly ICommentsData _commentsData;
+
+        public CommentController(ICommentsData commentsData)
+        {
+            _commentsData = commentsData;
+        }
+
+        [Route("GetComments/{taskId}")]
+        [HttpGet]
+        public IEnumerable<TaskCommentModel> GetComments(int taskId)
+        {
+             return _commentsData.GetComments(taskId);
+        }
+
+        [Route("AddComment")]
+        [HttpPost]
+        public void AddComment(TaskCommentModel taskComment)
+        {
+            _commentsData.AddComment(taskComment);
+        }
+
+
+        [Route("UpdateComments")]
+        [HttpPost]
+        public void UpdateComments(IEnumerable<TaskCommentModel> taskComments)
+        {
+            _commentsData.UpdateComments(taskComments);
+        }
+
+        #region Not Yet Implemented
+
+        [Route("GetComment")]
         [HttpGet]
         public TaskCommentModel GetComment(int id)
         {
@@ -18,27 +50,7 @@ namespace PegasusApi.Controllers
             //    return _context.TaskComments.FirstOrDefault(c => c.Id == id);
         }
 
-        [Route("/getcomments")]
-        [HttpGet]
-        public IEnumerable<TaskCommentModel> GetComments(int taskId)
-        {
-            return new []{ new TaskCommentModel() , new TaskCommentModel() } ;
-
-            //old code
-            //    return _context.TaskComments.Where(c => c.TaskId == taskId && !c.IsDeleted).OrderBy(c => c.Created);
-        }
-
-        [Route("/addcomment")]
-        [HttpPost]
-        public void AddComment(TaskCommentModel taskComment)
-        {
-
-            //old code
-            //    _context.TaskComments.Add(taskComment);
-            //    _context.SaveChanges();
-        }
-
-        [Route("/updatecomment")]
+        [Route("UpdateComment")]
         [HttpPost]
         public void UpdateComment(TaskCommentModel taskComment)
         {
@@ -48,17 +60,7 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-        [Route("/updatecomments")]
-        [HttpPost]
-        public void UpdateComments(IEnumerable<TaskCommentModel> taskComments)
-        {
+        #endregion
 
-            //old code
-            //    foreach (var taskComment in taskComments)
-            //    {
-            //        _context.TaskComments.Update(taskComment);
-            //    }
-            //    _context.SaveChanges();
-        }
     }
 }

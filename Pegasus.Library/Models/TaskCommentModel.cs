@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PegasusApi.Models
+namespace Pegasus.Library.Models
 {
     public class TaskCommentModel
     {

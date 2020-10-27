@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Library.Api
@@ -31,6 +34,44 @@ namespace Pegasus.Library.Api
             };
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public async Task<T> GetFromUri<T>(string requestUri)
+        {
+            using (var response = await ApiClient.GetAsync(requestUri))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+                var result = await response.Content.ReadAsAsync<T>();
+                return result;
+            }
+        }
+
+        public async Task<List<T>> GetListFromUri<T>(string requestUri)
+        {
+            using (var response = await ApiClient.GetAsync(requestUri))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+                var result = await response.Content.ReadAsAsync<List<T>>();
+                return result;
+            }
+        }
+
+        public async Task PostAsync<T>(T model, string requestUri)
+        {
+            HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
+            using (var response = await ApiClient.PostAsync(requestUri, content))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
         }
     }
 }

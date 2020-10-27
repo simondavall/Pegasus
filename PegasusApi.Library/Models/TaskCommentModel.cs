@@ -1,12 +1,10 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
-namespace Pegasus.Entities
+namespace PegasusApi.Library.Models
 {
-    public class TaskComment
+    public class TaskCommentModel
     {
         public int Id { get; set; }
-        [DataType(DataType.MultilineText)]
         public string Comment { get; set; }
         public DateTime Created { get; set; }
         public int TaskId { get; set; }

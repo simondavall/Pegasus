@@ -1,6 +1,6 @@
-﻿namespace Pegasus.Entities
+﻿namespace Pegasus.Library.Models
 {
-    public class TaskStatus
+    public class TaskStatusModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
