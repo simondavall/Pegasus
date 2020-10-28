@@ -63,7 +63,8 @@
     <Folder Include="PublishLocations" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PublishLocations\PegasusSQLData.publish.xml" />
+    <None Include="PublishLocations\Development -PegasusSQLData.publish.xml" />
+    <None Include="PublishLocations\Production-PegasusSQLData.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Projects.sql" />
