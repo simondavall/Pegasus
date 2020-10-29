@@ -2,6 +2,7 @@
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
 using Pegasus.Entities.Sorters.ProjectTask;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Models.TaskList
 {
@@ -14,8 +15,8 @@ namespace Pegasus.Models.TaskList
             _projectTasks = projectTasks;
         }
 
-        public IEnumerable<Project> Projects { get; set; }
-        public Project Project { get; set; }
+        public IEnumerable<ProjectModel> Projects { get; set; }
+        public ProjectModel Project { get; set; }
         public ISorter Sorter { get; set; } = new ModifiedDescSorter();
         public int TaskFilterId { get; set; }
 

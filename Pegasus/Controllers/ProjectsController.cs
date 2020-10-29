@@ -1,28 +1,28 @@
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Pegasus.Entities;
-using Pegasus.Services;
+using Pegasus.Library.Api;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Controllers
 {
     public class ProjectsController : Controller
     {
-        private readonly IPegasusData _context;
+        private readonly IProjectsEndpoint _projectsEndpoint;
 
-        public ProjectsController(IPegasusData context)
+        public ProjectsController(IProjectsEndpoint projectsEndpoint)
         {
-            _context = context;    
+            _projectsEndpoint = projectsEndpoint;
         }
 
-        // GET: Projects
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.GetAllProjects().ToListAsync());
+            var projects = await _projectsEndpoint.GetAllProjects();
+            return View(projects);
         }
 
-        // GET: Projects/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -33,29 +33,24 @@ namespace Pegasus.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ProjectPrefix")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,Name,ProjectPrefix")] ProjectModel project)
         {
             if (ModelState.IsValid)
             {
-                await _context.AddProjectAsync(project);
+                await _projectsEndpoint.AddProject(project);
                 return RedirectToAction("Index");
             }
+
             return View(project);
         }
 
-        // GET: Projects/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var project = await _context.GetProjectAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var project = await _projectsEndpoint.GetProject((int) id);
+            if (project == null) return NotFound();
             return View(project);
         }
 
@@ -64,65 +59,56 @@ namespace Pegasus.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ProjectPrefix")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ProjectPrefix")] ProjectModel project)
         {
-            if (id != project.Id)
-            {
-                return NotFound();
-            }
+            if (id != project.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _context.UpdateProjectAsync(project);
+                    await _projectsEndpoint.UpdateProject(project);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!ProjectExists(project.Id))
-                    {
+                    if (!await ProjectExists(project.Id))
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
+
                 return RedirectToAction("Index");
             }
+
             return View(project);
         }
 
-        // GET: Projects/Delete/5
+        // GET: Projects/Delete/
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var project = await _context.GetProjectAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var project = await _projectsEndpoint.GetProject((int) id);
+
+            if (project == null) return NotFound();
 
             return View(project);
         }
 
         // POST: Projects/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var project = await _context.GetProjectAsync(id);
-            await _context.DeleteProjectAsync(project);
+            await _projectsEndpoint.DeleteProject(id);
             return RedirectToAction("Index");
         }
 
-        private bool ProjectExists(int id)
+        private async Task<bool> ProjectExists(int id)
         {
-            return _context.GetAllProjects().Any(e => e.Id == id);
+            var projectFound = await _projectsEndpoint.GetProject(id);
+            return projectFound?.Id > 0;
         }
     }
 }

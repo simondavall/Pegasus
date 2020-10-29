@@ -7,40 +7,47 @@ using Pegasus.Domain;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities;
 using Pegasus.Extensions;
+using Pegasus.Library.Api;
+using Pegasus.Library.Models;
 using Pegasus.Models;
 using Pegasus.Models.TaskList;
-using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
     public class TaskListController : Controller
     {
         private readonly Cookies _cookies;
-        private readonly IPegasusData _db;
         private readonly Settings _settings;
         private readonly ITaskFilterService _taskFilterService;
+        private readonly IProjectsEndpoint _projectsEndpoint;
+        private readonly ITasksEndpoint _tasksEndpoint;
+        private readonly ICommentsEndpoint _commentsEndpoint;
 
-        public TaskListController(IPegasusData pegasusData, IConfiguration configuration, ITaskFilterService taskFilterService)
+        public TaskListController(IConfiguration configuration, ITaskFilterService taskFilterService, 
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint)
         {
-            _db = pegasusData;
             _taskFilterService = taskFilterService;
+            _projectsEndpoint = projectsEndpoint;
+            _tasksEndpoint = tasksEndpoint;
+            _commentsEndpoint = commentsEndpoint;
             _settings = new Settings(configuration);
             _cookies = new Cookies(configuration);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var taskFilterId = GetTaskFilterIdAndUpdateCookie();
             var projectId = GetProjectIdAndUpdateCookie();
 
-            var project = _db.GetProject(projectId) ?? new Project { Id = 0, Name = "All" };
-            var projectTasks = ProjectTaskExt.Convert(projectId > 0 ? _db.GetTasks(projectId) : _db.GetAllTasks());
+            var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
+            var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
+            var projectTasksExt = ProjectTaskExt.Convert(projectTasks);
 
-            var model = new IndexViewModel(projectTasks)
+            var model = new IndexViewModel(projectTasksExt)
             {
                 ProjectId = projectId,
                 TaskFilterId = taskFilterId,
-                Projects = _db.GetAllProjects(),
+                Projects = await _projectsEndpoint.GetAllProjects(),
                 TaskFilters = _taskFilterService.GetTaskFilters(),
                 Project = project
             };
@@ -67,43 +74,57 @@ namespace Pegasus.Controllers
             return taskFilterId;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             var projectId = _settings.GetSetting(Request, "Project.Id");
-            var project = _db.GetProject(projectId);
-            var projectTask = new ProjectTask
+            var project = await _projectsEndpoint.GetProject(projectId);
+            var taskModel = new TaskModel
             {
                 ProjectId = projectId,
-                TaskRef = await _db.GetNextTaskRef(projectId, project.ProjectPrefix)
+                TaskRef = $"{project.ProjectPrefix}-<tba>"
             };
-            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask, Project = project });
+            var model = await TaskViewModel.Create(new TaskViewModelArgs {
+                ProjectsEndpoint = _projectsEndpoint,
+                TasksEndpoint = _tasksEndpoint,
+                CommentsEndpoint = _commentsEndpoint,
+                ProjectTask = taskModel, 
+                Project = project});
 
-            model.ProjectTask = projectTask;
+            model.ProjectTask = taskModel;
 
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask)
+        public async Task<IActionResult> Create([Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] TaskModel projectTask)
         {
             projectTask.Created = projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
-                _db.AddTask(projectTask);
+                await _tasksEndpoint.AddTask(projectTask);
                 return RedirectToAction("Index");
             }
-            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
+            var model = await TaskViewModel.Create(new TaskViewModelArgs { 
+                ProjectsEndpoint = _projectsEndpoint, 
+                TasksEndpoint = _tasksEndpoint, 
+                CommentsEndpoint = _commentsEndpoint,
+                ProjectTask = projectTask });
 
             return View(model);
         }
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var projectTask = _db.GetTask(id);
+            var projectTask = await _tasksEndpoint.GetTask(id);
 
             _cookies.WriteCookie(Response,"Project.Id", projectTask.ProjectId.ToString());
-            var model = TaskViewModel.Create(new TaskViewModelArgs { PegasusData = _db, ProjectTask = projectTask });
+            var model = await TaskViewModel.Create(new TaskViewModelArgs {
+                ProjectsEndpoint = _projectsEndpoint, 
+                TasksEndpoint = _tasksEndpoint, 
+                CommentsEndpoint = _commentsEndpoint,
+                ProjectTask = projectTask});
 
             if (Request != null && Request.IsAjaxRequest())
             {
@@ -115,25 +136,21 @@ namespace Pegasus.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] ProjectTask projectTask,
-            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskComment> comments)
+        public async Task<IActionResult> Edit([Bind("Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")] TaskModel projectTask,
+            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskCommentModel> comments)
         {
             if (ModelState.IsValid)
             {
                 projectTask.Modified = DateTime.Now;
-                _db.UpdateTask(projectTask, existingTaskStatus);
-                _db.UpdateComments(comments);
+                await _tasksEndpoint.UpdateTask(projectTask);
+                await _commentsEndpoint.UpdateComments(comments);
                 if (!string.IsNullOrWhiteSpace(newComment))
                 {
-                    _db.AddComment(
-                        new TaskComment
-                        {
-                            Comment = newComment,
-                            Created = DateTime.Now,
-                            TaskId = projectTask.Id
-                        });
+                    await _commentsEndpoint.AddComment(new TaskCommentModel {TaskId = projectTask.Id, Comment = newComment });
                 }
-                if (projectTask.IsClosed && projectTask.TaskStatusId != existingTaskStatus)
+                var projectTaskExt = new ProjectTaskExt(projectTask);
+                //TODO CHeck whether adding an IsClose() extension method to TaskModel might be better
+                if (projectTaskExt.IsClosed && projectTask.TaskStatusId != existingTaskStatus)
                 {
                     return RedirectToAction("Index");
                 }
@@ -141,16 +158,15 @@ namespace Pegasus.Controllers
                 return RedirectToAction("Edit", projectTask.Id);
             }
 
-            var taskViewModelArgs =
-                new TaskViewModelArgs
-                {
-                    PegasusData = _db,
-                    ProjectTask = projectTask,
-                    ExistingStatusId = existingTaskStatus,
-                    Comments = comments,
-                    NewComment = newComment
-                };
-            var model = TaskViewModel.Create(taskViewModelArgs);
+            var taskViewModelArgs = new TaskViewModelArgs {
+                ProjectsEndpoint = _projectsEndpoint,
+                TasksEndpoint = _tasksEndpoint,
+                CommentsEndpoint = _commentsEndpoint,
+                ProjectTask = projectTask,
+                ExistingStatusId = existingTaskStatus,
+                Comments = comments,
+                NewComment = newComment};
+            var model = await TaskViewModel.Create(taskViewModelArgs);
 
             return View(model);
         }

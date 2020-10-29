@@ -5,6 +5,7 @@ using Pegasus.Entities.Sorters.ProjectTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pegasus.Library.Models;
 using Pegasus.Models.TaskList;
 
 namespace PegasusTests
@@ -16,8 +17,8 @@ namespace PegasusTests
         {
             var taskList = new List<ProjectTaskExt>
             {
-                new ProjectTaskExt(new ProjectTask { Modified = new DateTime(2020, 1, 1) }),
-                new ProjectTaskExt(new ProjectTask { Modified = new DateTime(2020, 2, 1) })
+                new ProjectTaskExt(new TaskModel { Modified = new DateTime(2020, 1, 1) }),
+                new ProjectTaskExt(new TaskModel { Modified = new DateTime(2020, 2, 1) })
             };
 
             var sut = new IndexViewModel(taskList);
@@ -32,8 +33,8 @@ namespace PegasusTests
         {
             var taskList = new List<ProjectTaskExt>
             {
-                new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.Low }),
-                new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.Critical })
+                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low }),
+                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical })
             };
         
             var sut = new IndexViewModel(taskList);
@@ -48,9 +49,9 @@ namespace PegasusTests
         {
             var taskList = new List<ProjectTaskExt>
             {
-                new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.High }),
-                new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.Low }),
-                new ProjectTaskExt(new ProjectTask { TaskPriorityId = (int)TaskPriorityEnum.Critical })
+                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.High }),
+                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low }),
+                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical })
             };
 
             var sut = new IndexViewModel(taskList);
@@ -65,9 +66,9 @@ namespace PegasusTests
         {
             var taskList = new List<ProjectTaskExt>
             {
-                new ProjectTaskExt(new ProjectTask { TaskRef = "1" }),
-                new ProjectTaskExt(new ProjectTask { TaskRef = "2" }),
-                new ProjectTaskExt(new ProjectTask { TaskRef = "3" })
+                new ProjectTaskExt(new TaskModel { TaskRef = "1" }),
+                new ProjectTaskExt(new TaskModel { TaskRef = "2" }),
+                new ProjectTaskExt(new TaskModel { TaskRef = "3" })
             };
         
             var sut = new IndexViewModel(taskList);
