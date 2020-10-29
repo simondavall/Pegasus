@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>698253ae-a8e7-44df-b3aa-2b0f5bd69dce</UserSecretsId>
-    <Version>2.0.2</Version>
+    <Version>2.1.0</Version>
     <Authors>Simon Da Vall</Authors>
     <Company>Hereford Securities Ltd</Company>
   </PropertyGroup>
