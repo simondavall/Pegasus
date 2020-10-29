@@ -9,13 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusTests", "PegasusTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusService", "PegasusService\PegasusService.csproj", "{16DF7990-4BA5-4B09-97D6-9D383950E7D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PegasusApi", "PegasusApi\PegasusApi.csproj", "{72577E3D-F935-42EA-A320-178267C0CAFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusApi", "PegasusApi\PegasusApi.csproj", "{72577E3D-F935-42EA-A320-178267C0CAFA}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "PegasusSQLData", "PegasusSQLData\PegasusSQLData.sqlproj", "{1F87F29E-94AC-4016-A8EF-EA73822B9F9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PegasusApi.Library", "PegasusApi.Library\PegasusApi.Library.csproj", "{C4CFC32C-A032-47EC-91E6-4FC8096AC7D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusApi.Library", "PegasusApi.Library\PegasusApi.Library.csproj", "{C4CFC32C-A032-47EC-91E6-4FC8096AC7D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegasus.Library", "Pegasus.Library\Pegasus.Library.csproj", "{7FCE316C-849E-4035-A62B-437BC8E3B01A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pegasus.Library", "Pegasus.Library\Pegasus.Library.csproj", "{7FCE316C-849E-4035-A62B-437BC8E3B01A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{06CF6EF2-637A-4DC4-95A8-555A713A6386}"
 EndProject

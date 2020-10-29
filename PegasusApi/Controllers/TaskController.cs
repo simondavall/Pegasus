@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
@@ -79,6 +80,7 @@ namespace PegasusApi.Controllers
 
         #region Not yet implemented
 
+        [Obsolete]
         [Route("GetNextTaskRef")]
         [HttpGet]
         public async Task<string> GetNextTaskRef(int projectId, string projectPrefix)
@@ -99,6 +101,7 @@ namespace PegasusApi.Controllers
             //    return string.Format("{0}-{1}", projectPrefix, nextIndex);
         }
 
+        [Obsolete]
         [Route("AddTaskIndexer")]
         [HttpPost]
         public void AddTaskIndexer(ProjectTaskIndexerModel projectTaskIndexer)
@@ -110,6 +113,7 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
+        [Obsolete]
         [Route("AddTaskIndexerAsync")]
         [HttpPost]
         public async Task AddTaskIndexerAsync(ProjectTaskIndexerModel projectTaskIndexer)
@@ -138,6 +142,7 @@ namespace PegasusApi.Controllers
             //    await _context.SaveChangesAsync();;
         }
 
+        [Obsolete]
         [Route("AddTaskStatus")]
         [HttpPost]
         public void AddTaskStatus(TaskStatusModel taskStatus)
@@ -148,7 +153,7 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-
+        [Obsolete]
         [Route("AddTaskType")]
         [HttpPost]
         public void AddTaskType(TaskTypeModel taskType)
@@ -159,7 +164,7 @@ namespace PegasusApi.Controllers
             //    _context.SaveChanges();
         }
 
-
+        [Obsolete]
         [Route("AddTaskPriority")]
         [HttpPost]
         public void AddTaskPriority(TaskPriorityModel taskPriority)
@@ -184,6 +189,7 @@ namespace PegasusApi.Controllers
         //    //    _context.SaveChanges();
         //}
 
+        [Obsolete]
         [Route("GetStatusHistory")]
         [HttpGet]
         public IEnumerable<TaskStatusHistoryModel> GetStatusHistory(int taskId)

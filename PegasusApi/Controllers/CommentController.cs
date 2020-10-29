@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
@@ -40,6 +41,7 @@ namespace PegasusApi.Controllers
 
         #region Not Yet Implemented
 
+        [Obsolete]
         [Route("GetComment")]
         [HttpGet]
         public TaskCommentModel GetComment(int id)
@@ -50,6 +52,7 @@ namespace PegasusApi.Controllers
             //    return _context.TaskComments.FirstOrDefault(c => c.Id == id);
         }
 
+        [Obsolete]
         [Route("UpdateComment")]
         [HttpPost]
         public void UpdateComment(TaskCommentModel taskComment)

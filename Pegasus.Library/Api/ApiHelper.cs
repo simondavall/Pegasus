@@ -27,11 +27,18 @@ namespace Pegasus.Library.Api
         private void InitializeClient()
         {
             var apiRoot = _configuration["apiRoot"];
+            var httpClientHandler = new HttpClientHandler
+            {
+                // This bypasses the SSL certificate check. Prevents the invalid license error message
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
 
-            _apiClient = new HttpClient
+            _apiClient = new HttpClient(httpClientHandler)
             {
                 BaseAddress = new Uri(apiRoot)
             };
+            
+            
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
