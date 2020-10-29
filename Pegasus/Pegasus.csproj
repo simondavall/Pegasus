@@ -3,22 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>698253ae-a8e7-44df-b3aa-2b0f5bd69dce</UserSecretsId>
-    <Version>2.0.2</Version>
+    <Version>2.1.0</Version>
     <Authors>Simon Da Vall</Authors>
     <Company>Hereford Securities Ltd</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\PegasusDbContextModelSnapshot.cs" />
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <ProjectReference Include="..\Pegasus.Library\Pegasus.Library.csproj" />
   </ItemGroup>
 
 </Project>

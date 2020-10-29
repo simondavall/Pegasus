@@ -18,6 +18,10 @@ namespace Pegasus.Extensions
             var timeNow = DateTime.Now.ToUniversalTime();
             var lapsedTime = timeNow - value.ToUniversalTime();
 
+            if (lapsedTime < timeNow - timeNow.AddMinutes(-1))
+            {
+                return "just now";
+            }
             if (lapsedTime < timeNow - timeNow.AddHours(-1))
             {
                 return FormatLapsedTime(lapsedTime.Minutes, "min");
@@ -40,7 +44,7 @@ namespace Pegasus.Extensions
 
         private static string FormatLapsedTime(int lapsedTime, string timeUnit)
         {
-            return $"{lapsedTime} {timeUnit}{Pluralize(lapsedTime)}";
+            return $"{lapsedTime} {timeUnit}{Pluralize(lapsedTime)} ago";
         }
 
         private static string Pluralize(int value)

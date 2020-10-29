@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
-using Pegasus.Entities;
-using Pegasus.Services;
+using Pegasus.Library.Api;
 
 namespace Pegasus
 {
@@ -22,12 +20,15 @@ namespace Pegasus
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IPegasusData, SqlPegasusData>();
             services.AddScoped<ITaskFilterService, TaskFilterService>();
 
-            services.AddDbContext<PegasusDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("Pegasus")));
+            services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
+            services.AddTransient<ITasksEndpoint, TasksEndpoint>();
+            services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
+
+            services.AddSingleton<IApiHelper, ApiHelper>();
+            //TODO Add loggedInUser Singleton here
+
             services.AddControllersWithViews();
         }
 

@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain.ProjectTask;
+using Pegasus.Library.Api;
 using Pegasus.Models;
-using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
     public class HomeController : TaskListController
     {
-        public HomeController(IPegasusData pegasusData, IConfiguration configuration, ITaskFilterService taskFilterService) : base(pegasusData, configuration, taskFilterService)
+        public HomeController(IConfiguration configuration, ITaskFilterService taskFilterService, 
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint) 
+            : base(configuration, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint)
         {
 
         }
