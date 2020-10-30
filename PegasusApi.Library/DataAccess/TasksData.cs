@@ -72,6 +72,43 @@ namespace PegasusApi.Library.DataAccess
             _dataAccess.SaveData<dynamic>("spTasks_Update", parameters, ConnectionStringName);
         }
 
+        public void AddTaskStatus(TaskStatusModel taskStatus)
+        {
+            var parameters = new
+            {
+                taskStatus.Name,
+                taskStatus.DisplayOrder
+            };
 
+            _dataAccess.SaveData<dynamic>("spTasks_AddTaskStatus", parameters, ConnectionStringName);
+        }
+
+        public void AddTaskType(TaskTypeModel taskType)
+        {
+            var parameters = new
+            {
+                taskType.Name,
+                taskType.DisplayOrder
+            };
+
+            _dataAccess.SaveData<dynamic>("spTasks_AddTaskType", parameters, ConnectionStringName);
+        }
+
+        public void AddTaskPriority(TaskPriorityModel taskPriority)
+        {
+            var parameters = new
+            {
+                taskPriority.Name,
+                taskPriority.DisplayOrder
+            };
+
+            _dataAccess.SaveData<dynamic>("spTasks_AddTaskPriority", parameters, ConnectionStringName);
+        }
+
+        public List<TaskStatusHistoryModel> GetStatusHistory(int taskId)
+        {
+            var output = _dataAccess.LoadData<TaskStatusHistoryModel, dynamic>("spTasks_GetStatusHistory", new { taskId }, ConnectionStringName);
+            return output;
+        }
     }
 }

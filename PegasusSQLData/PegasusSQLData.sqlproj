@@ -91,5 +91,9 @@
     <Build Include="dbo\Stored Procedures\spComments_Add.sql" />
     <Build Include="dbo\Stored Procedures\spComments_Update.sql" />
     <Build Include="dbo\Stored Procedures\spComments_GetAllForTask.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_AddTaskStatus.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_AddTaskType.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_AddTaskPriority.sql" />
+    <Build Include="dbo\Stored Procedures\spTasks_GetStatusHistory.sql" />
   </ItemGroup>
 </Project>

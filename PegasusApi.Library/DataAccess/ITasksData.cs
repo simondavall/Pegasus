@@ -13,5 +13,9 @@ namespace PegasusApi.Library.DataAccess
         List<TaskTypeModel> GetAllTaskTypes();
         void AddTask(TaskModel task);
         void UpdateTask(TaskModel task);
+        void AddTaskStatus(TaskStatusModel taskStatus);
+        void AddTaskType(TaskTypeModel taskType);
+        void AddTaskPriority(TaskPriorityModel taskPriority);
+        List<TaskStatusHistoryModel> GetStatusHistory(int taskId);
     }
 }
