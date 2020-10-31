@@ -82,7 +82,7 @@ namespace Pegasus.Controllers
             var taskModel = new TaskModel
             {
                 ProjectId = projectId,
-                TaskRef = $"{project.ProjectPrefix}-<tba>"
+                TaskRef = $"{project.ProjectPrefix}-<tbc>"
             };
             var model = await TaskViewModel.Create(new TaskViewModelArgs {
                 ProjectsEndpoint = _projectsEndpoint,
