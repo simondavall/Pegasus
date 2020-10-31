@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Pegasus.Library\Pegasus.Library.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Home\" />
+  </ItemGroup>
+
 </Project>
