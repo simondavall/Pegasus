@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
+using Pegasus.Library.Models;
 
 namespace Pegasus
 {
@@ -27,7 +28,7 @@ namespace Pegasus
             services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
 
             services.AddSingleton<IApiHelper, ApiHelper>();
-            //TODO Add loggedInUser Singleton here
+            services.AddSingleton<ILoggedInUserModel, LoggedInUserModel>();
 
             services.AddControllersWithViews();
         }

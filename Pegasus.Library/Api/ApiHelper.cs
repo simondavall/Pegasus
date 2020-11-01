@@ -5,6 +5,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Library.Api
 {
@@ -41,6 +42,36 @@ namespace Pegasus.Library.Api
             
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public async Task<AuthenticatedUser> Authenticate(string username, string password)
+        {
+            var data = new FormUrlEncodedContent(
+                new[]
+                {
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", username),
+                    new KeyValuePair<string, string>("password", password)
+                });
+
+            using (var response = await ApiClient.PostAsync("/token", data))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
+                    result.Succeeded = true;
+                    return result;
+                }
+                else
+                {
+                    var result = new AuthenticatedUser
+                    {
+                        Succeeded = false,
+                        FailedReason = response.ReasonPhrase
+                    };
+                    return result;
+                }
+            }
         }
 
         public async Task<T> GetFromUri<T>(string requestUri)

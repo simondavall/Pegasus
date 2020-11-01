@@ -65,17 +65,17 @@ namespace PegasusTests.ExtensionTests
         }
 
         [Test]
-        public void TimeLapsed_For29days_Returns29days()
+        public void TimeLapsed_For28days_Returns28days()
         {
-            var sut = DateTime.Now.AddMonths(-0).AddDays(-30).AddHours(-10).AddMinutes(-0);
+            var sut = DateTime.Now.AddMonths(-0).AddDays(-28).AddHours(-10).AddMinutes(-0);
 
-            Assert.AreEqual("1 mth ago", sut.LapsedTime());
+            Assert.AreEqual("28 days ago", sut.LapsedTime());
         }
 
         [Test]
-        public void TimeLapsed_For30days_Returns1month()
+        public void TimeLapsed_For31days_Returns1month()
         {
-            var sut = DateTime.Now.AddMonths(-0).AddDays(-30).AddHours(-10).AddMinutes(-0);
+            var sut = DateTime.Now.AddMonths(-0).AddDays(-31).AddHours(-10).AddMinutes(-0);
 
             Assert.AreEqual("1 mth ago", sut.LapsedTime());
         }

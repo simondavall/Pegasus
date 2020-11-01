@@ -35,7 +35,15 @@ namespace PegasusApi.Controllers
         //    return data.GetUserById(userId).First();
         //}
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("Admin/GetById")]
+        private IdentityUser GetUserById(string userId)
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == userId);
+        }
+
+        //[Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
