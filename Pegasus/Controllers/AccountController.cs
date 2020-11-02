@@ -40,8 +40,8 @@ namespace Pegasus.Controllers
                 //// This doesn't count login failures towards account lockout
                 //// To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                //TODO Nothing assigned to the Remember Me checkbox at the moment
-                //TODO Consider enabling lockoutOnFailure
+                //TODO PGS-71 Nothing assigned to the Remember Me checkbox at the moment
+                //TODO PGS-72 Consider enabling lockoutOnFailure
                 var result = await _apiHelper.Authenticate(model.Email, model.Password);
 
                 if (result.Succeeded)
@@ -53,12 +53,12 @@ namespace Pegasus.Controllers
                     _logger.LogInformation("User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
-                //TODO Add this next line if we need 2fa
+                //TODO PGS-73 Add this next line if we need 2fa
                 //if (result.RequiresTwoFactor)
                 //{
                 //    return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl, model.RememberMe });
                 //}
-                // TODO Implement Lockout recovery
+                // TODO PGS-72 Implement Lockout recovery
                 //if (result.IsLockedOut)
                 //{
                 //    _logger.LogWarning("User account locked out.");

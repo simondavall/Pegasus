@@ -149,7 +149,7 @@ namespace Pegasus.Controllers
                     await _commentsEndpoint.AddComment(new TaskCommentModel {TaskId = projectTask.Id, Comment = newComment });
                 }
                 var projectTaskExt = new ProjectTaskExt(projectTask);
-                //TODO CHeck whether adding an IsClose() extension method to TaskModel might be better
+                //TODO PGS-74 CHeck whether adding an IsClose() extension method to TaskModel might be better
                 if (projectTaskExt.IsClosed && projectTask.TaskStatusId != existingTaskStatus)
                 {
                     return RedirectToAction("Index");
