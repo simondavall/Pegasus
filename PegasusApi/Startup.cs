@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;
 using PegasusApi.Library.DataAccess;
-using PegasusApi.Library.JwtAuthentication;
+using PegasusApi.Library.JwtAuthentication.Extensions;
 using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
 
 namespace PegasusApi
@@ -49,27 +47,7 @@ namespace PegasusApi
                 Configuration["Token:Issuer"],
                 Configuration["Token:SigningKey"]);
 
-            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(serviceProvider =>
-                new JwtTokenGenerator(tokenOptions));
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = "JwtBearer";
-                options.DefaultChallengeScheme = "JwtBearer";
-            })
-                .AddJwtBearer("JwtBearer", jwtBearerOption =>
-                {
-                    jwtBearerOption.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = tokenOptions.SigningKey,
-                        ValidateIssuer = true,
-                        ValidIssuer = tokenOptions.Issuer,
-                        ValidateAudience = true,
-                        ValidAudience = tokenOptions.Audience,
-                        ClockSkew = TimeSpan.FromMinutes(1)
-                    };
-                });
+            services.AddJwtAuthenticationForApi(tokenOptions);
 
             services.AddSwaggerGen(setup =>
             {
