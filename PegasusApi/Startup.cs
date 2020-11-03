@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.JwtAuthentication.Extensions;
+using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
 
 namespace PegasusApi
 {
@@ -27,16 +29,25 @@ namespace PegasusApi
             services.AddTransient<IProjectsData, ProjectsData>();
             services.AddTransient<ITasksData, TasksData>();
             services.AddTransient<ICommentsData, CommentsData>();
+            
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("PegasusAuth")));
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            var tokenOptions = new JwtModels.TokenOptions(
+                Configuration["Token:Audience"],
+                Configuration["Token:Issuer"],
+                Configuration["Token:SigningKey"]);
+
+            services.AddJwtAuthenticationForApi(tokenOptions);
 
             services.AddSwaggerGen(setup =>
             {

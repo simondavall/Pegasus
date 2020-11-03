@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{52316936-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Worker Service", "Worker Service", "{EE3438E0-9987-4EEA-8339-9F52D60DE9EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PegasusApi.Tests", "PegasusApi.Tests\PegasusApi.Tests.csproj", "{C3C35E03-184F-4214-A9CC-E9691FBCCF36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{7FCE316C-849E-4035-A62B-437BC8E3B01A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FCE316C-849E-4035-A62B-437BC8E3B01A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FCE316C-849E-4035-A62B-437BC8E3B01A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C35E03-184F-4214-A9CC-E9691FBCCF36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C35E03-184F-4214-A9CC-E9691FBCCF36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C35E03-184F-4214-A9CC-E9691FBCCF36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C35E03-184F-4214-A9CC-E9691FBCCF36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{1F87F29E-94AC-4016-A8EF-EA73822B9F9B} = {52316936-BD48-4938-89A0-9C4EC32BB18F}
 		{C4CFC32C-A032-47EC-91E6-4FC8096AC7D3} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
 		{7FCE316C-849E-4035-A62B-437BC8E3B01A} = {06CF6EF2-637A-4DC4-95A8-555A713A6386}
+		{C3C35E03-184F-4214-A9CC-E9691FBCCF36} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A88CDAC7-AF12-41D8-B2A8-9F9EC58A5053}

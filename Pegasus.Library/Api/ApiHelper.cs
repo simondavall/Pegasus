@@ -5,13 +5,13 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Library.Api
 {
     public class ApiHelper : IApiHelper
     {
         private readonly IConfiguration _configuration;
-        private HttpClient _apiClient;
 
         public ApiHelper(IConfiguration configuration)
         {
@@ -19,10 +19,7 @@ namespace Pegasus.Library.Api
             InitializeClient();
         }
 
-        public HttpClient ApiClient
-        {
-            get { return _apiClient; }
-        }
+        public HttpClient ApiClient { get; private set; }
 
         private void InitializeClient()
         {
@@ -33,14 +30,44 @@ namespace Pegasus.Library.Api
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
             };
 
-            _apiClient = new HttpClient(httpClientHandler)
+            ApiClient = new HttpClient(httpClientHandler)
             {
                 BaseAddress = new Uri(apiRoot)
             };
             
             
-            _apiClient.DefaultRequestHeaders.Accept.Clear();
-            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            ApiClient.DefaultRequestHeaders.Accept.Clear();
+            ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public async Task<AuthenticatedUser> Authenticate(string username, string password)
+        {
+            var data = new FormUrlEncodedContent(
+                new[]
+                {
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", username),
+                    new KeyValuePair<string, string>("password", password)
+                });
+
+            using (var response = await ApiClient.PostAsync("/token", data))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
+                    result.Succeeded = true;
+                    return result;
+                }
+                else
+                {
+                    var result = new AuthenticatedUser
+                    {
+                        Succeeded = false,
+                        FailedReason = response.ReasonPhrase
+                    };
+                    return result;
+                }
+            }
         }
 
         public async Task<T> GetFromUri<T>(string requestUri)

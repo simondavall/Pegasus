@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
+using Pegasus.Library.JwtAuthentication.Extensions;
+using Pegasus.Library.JwtAuthentication.Models;
+using Pegasus.Library.Models;
 
 namespace Pegasus
 {
@@ -27,7 +30,15 @@ namespace Pegasus
             services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
 
             services.AddSingleton<IApiHelper, ApiHelper>();
-            //TODO Add loggedInUser Singleton here
+            services.AddSingleton<ILoggedInUserModel, LoggedInUserModel>();
+
+            //TODO See if these options can be moved to the JwtAuth method, and pass the configuration
+            var tokenOptions = new TokenOptions(
+                Configuration["Token:Audience"],
+                Configuration["Token:Issuer"],
+                Configuration["Token:SigningKey"]);
+
+            services.AddJwtAuthenticationWithProtectedCookie(tokenOptions);
 
             services.AddControllersWithViews();
         }
@@ -50,6 +61,7 @@ namespace Pegasus
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
