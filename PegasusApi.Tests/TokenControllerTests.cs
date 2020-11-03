@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using PegasusApi.Controllers;
@@ -16,10 +19,18 @@ namespace PegasusApi.Tests
         private UserManager<IdentityUser> _userManager;
         private string _username = "test.user@email.com";
         private string _password = "SecretPassword";
+        private IConfiguration _configuration;
 
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
+            var jsonConfig = "{ \"Token\": { \"Issuer\": \"https://localhost:5001\", \"Audience\": \"https://localhost:5002\", \"SigningKey\": \"MySecretKeyIsSecretSoDoNotTell\" }}";
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonConfig));
+
+            _configuration = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+
             var user1 = new IdentityUser { Id = "12345", UserName = _username, PasswordHash = _password };
 
             _options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -40,7 +51,7 @@ namespace PegasusApi.Tests
         {
             using (var context = new ApplicationDbContext(_options))
             {
-                var tokenController = new TokenController(context, _userManager);
+                var tokenController = new TokenController(context, _userManager, _configuration);
 
                 var sut = tokenController.Create(_username, _password, "password").Result;
 

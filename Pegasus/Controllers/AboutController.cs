@@ -5,7 +5,7 @@ using Pegasus.Models;
 
 namespace Pegasus.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class AboutController : Controller
     {
         public IActionResult Index()

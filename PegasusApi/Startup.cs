@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using PegasusApi.Library.DataAccess;
+using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
 
 namespace PegasusApi
 {
@@ -42,6 +42,11 @@ namespace PegasusApi
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            var tokenOptions = new JwtModels.TokenOptions(
+                Configuration["Token:Audience"],
+                Configuration["Token:Issuer"],
+                Configuration["Token:SigningKey"]);
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "JwtBearer";
@@ -52,11 +57,12 @@ namespace PegasusApi
                     jwtBearerOption.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKeyIsSecretSoDoNotTell")),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.FromMinutes(5)
+                        IssuerSigningKey = tokenOptions.SigningKey,
+                        ValidateIssuer = true,
+                        ValidIssuer = tokenOptions.Issuer,
+                        ValidateAudience = true,
+                        ValidAudience = tokenOptions.Audience,
+                        ClockSkew = TimeSpan.FromMinutes(1)
                     };
                 });
 

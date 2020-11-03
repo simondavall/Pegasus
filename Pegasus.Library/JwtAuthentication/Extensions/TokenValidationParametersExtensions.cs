@@ -10,19 +10,13 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
             this TokenOptions tokenOptions) =>
             new TokenValidationParameters
             {
-                ClockSkew = TimeSpan.Zero,
-
-                ValidateAudience = true,
-                ValidAudience = tokenOptions.Audience,
-
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = tokenOptions.SigningKey,
                 ValidateIssuer = true,
                 ValidIssuer = tokenOptions.Issuer,
-
-                IssuerSigningKey = tokenOptions.SigningKey,
-                ValidateIssuerSigningKey = true,
-
-                RequireExpirationTime = true,
-                ValidateLifetime = true
+                ValidateAudience = true,
+                ValidAudience = tokenOptions.Audience,
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
     }
 }

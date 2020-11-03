@@ -23,12 +23,12 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
             var hostingEnvironment = services.BuildServiceProvider().GetService<IHostEnvironment>();
 
             // The JwtAuthTicketFormat representing the cookie needs an IDataProtector and
-            // IDataSerialiser to correctly encrypt/decrypt and serialise/deserialise the payload
+            // IDataSerializer to correctly encrypt/decrypt and serialize/deserialize the payload
             // respectively. This requirement is enforced by ISecureDataFormat interface in ASP.NET
             // Core. Read more about ASP.NET Core Data Protection API here:
             // https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/
             // NB: This is only required if you're using JWT with Cookie based authentication, for
-            //     cookieless auth (such as with a Web API) the data protection and serialisation
+            //     cookieless auth (such as with a Web API) the data protection and serialization
             //     dependencies won't be needed. You simply need to set the validation params and add
             //     the token generator dependencies and use the right authentication extension below.
 
@@ -70,18 +70,20 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                         services.BuildServiceProvider().GetService<IDataSerializer<AuthenticationTicket>>(),
                         services.BuildServiceProvider().GetDataProtector(new[] { $"{applicationName}-Auth1" }));
 
-                    options.LoginPath = authUrlOptions != null
-                        ? new PathString(authUrlOptions.LoginPath)
-                        : new PathString("/Account/Login");
-                    options.LogoutPath = authUrlOptions != null
-                        ? new PathString(authUrlOptions.LogoutPath)
-                        : new PathString("/Account/Logout");
-
-                    options.AccessDeniedPath = options.LoginPath;
+                    options.LoginPath = GetPath(authUrlOptions?.LoginPath, "/Account/Login");
+                    options.LogoutPath = GetPath(authUrlOptions?.LogoutPath, "/Account/Logout");
+                    options.AccessDeniedPath = GetPath(authUrlOptions?.AccessDeniedPath, "/Account/Login");
                     options.ReturnUrlParameter = authUrlOptions?.ReturnUrlParameter ?? "returnUrl";
                 });
 
             return services;
+        }
+
+        private static string GetPath(string pathFromConfig, string defaultPath)
+        {
+            return pathFromConfig != null
+                ? new PathString(pathFromConfig)
+                : new PathString(defaultPath);
         }
     }
 }

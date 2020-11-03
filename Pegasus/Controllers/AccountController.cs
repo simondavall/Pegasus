@@ -60,25 +60,8 @@ namespace Pegasus.Controllers
 
                     _logger.LogInformation("User logged in.");
 
-                    var userInfo = new UserInfo
-                    {
-                        FirstName = "Simon",
-                        LastName = "Da Vall",
-                        HasAdminRights = true
-                    };
-
-                    var userCredentials = new UserCredentials
-                    {
-                        Username = model.Email,
-                        Password = model.Password
-                    };
-
-                    var accessTokenResult = _tokenGenerator.GenerateAccessTokenWithClaimsPrincipal(
-                        userCredentials.Username,
-                        AddMyClaims(userInfo));
-
+                    var accessTokenResult = _tokenGenerator.GetAccessTokenWithClaimsPrincipal(result);
                     await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
-                    //returnTo = returnUrl;
 
                     return RedirectToLocal(returnUrl);
                 }

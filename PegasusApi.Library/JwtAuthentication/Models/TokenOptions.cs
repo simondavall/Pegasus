@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Pegasus.Library.JwtAuthentication.Models
+namespace PegasusApi.Library.JwtAuthentication.Models
 {
     /// <summary>
     ///     A structure containing the various options required

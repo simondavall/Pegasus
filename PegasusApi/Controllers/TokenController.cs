@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PegasusApi.Data;
 using PegasusApi.Models;
+using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
 
 namespace PegasusApi.Controllers
 {
@@ -17,11 +18,13 @@ namespace PegasusApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         [Route("/token")]
@@ -53,11 +56,18 @@ namespace PegasusApi.Controllers
                 where ur.UserId == user.Id
                 select new {ur.UserId, ur.RoleId, r.Name};
 
+            var tokenOptions = new JwtModels.TokenOptions(
+                _configuration["Token:Audience"],
+                _configuration["Token:Issuer"],
+                _configuration["Token:SigningKey"]);
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iss, tokenOptions.Issuer),                
+                new Claim(JwtRegisteredClaimNames.Aud, tokenOptions.Audience),
                 new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
                 new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
             };
@@ -68,10 +78,7 @@ namespace PegasusApi.Controllers
             }
 
             var token = new JwtSecurityToken(
-                new JwtHeader(
-                    new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKeyIsSecretSoDoNotTell")),
-                        SecurityAlgorithms.HmacSha256)), 
+                new JwtHeader(new SigningCredentials(tokenOptions.SigningKey, SecurityAlgorithms.HmacSha256)), 
                 new JwtPayload(claims));
 
             var output = new TokenModel
