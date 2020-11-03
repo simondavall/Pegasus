@@ -1,8 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
+using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models;
 using Pegasus.Models.Account;
 
@@ -13,12 +18,15 @@ namespace Pegasus.Controllers
         private readonly ILogger _logger;
         private readonly IApiHelper _apiHelper;
         private readonly ILoggedInUserModel _loggedInUser;
+        private readonly IJwtTokenGenerator _tokenGenerator;
 
-        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, ILoggedInUserModel loggedInUser)
+        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, 
+            ILoggedInUserModel loggedInUser, IJwtTokenGenerator tokenGenerator)
         {
             _logger = logger;
             _apiHelper = apiHelper;
             _loggedInUser = loggedInUser;
+            _tokenGenerator = tokenGenerator;
         }
 
         [HttpGet]
@@ -51,6 +59,27 @@ namespace Pegasus.Controllers
                     _loggedInUser.IsLoggedIn = true;
 
                     _logger.LogInformation("User logged in.");
+
+                    var userInfo = new UserInfo
+                    {
+                        FirstName = "Simon",
+                        LastName = "Da Vall",
+                        HasAdminRights = true
+                    };
+
+                    var userCredentials = new UserCredentials
+                    {
+                        Username = model.Email,
+                        Password = model.Password
+                    };
+
+                    var accessTokenResult = _tokenGenerator.GenerateAccessTokenWithClaimsPrincipal(
+                        userCredentials.Username,
+                        AddMyClaims(userInfo));
+
+                    await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
+                    //returnTo = returnUrl;
+
                     return RedirectToLocal(returnUrl);
                 }
                 //TODO PGS-73 Add this next line if we need 2fa
@@ -77,13 +106,18 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Logout(string returnUrl = null)
+
+        //TODO Should this be POST only?
+        [Authorize]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout(string returnUrl = null)
         {
             _loggedInUser.Username = string.Empty;
             _loggedInUser.Token = string.Empty;
             _loggedInUser.IsLoggedIn = false;
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             _logger.LogInformation("User logged in.");
             ViewData["ReturnUrl"] = returnUrl;
@@ -101,5 +135,34 @@ namespace Pegasus.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
+
+        private static IEnumerable<Claim> AddMyClaims(UserInfo authenticatedUser)
+        {
+            var myClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.GivenName, authenticatedUser.FirstName),
+                new Claim(ClaimTypes.Surname, authenticatedUser.LastName),
+                new Claim("HasAdminRights", authenticatedUser.HasAdminRights ? "Y" : "N")
+            };
+
+            return myClaims;
+        }
     }
+
+    public class UserInfo
+    {
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public bool HasAdminRights { get; set; }
+    }
+
+    public class UserCredentials
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+
 }
