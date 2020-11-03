@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.JwtAuthentication;
 using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
 
 namespace PegasusApi
@@ -30,6 +31,7 @@ namespace PegasusApi
             services.AddTransient<IProjectsData, ProjectsData>();
             services.AddTransient<ITasksData, TasksData>();
             services.AddTransient<ICommentsData, CommentsData>();
+            
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
@@ -46,6 +48,9 @@ namespace PegasusApi
                 Configuration["Token:Audience"],
                 Configuration["Token:Issuer"],
                 Configuration["Token:SigningKey"]);
+
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(serviceProvider =>
+                new JwtTokenGenerator(tokenOptions));
 
             services.AddAuthentication(options =>
             {

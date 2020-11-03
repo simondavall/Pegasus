@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using PegasusApi.Library.JwtAuthentication.Models;
+using TokenOptions = PegasusApi.Library.JwtAuthentication.Models.TokenOptions;
 
 
 namespace PegasusApi.Library.JwtAuthentication
@@ -27,33 +28,29 @@ namespace PegasusApi.Library.JwtAuthentication
                     $"An instance of valid {nameof(TokenOptions)} must be passed in order to generate a JWT!");
         }
 
-        public string GenerateAccessToken(string userName, IEnumerable<Claim> userClaims)
+        public string GenerateAccessToken(IdentityUser user, IEnumerable<Claim> userClaims)
         {
-            var expiration = TimeSpan.FromMinutes(_tokenOptions.TokenExpiryInMinutes);
-            var jwt = new JwtSecurityToken(issuer: _tokenOptions.Issuer,
-                                           audience: _tokenOptions.Audience,
-                                           claims: MergeUserClaimsWithDefaultClaims(userName, userClaims),
-                                           notBefore: DateTime.UtcNow,
-                                           expires: DateTime.UtcNow.Add(expiration),
-                                           signingCredentials: new SigningCredentials(
-                                               _tokenOptions.SigningKey,
-                                               SecurityAlgorithms.HmacSha256));
+            var claims = MergeUserClaimsWithDefaultClaims(user, userClaims);
+
+            var jwt = new JwtSecurityToken(
+                new JwtHeader(new SigningCredentials(_tokenOptions.SigningKey, SecurityAlgorithms.HmacSha256)),
+                new JwtPayload(claims));
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
-
             return accessToken;
         }
 
-        private static IEnumerable<Claim> MergeUserClaimsWithDefaultClaims(string userName, IEnumerable<Claim> userClaims)
+        private IEnumerable<Claim> MergeUserClaimsWithDefaultClaims(IdentityUser user, IEnumerable<Claim> userClaims)
         {
             var claims = new List<Claim>(userClaims)
             {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(JwtRegisteredClaimNames.Sub, userName),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-                new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-                new Claim(JwtRegisteredClaimNames.Exp, DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+                new Claim(JwtRegisteredClaimNames.Iss, _tokenOptions.Issuer),
+                new Claim(JwtRegisteredClaimNames.Aud, _tokenOptions.Audience),
+                new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
+                new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddMinutes(_tokenOptions.TokenExpiryInMinutes)).ToUnixTimeSeconds().ToString())
             };
 
             return claims;
