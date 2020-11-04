@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -17,15 +15,13 @@ namespace Pegasus.Controllers
     {
         private readonly ILogger _logger;
         private readonly IApiHelper _apiHelper;
-        private readonly ILoggedInUserModel _loggedInUser;
         private readonly IJwtTokenGenerator _tokenGenerator;
 
         public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, 
-            ILoggedInUserModel loggedInUser, IJwtTokenGenerator tokenGenerator)
+            IJwtTokenGenerator tokenGenerator)
         {
             _logger = logger;
             _apiHelper = apiHelper;
-            _loggedInUser = loggedInUser;
             _tokenGenerator = tokenGenerator;
         }
 
@@ -50,14 +46,11 @@ namespace Pegasus.Controllers
                 //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 //TODO PGS-71 Nothing assigned to the Remember Me checkbox at the moment
                 //TODO PGS-72 Consider enabling lockoutOnFailure
-                var result = await _apiHelper.Authenticate(model.Email, model.Password);
+                var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
+                var result = await _apiHelper.Authenticate(credentials);
 
                 if (result.Succeeded)
                 {
-                    _loggedInUser.Username = result.Username;
-                    _loggedInUser.Token = result.AccessToken;
-                    _loggedInUser.IsLoggedIn = true;
-
                     _logger.LogInformation("User logged in.");
 
                     var accessTokenResult = _tokenGenerator.GetAccessTokenWithClaimsPrincipal(result);
@@ -89,17 +82,12 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-
         //TODO Should this be POST only?
         [Authorize]
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
-            _loggedInUser.Username = string.Empty;
-            _loggedInUser.Token = string.Empty;
-            _loggedInUser.IsLoggedIn = false;
-
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             _logger.LogInformation("User logged in.");
@@ -118,34 +106,5 @@ namespace Pegasus.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
-
-        private static IEnumerable<Claim> AddMyClaims(UserInfo authenticatedUser)
-        {
-            var myClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.GivenName, authenticatedUser.FirstName),
-                new Claim(ClaimTypes.Surname, authenticatedUser.LastName),
-                new Claim("HasAdminRights", authenticatedUser.HasAdminRights ? "Y" : "N")
-            };
-
-            return myClaims;
-        }
     }
-
-    public class UserInfo
-    {
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public bool HasAdminRights { get; set; }
-    }
-
-    public class UserCredentials
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-
 }

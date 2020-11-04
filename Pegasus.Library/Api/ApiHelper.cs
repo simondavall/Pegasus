@@ -35,19 +35,18 @@ namespace Pegasus.Library.Api
                 BaseAddress = new Uri(apiRoot)
             };
             
-            
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<AuthenticatedUser> Authenticate(string username, string password)
+        public async Task<AuthenticatedUser> Authenticate(UserCredentials credentials)
         {
             var data = new FormUrlEncodedContent(
                 new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", username),
-                    new KeyValuePair<string, string>("password", password)
+                    new KeyValuePair<string, string>("username", credentials?.Username),
+                    new KeyValuePair<string, string>("password", credentials?.Password)
                 });
 
             using (var response = await ApiClient.PostAsync("/token", data))
