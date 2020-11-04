@@ -46,6 +46,7 @@ namespace PegasusApi.Library.JwtAuthentication
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, "PegasusUser"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iss, _tokenOptions.Issuer),
                 new Claim(JwtRegisteredClaimNames.Aud, _tokenOptions.Audience),

@@ -1,11 +1,12 @@
-﻿@using Pegasus.Library.Models
-@inject ILoggedInUserModel LoggedInUser
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpAccessor
 
 <ul class="navbar-nav">
-    @if (LoggedInUser.IsLoggedIn)
+    @if (HttpAccessor.HttpContext.User.HasClaim(ClaimTypes.Role, "PegasusUser"))
     {
         <li class="nav-item">
-            <a class="nav-link" asp-area="" asp-page="" title="Manage">Hello @LoggedInUser.Username!</a>
+            <a class="nav-link" asp-area="" asp-page="" title="Manage">Hello @HttpAccessor.HttpContext.User.Identity.Name!</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>

@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Pegasus.Library.Api;
+using Pegasus.Library.Models;
 
 namespace PegasusTests
 {
@@ -18,13 +19,13 @@ namespace PegasusTests
                .AddJsonStream(stream)
                .Build();
 
+            //TODO Urgent!! Change this to use a mock authentication rather than real credentials
             var apiHelper = new ApiHelper(configuration);
-            var username = "simon.davall@gmail.com";
-            var password = "H3r3ford!!";
-            var sut = apiHelper.Authenticate(username, password).Result;
+            var credentials = new UserCredentials {Username = "simon.davall@gmail.com", Password = "H3r3ford!!"};
+            var sut = apiHelper.Authenticate(credentials).Result;
 
             Assert.IsNotNull(sut);
-            Assert.AreEqual(username, sut.Username);
+            Assert.AreEqual(credentials.Username, sut.Username);
         }
     }
 }
