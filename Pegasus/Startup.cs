@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
-using Pegasus.Library.Models;
 using TokenOptions = Pegasus.Library.JwtAuthentication.Models.TokenOptions;
 
 namespace Pegasus
@@ -30,6 +28,7 @@ namespace Pegasus
             services.AddTransient<ITasksEndpoint, TasksEndpoint>();
             services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
 
+            services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
 
             //TODO See if these options can be moved to the JwtAuth method, and pass the configuration
@@ -40,7 +39,7 @@ namespace Pegasus
 
             services.AddJwtAuthenticationWithProtectedCookie(tokenOptions);
 
-            services.AddHttpContextAccessor();
+
             services.AddControllersWithViews();
         }
 

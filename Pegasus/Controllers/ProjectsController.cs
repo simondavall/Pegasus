@@ -1,11 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 
 namespace Pegasus.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProjectsController : Controller
     {
         private readonly IProjectsEndpoint _projectsEndpoint;
@@ -54,7 +56,6 @@ namespace Pegasus.Controllers
             return View(project);
         }
 
-        // POST: Projects/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -82,7 +83,6 @@ namespace Pegasus.Controllers
             return View(project);
         }
 
-        // GET: Projects/Delete/
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -95,7 +95,6 @@ namespace Pegasus.Controllers
             return View(project);
         }
 
-        // POST: Projects/Delete/5
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]

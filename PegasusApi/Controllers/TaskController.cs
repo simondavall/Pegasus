@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
@@ -72,6 +74,7 @@ namespace PegasusApi.Controllers
             return _taskData.GetAllTaskTypes();
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("AddTaskStatus")]
         [HttpPost]
         public void AddTaskStatus(TaskStatusModel taskStatus)
@@ -79,6 +82,7 @@ namespace PegasusApi.Controllers
             _taskData.AddTaskStatus(taskStatus);
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("AddTaskType")]
         [HttpPost]
         public void AddTaskType(TaskTypeModel taskType)
@@ -86,6 +90,7 @@ namespace PegasusApi.Controllers
             _taskData.AddTaskType(taskType);
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("AddTaskPriority")]
         [HttpPost]
         public void AddTaskPriority(TaskPriorityModel taskPriority)

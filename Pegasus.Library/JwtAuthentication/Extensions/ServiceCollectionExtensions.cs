@@ -41,12 +41,12 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(serviceProvider => new JwtTokenGenerator(tokenOptions));
 
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-                .AddCookie(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
                     // cookie expiration should be set the same as the token expiry (the default is 5
                     // mins). The token generator doesn't provide auto-refresh of an expired token so the
@@ -65,6 +65,7 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                     // that if the incoming token is invalid (may be it was tampered or spoofed) the
                     // Unprotect() method in JwtAuthTicketFormat will simply return null and the
                     // authentication will fail.
+                    options.Cookie.Name = "PegasusAuth";
                     options.TicketDataFormat = new JwtAuthTicketFormat(
                         tokenOptions.ToTokenValidationParams(),
                         services.BuildServiceProvider().GetService<IDataSerializer<AuthenticationTicket>>(),
@@ -72,7 +73,7 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
 
                     options.LoginPath = GetPath(authUrlOptions?.LoginPath, "/Account/Login");
                     options.LogoutPath = GetPath(authUrlOptions?.LogoutPath, "/Account/Logout");
-                    options.AccessDeniedPath = GetPath(authUrlOptions?.AccessDeniedPath, "/Account/Login");
+                    options.AccessDeniedPath = GetPath(authUrlOptions?.AccessDeniedPath, "/Account/AccessDenied");
                     options.ReturnUrlParameter = authUrlOptions?.ReturnUrlParameter ?? "returnUrl";
                 });
 

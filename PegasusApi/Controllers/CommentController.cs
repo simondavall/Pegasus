@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase

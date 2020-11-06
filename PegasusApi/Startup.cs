@@ -6,7 +6,7 @@ using PegasusApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using PegasusApi.Extensions;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.JwtAuthentication.Extensions;
 using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
@@ -48,15 +48,7 @@ namespace PegasusApi
                 Configuration["Token:SigningKey"]);
 
             services.AddJwtAuthenticationForApi(tokenOptions);
-
-            services.AddSwaggerGen(setup =>
-            {
-                setup.SwaggerDoc("v1", new OpenApiInfo()
-                {
-                    Title = "Pegasus Api",
-                    Version = "v1"
-                });
-            });
+            services.AddPegasusSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

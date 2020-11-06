@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Data;
@@ -11,6 +12,7 @@ using PegasusApi.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TokenController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,6 +26,7 @@ namespace PegasusApi.Controllers
             _jwtTokenGenerator = jwtTokenGenerator;
         }
 
+        [AllowAnonymous]
         [Route("/token")]
         [HttpPost]
         public async Task<IActionResult> Create(string username, string password, string grantType)

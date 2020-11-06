@@ -27,10 +27,10 @@ namespace Pegasus.Library.JwtAuthentication.Models
         ///     Any string that is sufficiently long and unguessable will do.
         /// </param>
         /// <param name="tokenExpiryInMinutes">
-        ///     Defaults to 24hrs
+        ///     Defaults to 5 mins
         ///     but can be longer or shorter.
         /// </param>
-        public TokenOptions(string issuer, string audience, string signingKey, int tokenExpiryInMinutes = 1440)
+        public TokenOptions(string issuer, string audience, string signingKey, int tokenExpiryInMinutes = 5)
         {
             if (string.IsNullOrWhiteSpace(audience))
                 throw new ArgumentNullException($"{nameof(Audience)} is mandatory in order to generate a JWT!");
@@ -58,6 +58,6 @@ namespace Pegasus.Library.JwtAuthentication.Models
 
     public struct TokenConstants
     {
-        public const string TokenName = "jwt";
+        public const string TokenName = "access_token";
     }
 }

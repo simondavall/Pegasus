@@ -32,16 +32,17 @@ namespace PegasusApi.Library.JwtAuthentication
         {
             var claims = MergeUserClaimsWithDefaultClaims(user, userClaims);
 
-            var jwt = new JwtSecurityToken(
+            var token = new JwtSecurityToken(
                 new JwtHeader(new SigningCredentials(_tokenOptions.SigningKey, SecurityAlgorithms.HmacSha256)),
                 new JwtPayload(claims));
 
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
             return accessToken;
         }
 
         private IEnumerable<Claim> MergeUserClaimsWithDefaultClaims(IdentityUser user, IEnumerable<Claim> userClaims)
         {
+            // TODO change this to the JwtSecurityToken creator with arguments
             var claims = new List<Claim>(userClaims)
             {
                 new Claim(ClaimTypes.Name, user.UserName),

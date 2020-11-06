@@ -8,6 +8,7 @@ namespace Pegasus.Library.Api
     public interface IApiHelper
     {
         Task<AuthenticatedUser> Authenticate(UserCredentials credentials);
+        void AddTokenToHeaders(string token);
         HttpClient ApiClient { get; }
         Task<T> GetFromUri<T>(string requestUri);
         Task<List<T>> GetListFromUri<T>(string requestUri);
