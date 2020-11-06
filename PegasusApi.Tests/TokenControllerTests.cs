@@ -1,15 +1,4 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using NUnit.Framework;
-using PegasusApi.Controllers;
-using PegasusApi.Data;
-using PegasusApi.Models;
 
 namespace PegasusApi.Tests
 {
@@ -17,38 +6,45 @@ namespace PegasusApi.Tests
     //TODO Need to implement this test for new JwtBearer code.
     // The original tests took too long to run. See if things can be improved.
 
-    //public class TokenControllerTests
-    //{
-    //    private DbContextOptions<ApplicationDbContext> _options;
-    //    private UserManager<IdentityUser> _userManager;
-    //    private string _username = "test.user@email.com";
-    //    private string _password = "SecretPassword";
-    //    private IConfiguration _configuration;
+    public class TokenControllerTests
+    {
 
-    //    [OneTimeSetUp]
-    //    public void OneTimeSetup()
-    //    {
-    //        var jsonConfig = "{ \"Token\": { \"Issuer\": \"https://localhost:5001\", \"Audience\": \"https://localhost:5002\", \"SigningKey\": \"MySecretKeyIsSecretSoDoNotTell\" }}";
-    //        var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonConfig));
+        [Test]
+        public void DefaultTest()
+        {
+            Assert.Pass("Placeholder test");
+        }
 
-    //        _configuration = new ConfigurationBuilder()
-    //            .AddJsonStream(stream)
-    //            .Build();
+        //    private DbContextOptions<ApplicationDbContext> _options;
+        //    private UserManager<IdentityUser> _userManager;
+        //    private string _username = "test.user@email.com";
+        //    private string _password = "SecretPassword";
+        //    private IConfiguration _configuration;
 
-    //        var user1 = new IdentityUser { Id = "12345", UserName = _username, PasswordHash = _password };
+        //    [OneTimeSetUp]
+        //    public void OneTimeSetup()
+        //    {
+        //        var jsonConfig = "{ \"Token\": { \"Issuer\": \"https://localhost:5001\", \"Audience\": \"https://localhost:5002\", \"SigningKey\": \"MySecretKeyIsSecretSoDoNotTell\" }}";
+        //        var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonConfig));
 
-    //        _options = new DbContextOptionsBuilder<ApplicationDbContext>()
-    //            .UseInMemoryDatabase(databaseName: "PegasusAuth")
-    //            .Options;
+        //        _configuration = new ConfigurationBuilder()
+        //            .AddJsonStream(stream)
+        //            .Build();
 
-    //        using (var context = new ApplicationDbContext(_options))
-    //        {
-    //            context.Users.Add(user1);
-    //            context.SaveChanges();
-    //        }
+        //        var user1 = new IdentityUser { Id = "12345", UserName = _username, PasswordHash = _password };
 
-    //        _userManager = MockUserManager(new List<IdentityUser> { user1 }).Object;
-    //    }
+        //        _options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        //            .UseInMemoryDatabase(databaseName: "PegasusAuth")
+        //            .Options;
+
+        //        using (var context = new ApplicationDbContext(_options))
+        //        {
+        //            context.Users.Add(user1);
+        //            context.SaveChanges();
+        //        }
+
+        //        _userManager = MockUserManager(new List<IdentityUser> { user1 }).Object;
+        //    }
 
         //[Test]
         //public void TokenControllerTest()
@@ -82,5 +78,5 @@ namespace PegasusApi.Tests
 
         //    return mgr;
         //}
-    //}
+    }
 }

@@ -11,6 +11,7 @@ using Pegasus.Models.Account;
 
 namespace Pegasus.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     public class AccountController : Controller
     {
         private readonly ILogger _logger;
@@ -25,16 +26,16 @@ namespace Pegasus.Controllers
             _tokenGenerator = tokenGenerator;
         }
 
-        [HttpGet]
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
-        [HttpPost]
         [AllowAnonymous]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
@@ -55,6 +56,8 @@ namespace Pegasus.Controllers
 
                     var accessTokenResult = _tokenGenerator.GetAccessTokenWithClaimsPrincipal(result);
                     await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
+
+                    _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -83,16 +86,23 @@ namespace Pegasus.Controllers
         }
 
         //TODO Should this be POST only?
-        [Authorize]
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
+            _apiHelper.ApiClient.DefaultRequestHeaders.Remove("Authorization");
             _logger.LogInformation("User logged in.");
             ViewData["ReturnUrl"] = returnUrl;
             return RedirectToLocal("/Account/Login");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult AccessDenied(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

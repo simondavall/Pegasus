@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain;
@@ -14,6 +15,7 @@ using Pegasus.Models.TaskList;
 
 namespace Pegasus.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     public class TaskListController : Controller
     {
         private readonly Cookies _cookies;
@@ -34,6 +36,7 @@ namespace Pegasus.Controllers
             _cookies = new Cookies(configuration);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var taskFilterId = GetTaskFilterIdAndUpdateCookie();
@@ -58,20 +61,6 @@ namespace Pegasus.Controllers
             }
 
             return View("../TaskList/Index", model);
-        }
-
-        private int GetProjectIdAndUpdateCookie()
-        {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
-            _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
-            return projectId;
-        }
-
-        private int GetTaskFilterIdAndUpdateCookie()
-        {
-            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
-            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
-            return taskFilterId;
         }
 
         [HttpGet]
@@ -115,6 +104,7 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var projectTask = await _tasksEndpoint.GetTask(id);
@@ -175,6 +165,20 @@ namespace Pegasus.Controllers
         {
             var model = new BaseViewModel { ProjectId = 0 };
             return View(model);
+        }
+
+        private int GetProjectIdAndUpdateCookie()
+        {
+            var projectId = _settings.GetSetting(Request, "Project.Id");
+            _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
+            return projectId;
+        }
+
+        private int GetTaskFilterIdAndUpdateCookie()
+        {
+            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
+            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
+            return taskFilterId;
         }
     }
 }

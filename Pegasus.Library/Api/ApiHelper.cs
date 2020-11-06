@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Library.Models;
 
@@ -12,10 +14,12 @@ namespace Pegasus.Library.Api
     public class ApiHelper : IApiHelper
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiHelper(IConfiguration configuration)
+        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
             InitializeClient();
         }
 
@@ -37,6 +41,9 @@ namespace Pegasus.Library.Api
             
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var token = _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+            AddTokenToHeaders(token.Result);
         }
 
         public async Task<AuthenticatedUser> Authenticate(UserCredentials credentials)
@@ -67,6 +74,12 @@ namespace Pegasus.Library.Api
                     return result;
                 }
             }
+        }
+
+        public void AddTokenToHeaders(string token)
+        {
+            ApiClient.DefaultRequestHeaders.Remove("Authorization");
+            ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
 
         public async Task<T> GetFromUri<T>(string requestUri)
