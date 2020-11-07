@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
@@ -20,23 +21,23 @@ namespace PegasusApi.Controllers
 
         [Route("GetComments/{taskId}")]
         [HttpGet]
-        public IEnumerable<TaskCommentModel> GetComments(int taskId)
+        public async Task<IEnumerable<TaskCommentModel>> GetComments(int taskId)
         {
-             return _commentsData.GetComments(taskId);
+             return await _commentsData.GetComments(taskId);
         }
 
         [Route("AddComment")]
         [HttpPost]
-        public void AddComment(TaskCommentModel taskComment)
+        public async Task AddComment(TaskCommentModel taskComment)
         {
-            _commentsData.AddComment(taskComment);
+            await _commentsData.AddComment(taskComment);
         }
 
         [Route("UpdateComments")]
         [HttpPost]
-        public void UpdateComments(IEnumerable<TaskCommentModel> taskComments)
+        public async Task UpdateComments(IEnumerable<TaskCommentModel> taskComments)
         {
-            _commentsData.UpdateComments(taskComments);
+            await _commentsData.UpdateComments(taskComments);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Library.DataAccess
@@ -14,43 +15,43 @@ namespace PegasusApi.Library.DataAccess
             _dataAccess = dataAccess;
         }
 
-        public TaskModel GetTask(int id)
+        public async Task<TaskModel> GetTask(int id)
         {
-            var output = _dataAccess.LoadData<TaskModel, dynamic>("spTasks_Get", new { id }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskModel, dynamic>("spTasks_Get", new { id }, ConnectionStringName);
             return output.FirstOrDefault();
         }
 
-        public List<TaskModel> GetTasks(int projectId)
+        public async Task<List<TaskModel>> GetTasks(int projectId)
         {
-            var output = _dataAccess.LoadData<TaskModel, dynamic>("spTasks_GetAllForProject", new { projectId }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskModel, dynamic>("spTasks_GetAllForProject", new { projectId }, ConnectionStringName);
             return output;
         }
 
-        public List<TaskModel> GetAllTasks()
+        public async Task<List<TaskModel>> GetAllTasks()
         {
-            var output = _dataAccess.LoadData<TaskModel, dynamic>("spTasks_GetAll", new { }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskModel, dynamic>("spTasks_GetAll", new { }, ConnectionStringName);
             return output;
         }
 
-        public List<TaskPriorityModel> GetAllTaskPriorities()
+        public async Task<List<TaskPriorityModel>> GetAllTaskPriorities()
         {
-            var output = _dataAccess.LoadData<TaskPriorityModel, dynamic>("spTasks_GetAllTaskPriorities", new { }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskPriorityModel, dynamic>("spTasks_GetAllTaskPriorities", new { }, ConnectionStringName);
             return output;
         }
 
-        public List<TaskStatusModel> GetAllTaskStatuses()
+        public async Task<List<TaskStatusModel>> GetAllTaskStatuses()
         {
-            var output = _dataAccess.LoadData<TaskStatusModel, dynamic>("spTasks_GetAllTaskStatuses", new { }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskStatusModel, dynamic>("spTasks_GetAllTaskStatuses", new { }, ConnectionStringName);
             return output;
         }
 
-        public List<TaskTypeModel> GetAllTaskTypes()
+        public async Task<List<TaskTypeModel>> GetAllTaskTypes()
         {
-            var output = _dataAccess.LoadData<TaskTypeModel, dynamic>("spTasks_GetAllTaskTypes", new { }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskTypeModel, dynamic>("spTasks_GetAllTaskTypes", new { }, ConnectionStringName);
             return output;
         }
 
-        public void AddTask(TaskModel task)
+        public async Task AddTask(TaskModel task)
         {
             var parameters = new
             {
@@ -58,10 +59,10 @@ namespace PegasusApi.Library.DataAccess
                 task.TaskTypeId, task.TaskPriorityId, task.FixedInRelease
             };
 
-            _dataAccess.SaveData<dynamic>("spTasks_Add", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spTasks_Add", parameters, ConnectionStringName);
         }
 
-        public void UpdateTask(TaskModel task)
+        public async Task UpdateTask(TaskModel task)
         {
             var parameters = new
             {
@@ -69,10 +70,10 @@ namespace PegasusApi.Library.DataAccess
                 task.TaskTypeId, task.TaskPriorityId, task.FixedInRelease
             };
 
-            _dataAccess.SaveData<dynamic>("spTasks_Update", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spTasks_Update", parameters, ConnectionStringName);
         }
 
-        public void AddTaskStatus(TaskStatusModel taskStatus)
+        public async Task AddTaskStatus(TaskStatusModel taskStatus)
         {
             var parameters = new
             {
@@ -80,10 +81,10 @@ namespace PegasusApi.Library.DataAccess
                 taskStatus.DisplayOrder
             };
 
-            _dataAccess.SaveData<dynamic>("spTasks_AddTaskStatus", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spTasks_AddTaskStatus", parameters, ConnectionStringName);
         }
 
-        public void AddTaskType(TaskTypeModel taskType)
+        public async Task AddTaskType(TaskTypeModel taskType)
         {
             var parameters = new
             {
@@ -91,10 +92,10 @@ namespace PegasusApi.Library.DataAccess
                 taskType.DisplayOrder
             };
 
-            _dataAccess.SaveData<dynamic>("spTasks_AddTaskType", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spTasks_AddTaskType", parameters, ConnectionStringName);
         }
 
-        public void AddTaskPriority(TaskPriorityModel taskPriority)
+        public async Task AddTaskPriority(TaskPriorityModel taskPriority)
         {
             var parameters = new
             {
@@ -102,12 +103,12 @@ namespace PegasusApi.Library.DataAccess
                 taskPriority.DisplayOrder
             };
 
-            _dataAccess.SaveData<dynamic>("spTasks_AddTaskPriority", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spTasks_AddTaskPriority", parameters, ConnectionStringName);
         }
 
-        public List<TaskStatusHistoryModel> GetStatusHistory(int taskId)
+        public async Task<List<TaskStatusHistoryModel>> GetStatusHistory(int taskId)
         {
-            var output = _dataAccess.LoadData<TaskStatusHistoryModel, dynamic>("spTasks_GetStatusHistory", new { taskId }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<TaskStatusHistoryModel, dynamic>("spTasks_GetStatusHistory", new { taskId }, ConnectionStringName);
             return output;
         }
     }

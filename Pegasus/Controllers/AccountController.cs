@@ -91,7 +91,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            _apiHelper.ApiClient.DefaultRequestHeaders.Remove("Authorization");
+            _apiHelper.RemoveTokenFromHeaders();
             _logger.LogInformation("User logged in.");
             ViewData["ReturnUrl"] = returnUrl;
             return RedirectToLocal("/Account/Login");

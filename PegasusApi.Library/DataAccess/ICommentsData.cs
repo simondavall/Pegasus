@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Library.DataAccess
 {
     public interface ICommentsData
     {
-        List<TaskCommentModel> GetComments(int taskId);
-        void AddComment(TaskCommentModel comment);
-        void UpdateComment(TaskCommentModel comment);
-        void UpdateComments(IEnumerable<TaskCommentModel> comments);
+        Task<List<TaskCommentModel>> GetComments(int taskId);
+        Task AddComment(TaskCommentModel comment);
+        Task UpdateComment(TaskCommentModel comment);
+        Task UpdateComments(IEnumerable<TaskCommentModel> comments);
     }
 }

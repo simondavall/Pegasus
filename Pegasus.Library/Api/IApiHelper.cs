@@ -9,7 +9,8 @@ namespace Pegasus.Library.Api
     {
         Task<AuthenticatedUser> Authenticate(UserCredentials credentials);
         void AddTokenToHeaders(string token);
-        HttpClient ApiClient { get; }
+        void RemoveTokenFromHeaders();
+		HttpClient ApiClient { get; }
         Task<T> GetFromUri<T>(string requestUri);
         Task<List<T>> GetListFromUri<T>(string requestUri);
         Task PostAsync<T>(T model, string requestUri);
