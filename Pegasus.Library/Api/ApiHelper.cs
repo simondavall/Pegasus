@@ -82,6 +82,11 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
 
+        public void RemoveTokenFromHeaders()
+        {
+            ApiClient.DefaultRequestHeaders.Remove("Authorization");
+        }
+
         public async Task<T> GetFromUri<T>(string requestUri)
         {
             using (var response = await ApiClient.GetAsync(requestUri))

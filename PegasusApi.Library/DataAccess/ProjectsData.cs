@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Library.DataAccess
@@ -14,33 +15,33 @@ namespace PegasusApi.Library.DataAccess
             _dataAccess = dataAccess;
         }
 
-        public void AddProject(ProjectModel project)
+        public  async Task AddProject(ProjectModel project)
         {
             var parameters = new { project.Name, project.ProjectPrefix };
-            _dataAccess.SaveData<dynamic>("spProjects_Add", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spProjects_Add", parameters, ConnectionStringName);
         }
 
-        public void DeleteProject(int id)
+        public async Task DeleteProject(int id)
         {
-            _dataAccess.SaveData<dynamic>("spProjects_Delete", new { id }, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spProjects_Delete", new { id }, ConnectionStringName);
         }
 
-        public ProjectModel GetProject(int id)
+        public async Task<ProjectModel> GetProject(int id)
         {
-            var output = _dataAccess.LoadData<ProjectModel, dynamic>("spProjects_Get", new { id }, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<ProjectModel, dynamic>("spProjects_Get", new { id }, ConnectionStringName);
             return output.FirstOrDefault();
         }
 
-        public List<ProjectModel> GetProjects()
+        public async Task<List<ProjectModel>> GetProjects()
         {
-            var output = _dataAccess.LoadData<ProjectModel, dynamic>("spProjects_GetAll", new {}, ConnectionStringName);
+            var output = await _dataAccess.LoadDataAsync<ProjectModel, dynamic>("spProjects_GetAll", new {}, ConnectionStringName);
             return output;
         }
 
-        public void UpdateProject(ProjectModel project)
+        public async Task UpdateProject(ProjectModel project)
         {
             var parameters = new { project.Id, project.Name, project.ProjectPrefix };
-            _dataAccess.SaveData<dynamic>("spProjects_Update", parameters, ConnectionStringName);
+            await _dataAccess.SaveDataAsync<dynamic>("spProjects_Update", parameters, ConnectionStringName);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
@@ -20,89 +21,89 @@ namespace PegasusApi.Controllers
 
         [Route("GetTask/{taskId}")]
         [HttpGet]
-        public TaskModel GetTask(int taskId)
+        public async Task<TaskModel> GetTask(int taskId)
         {
-            return _taskData.GetTask(taskId);
+            return await _taskData.GetTask(taskId);
         }
 
         [Route("GetTasks/{projectId}")]
         [HttpGet]
-        public IEnumerable<TaskModel> GetTasks(int projectId)
+        public async Task<IEnumerable<TaskModel>> GetTasks(int projectId)
         {
-            return _taskData.GetTasks(projectId);
+            return await _taskData.GetTasks(projectId);
         }
 
         [Route("GetAllTasks")]
         [HttpGet]
-        public IEnumerable<TaskModel> GetAllTasks()
+        public async Task<IEnumerable<TaskModel>> GetAllTasks()
         {
-            return _taskData.GetAllTasks();
+            return await _taskData.GetAllTasks();
         }
 
         [Route("AddTask")]
         [HttpPost]
-        public void AddTask(TaskModel task)
+        public async Task AddTask(TaskModel task)
         {
-            _taskData.AddTask(task);
+            await _taskData.AddTask(task);
         }
 
         [Route("UpdateTask")]
         [HttpPost]
-        public void UpdateTask(TaskModel task)
+        public async Task UpdateTask(TaskModel task)
         {
-            _taskData.UpdateTask(task);
+            await _taskData.UpdateTask(task);
         }
 
         [Route("GetAllTaskPriorities")]
         [HttpGet]
-        public IEnumerable<TaskPriorityModel> GetAllTaskPriorities()
+        public async Task<IEnumerable<TaskPriorityModel>> GetAllTaskPriorities()
         {
-            return _taskData.GetAllTaskPriorities();
+            return await _taskData.GetAllTaskPriorities();
         }
 
         [Route("GetAllTaskStatuses")]
         [HttpGet]
-        public IEnumerable<TaskStatusModel> GetAllTaskStatuses()
+        public async Task<IEnumerable<TaskStatusModel>> GetAllTaskStatuses()
         {
-            return _taskData.GetAllTaskStatuses();
+            return await _taskData.GetAllTaskStatuses();
         }
 
         [Route("GetAllTaskTypes")]
         [HttpGet]
-        public IEnumerable<TaskTypeModel> GetAllTaskTypes()
+        public async Task<IEnumerable<TaskTypeModel>> GetAllTaskTypes()
         {
-            return _taskData.GetAllTaskTypes();
+            return await _taskData.GetAllTaskTypes();
         }
 
         [Authorize(Roles = "Admin")]
         [Route("AddTaskStatus")]
         [HttpPost]
-        public void AddTaskStatus(TaskStatusModel taskStatus)
+        public async Task AddTaskStatus(TaskStatusModel taskStatus)
         {
-            _taskData.AddTaskStatus(taskStatus);
+            await _taskData.AddTaskStatus(taskStatus);
         }
 
         [Authorize(Roles = "Admin")]
         [Route("AddTaskType")]
         [HttpPost]
-        public void AddTaskType(TaskTypeModel taskType)
+        public async Task AddTaskType(TaskTypeModel taskType)
         {
-            _taskData.AddTaskType(taskType);
+            await _taskData.AddTaskType(taskType);
         }
 
         [Authorize(Roles = "Admin")]
         [Route("AddTaskPriority")]
         [HttpPost]
-        public void AddTaskPriority(TaskPriorityModel taskPriority)
+        public async Task AddTaskPriority(TaskPriorityModel taskPriority)
         {
-            _taskData.AddTaskPriority(taskPriority);
+            await _taskData.AddTaskPriority(taskPriority);
         }
 
         [Route("GetStatusHistory")]
         [HttpGet]
-        public IEnumerable<TaskStatusHistoryModel> GetStatusHistory(int taskId)
+        public async Task<IEnumerable<TaskStatusHistoryModel>> GetStatusHistory(int taskId)
         {
-            return _taskData.GetStatusHistory(taskId);
+            return await _taskData.GetStatusHistory(taskId);
         }
     }
 }

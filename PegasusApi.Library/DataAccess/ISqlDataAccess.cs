@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PegasusApi.Library.DataAccess
 {
     public interface IDataAccess
     {
-        List<T> LoadData<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName);
-        void SaveData<TParam>(string storedProcedure, TParam parameters, string connectionStringName);
+        Task<List<T>> LoadDataAsync<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName);
+        Task SaveDataAsync<TParam>(string storedProcedure, TParam parameters, string connectionStringName);
     }
 }

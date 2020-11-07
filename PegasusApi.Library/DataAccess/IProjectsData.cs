@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Library.DataAccess
 {
     public interface IProjectsData
     {
-        void AddProject(ProjectModel project);
-        void DeleteProject(int id);
-        ProjectModel GetProject(int id);
-        List<ProjectModel> GetProjects();
-        void UpdateProject(ProjectModel project);
+        Task AddProject(ProjectModel project);
+        Task DeleteProject(int id);
+        Task<ProjectModel> GetProject(int id);
+        Task<List<ProjectModel>> GetProjects();
+        Task UpdateProject(ProjectModel project);
     }
 }
