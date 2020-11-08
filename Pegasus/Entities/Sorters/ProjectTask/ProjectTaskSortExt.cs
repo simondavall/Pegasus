@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Entities.Sorters.ProjectTask
 {
     public static class ProjectTaskSortExt
     {
-        public static IOrderedEnumerable<ProjectTaskExt> Sorted(this IEnumerable<ProjectTaskExt> projectTaskExts, ISorter sorter)
+        public static IOrderedEnumerable<TaskModel> Sorted(this IEnumerable<TaskModel> projectTasks, ISorter sorter)
         {
-            return sorter.Sort(projectTaskExts);
+            return sorter.Sort(projectTasks);
         }
     }
 }

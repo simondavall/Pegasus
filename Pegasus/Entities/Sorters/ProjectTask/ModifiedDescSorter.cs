@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Pegasus.Library.Models;
 
 namespace Pegasus.Entities.Sorters.ProjectTask
 {
     public class ModifiedDescSorter : ISorter
     {
-        public IOrderedEnumerable<ProjectTaskExt> Sort(IEnumerable<ProjectTaskExt> projectTaskExts)
+        public IOrderedEnumerable<TaskModel> Sort(IEnumerable<TaskModel> projectTasks)
         {
-            return projectTaskExts.OrderByDescending(pt => pt.Modified);
+            return projectTasks.OrderByDescending(pt => pt.Modified);
         }
     }
 }
