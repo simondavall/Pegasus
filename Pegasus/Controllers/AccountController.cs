@@ -44,8 +44,7 @@ namespace Pegasus.Controllers
             {
                 //// This doesn't count login failures towards account lockout
                 //// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                //TODO PGS-71 Nothing assigned to the Remember Me checkbox at the moment
+                //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, lockoutOnFailure: false);
                 //TODO PGS-72 Consider enabling lockoutOnFailure
                 var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
                 var result = await _apiHelper.Authenticate(credentials);
@@ -64,7 +63,7 @@ namespace Pegasus.Controllers
                 //TODO PGS-73 Add this next line if we need 2fa
                 //if (result.RequiresTwoFactor)
                 //{
-                //    return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl, model.RememberMe });
+                //    return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
                 //}
                 // TODO PGS-72 Implement Lockout recovery
                 //if (result.IsLockedOut)
