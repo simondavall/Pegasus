@@ -10,6 +10,7 @@ namespace Pegasus.Library.JwtAuthentication.Models
     /// </summary>
     public sealed class TokenOptions
     {
+        private const int DefaultExpiryTimeInMinutes = 5;
         /// <summary>
         ///     Creates a new instance of <see cref="TokenOptions" />
         /// </summary>
@@ -30,7 +31,7 @@ namespace Pegasus.Library.JwtAuthentication.Models
         ///     Defaults to 5 mins
         ///     but can be longer or shorter.
         /// </param>
-        public TokenOptions(string issuer, string audience, string signingKey, int tokenExpiryInMinutes = 5)
+        public TokenOptions(string issuer, string audience, string signingKey, int tokenExpiryInMinutes = DefaultExpiryTimeInMinutes)
         {
             if (string.IsNullOrWhiteSpace(audience))
                 throw new ArgumentNullException($"{nameof(Audience)} is mandatory in order to generate a JWT!");
@@ -46,6 +47,27 @@ namespace Pegasus.Library.JwtAuthentication.Models
             SigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(signingKey));
             TokenExpiryInMinutes = tokenExpiryInMinutes;
         }
+
+        public TokenOptions(string issuer, string audience, string signingKey, string tokenExpiryInMinutes) 
+            : this(issuer, audience, signingKey)
+        {
+            if (!string.IsNullOrWhiteSpace(tokenExpiryInMinutes) && int.TryParse(tokenExpiryInMinutes, out var expiryTime))
+            {
+                TokenExpiryInMinutes = expiryTime;
+            }
+        }
+
+        private int GetExpiryTime(string tokenExpiryInMinutes)
+        {
+            var expiryTime = 0;
+            if (string.IsNullOrWhiteSpace(tokenExpiryInMinutes) || !int.TryParse(tokenExpiryInMinutes, out expiryTime))
+            {
+                return expiryTime;
+            }
+
+            return DefaultExpiryTimeInMinutes;
+        }
+
 
         public SecurityKey SigningKey { get; }
 

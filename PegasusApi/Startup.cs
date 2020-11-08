@@ -42,12 +42,7 @@ namespace PegasusApi
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            var tokenOptions = new JwtModels.TokenOptions(
-                Configuration["Token:Audience"],
-                Configuration["Token:Issuer"],
-                Configuration["Token:SigningKey"]);
-
-            services.AddJwtAuthenticationForApi(tokenOptions);
+            services.AddJwtAuthenticationForApi(Configuration);
             services.AddPegasusSwaggerGen();
         }
 

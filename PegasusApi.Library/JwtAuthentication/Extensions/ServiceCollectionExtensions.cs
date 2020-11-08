@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PegasusApi.Library.JwtAuthentication.Models;
 
@@ -11,14 +11,13 @@ namespace PegasusApi.Library.JwtAuthentication.Extensions
     {       
         public static IServiceCollection AddJwtAuthenticationForApi(
             this IServiceCollection services,
-            TokenOptions tokenOptions)
+            IConfiguration configuration)
         {
-            if (tokenOptions == null)
-            {
-                throw new ArgumentNullException(
-                    $"{nameof(tokenOptions)} is a required parameter. " +
-                    $"Please make sure you've provided a valid instance with the appropriate values configured.");
-            }
+            var tokenOptions = new TokenOptions(
+                configuration["Token:Audience"],
+                configuration["Token:Issuer"],
+                configuration["Token:SigningKey"],
+                configuration["Token:ExpiryInMinutes"]);
 
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(serviceProvider =>
                 new JwtTokenGenerator(tokenOptions));

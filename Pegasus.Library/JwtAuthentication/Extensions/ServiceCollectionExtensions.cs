@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Library.JwtAuthentication.Models;
@@ -12,13 +13,14 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddJwtAuthenticationWithProtectedCookie(this IServiceCollection services, TokenOptions tokenOptions,
+        public static IServiceCollection AddJwtAuthenticationWithProtectedCookie(this IServiceCollection services, IConfiguration configuration,
             string applicationDiscriminator = null, AuthUrlOptions authUrlOptions = null)
         {
-            if (tokenOptions == null)
-                throw new ArgumentNullException(
-                    $"{nameof(tokenOptions)} is a required parameter. " +
-                    "Please make sure you've provided a valid instance with the appropriate values configured.");
+            var tokenOptions = new TokenOptions(
+                configuration["Token:Audience"],
+                configuration["Token:Issuer"],
+                configuration["Token:SigningKey"],
+                configuration["Token:ExpiryInMinutes"]);
 
             var hostingEnvironment = services.BuildServiceProvider().GetService<IHostEnvironment>();
 

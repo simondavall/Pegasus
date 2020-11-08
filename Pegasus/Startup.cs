@@ -31,14 +31,7 @@ namespace Pegasus
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
 
-            //TODO See if these options can be moved to the JwtAuth method, and pass the configuration
-            var tokenOptions = new TokenOptions(
-                Configuration["Token:Audience"],
-                Configuration["Token:Issuer"],
-                Configuration["Token:SigningKey"]);
-
-            services.AddJwtAuthenticationWithProtectedCookie(tokenOptions);
-
+            services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 
             services.AddControllersWithViews();
         }
