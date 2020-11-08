@@ -4,7 +4,7 @@ namespace Pegasus.Entities.Profiles
 {
     public class TaskProfileResolver
     {
-        public static ITaskProfile SetTaskProfile(TaskStatusEnum taskStatus)
+        public static ITaskProfile GetTaskProfile(TaskStatusEnum taskStatus)
         {
             switch (taskStatus)
             {

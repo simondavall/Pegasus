@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using Pegasus.Entities;
 using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Sorters.ProjectTask;
 using System;
@@ -15,10 +14,10 @@ namespace PegasusTests
         [Test]
         public void ProjectTask_SortsByModifiedDate_ReturnsMostRecentModifiedFirst()
         {
-            var taskList = new List<ProjectTaskExt>
+            var taskList = new List<TaskModel>
             {
-                new ProjectTaskExt(new TaskModel { Modified = new DateTime(2020, 1, 1) }),
-                new ProjectTaskExt(new TaskModel { Modified = new DateTime(2020, 2, 1) })
+                new TaskModel { Modified = new DateTime(2020, 1, 1) },
+                new TaskModel { Modified = new DateTime(2020, 2, 1) }
             };
 
             var sut = new IndexViewModel(taskList);
@@ -31,10 +30,10 @@ namespace PegasusTests
         [Test]
         public void ProjectTask_SortsByPriorityDateDesc_ReturnsHighestPriorityFirst()
         {
-            var taskList = new List<ProjectTaskExt>
+            var taskList = new List<TaskModel>
             {
-                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low }),
-                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical })
+                new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low },
+                new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
         
             var sut = new IndexViewModel(taskList);
@@ -47,11 +46,11 @@ namespace PegasusTests
         [Test]
         public void ProjectTask_SortsByPriorityDateAsc_ReturnsLowestPriorityFirst()
         {
-            var taskList = new List<ProjectTaskExt>
+            var taskList = new List<TaskModel>
             {
-                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.High }),
-                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low }),
-                new ProjectTaskExt(new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical })
+                new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.High },
+                new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Low },
+                new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
 
             var sut = new IndexViewModel(taskList);
@@ -64,11 +63,11 @@ namespace PegasusTests
         [Test]
         public void ProjectTask_SortsByTaskRefDesc_ReturnsHighestTaskRefFirst()
         {
-            var taskList = new List<ProjectTaskExt>
+            var taskList = new List<TaskModel>
             {
-                new ProjectTaskExt(new TaskModel { TaskRef = "1" }),
-                new ProjectTaskExt(new TaskModel { TaskRef = "2" }),
-                new ProjectTaskExt(new TaskModel { TaskRef = "3" })
+                new TaskModel { TaskRef = "1" },
+                new TaskModel { TaskRef = "2" },
+                new TaskModel { TaskRef = "3" }
             };
         
             var sut = new IndexViewModel(taskList);

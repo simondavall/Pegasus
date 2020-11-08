@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain;
 using Pegasus.Domain.ProjectTask;
-using Pegasus.Entities;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -44,9 +43,8 @@ namespace Pegasus.Controllers
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
-            var projectTasksExt = ProjectTaskExt.Convert(projectTasks);
 
-            var model = new IndexViewModel(projectTasksExt)
+            var model = new IndexViewModel(projectTasks)
             {
                 ProjectId = projectId,
                 TaskFilterId = taskFilterId,
@@ -138,9 +136,8 @@ namespace Pegasus.Controllers
                 {
                     await _commentsEndpoint.AddComment(new TaskCommentModel {TaskId = projectTask.Id, Comment = newComment });
                 }
-                var projectTaskExt = new ProjectTaskExt(projectTask);
-                //TODO PGS-74 CHeck whether adding an IsClose() extension method to TaskModel might be better
-                if (projectTaskExt.IsClosed && projectTask.TaskStatusId != existingTaskStatus)
+
+                if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)
                 {
                     return RedirectToAction("Index");
                 }
