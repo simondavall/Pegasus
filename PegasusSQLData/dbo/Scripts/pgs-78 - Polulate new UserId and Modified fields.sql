@@ -1,18 +1,35 @@
-﻿update TaskComments
+﻿/*
+Manual deployment script
+
+This should be run during deployment of branch pgs-78
+
+The following scripts populate the new UserId and Modified fields
+and add initial data to the new Users table
+
+Change the declared variables to correct values for Production and Execute.
+
+*/
+
+declare @UserId nvarchar(450) = 'f7d69a12-ab97-4cf4-916a-da96f403a0e7'
+declare @Username nvarchar(256) = 'Simon Da Vall'
+declare @Email nvarchar(256) = 'simon.davall@gmail.com'
+
+
+update TaskComments
 Set Modified = Created
 where Modified IS NULL
 
 Update ProjectTasks
-Set UserId = 'f7d69a12-ab97-4cf4-916a-da96f403a0e7'
+Set UserId = @UserId
 where UserId IS NULL
 
 Update TaskComments
-Set UserId = 'f7d69a12-ab97-4cf4-916a-da96f403a0e7'
+Set UserId = @UserId
 where UserId IS NULL
 
 Update StatusHistory
-Set UserId = 'f7d69a12-ab97-4cf4-916a-da96f403a0e7'
+Set UserId = @UserId
 where UserId IS NULL
 
 Insert Users (Id, UserName, Email)
-Values ('f7d69a12-ab97-4cf4-916a-da96f403a0e7', 'Simon Da Vall', 'simon.davall@gmail.com')
+Values (@UserId, @Username, @Email)
