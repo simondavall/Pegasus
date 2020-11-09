@@ -15,6 +15,7 @@
             </div>
             <div class="task-comment-date">
                 <span>@Model[i].Created.ToString("dd MMM yy, HH:mm")</span>
+                <span>by @Model[i].Username</span>
             </div>
             <div class="task-comment">
                 <p>@Html.Raw(Model[i].Comment.Replace(Environment.NewLine, "<br/>"))</p>

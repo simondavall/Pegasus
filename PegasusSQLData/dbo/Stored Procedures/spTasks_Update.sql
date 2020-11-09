@@ -7,6 +7,7 @@
 	, @TaskTypeId int
 	, @TaskPriorityId int
 	, @FixedInRelease nvarchar(20)
+	, @UserId nvarchar(450)
 AS
 
 BEGIN TRANSACTION
@@ -18,7 +19,7 @@ declare @currentStatus int
 	SELECt @currentStatus = [TaskStatusId] FROM [ProjectTasks] WHERE [Id] = @Id
 
 	IF @currentStatus <> @TaskStatusId
-		INSERT [dbo].[StatusHistory] (TaskId, TaskStatusId, Created) VALUES (@Id, @TaskStatusId, GETUTCDATE())
+		INSERT [dbo].[StatusHistory] (TaskId, TaskStatusId, UserId, Created) VALUES (@Id, @TaskStatusId, @UserId, GETUTCDATE())
 
 	UPDATE [dbo].[ProjectTasks]
 	SET [Name] = @Name

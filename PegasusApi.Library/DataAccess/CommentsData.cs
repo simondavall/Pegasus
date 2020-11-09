@@ -22,7 +22,7 @@ namespace PegasusApi.Library.DataAccess
 
         public async Task AddComment(TaskCommentModel comment)
         {
-            var parameters = new { comment.TaskId, comment.Comment };
+            var parameters = new { comment.TaskId, comment.Comment, comment.UserId };
             await _dataAccess.SaveDataAsync<dynamic>("spComments_Add", parameters, ConnectionStringName);
         }
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -90,6 +92,7 @@ namespace Pegasus.Controllers
             projectTask.Created = projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
+                projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 await _tasksEndpoint.AddTask(projectTask);
                 return RedirectToAction("Index");
             }
@@ -129,12 +132,13 @@ namespace Pegasus.Controllers
         {
             if (ModelState.IsValid)
             {
-                projectTask.Modified = DateTime.Now;
+                var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                projectTask.UserId = userId;
                 await _tasksEndpoint.UpdateTask(projectTask);
                 await _commentsEndpoint.UpdateComments(comments);
                 if (!string.IsNullOrWhiteSpace(newComment))
                 {
-                    await _commentsEndpoint.AddComment(new TaskCommentModel {TaskId = projectTask.Id, Comment = newComment });
+                    await _commentsEndpoint.AddComment(new TaskCommentModel {TaskId = projectTask.Id, Comment = newComment, UserId = userId });
                 }
 
                 if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)

@@ -61,10 +61,12 @@
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Views" />
     <Folder Include="PublishLocations" />
+    <Folder Include="dbo\Scripts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\Development -PegasusSQLData.publish.xml" />
     <None Include="PublishLocations\Production-PegasusSQLData.publish.xml" />
+    <None Include="dbo\Scripts\pgs-78 - Polulate new UserId and Modified fields.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Projects.sql" />
@@ -95,5 +97,6 @@
     <Build Include="dbo\Stored Procedures\spTasks_AddTaskType.sql" />
     <Build Include="dbo\Stored Procedures\spTasks_AddTaskPriority.sql" />
     <Build Include="dbo\Stored Procedures\spTasks_GetStatusHistory.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
   </ItemGroup>
 </Project>

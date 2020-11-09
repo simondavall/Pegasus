@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[spTasks_GetAll]
 
 AS
-	SELECT [Id], [Created], [Description], [Modified], [Name], [ProjectId], [TaskRef], [TaskStatusId], [TaskTypeId], [FixedInRelease], [TaskPriorityId]
+	SELECT [Id], [TaskRef], [Name], [Description], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [ProjectId], [UserId], [Modified], [Created]
 	FROM ProjectTasks
 	ORDER BY Modified DESC
 
