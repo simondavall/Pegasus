@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +24,7 @@ namespace Pegasus.Controllers
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
         private readonly ICommentsEndpoint _commentsEndpoint;
+        private readonly int _pageSize;
 
         public TaskListController(IConfiguration configuration, ITaskFilterService taskFilterService, 
             IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint)
@@ -35,6 +35,7 @@ namespace Pegasus.Controllers
             _commentsEndpoint = commentsEndpoint;
             _settings = new Settings(configuration);
             _cookies = new Cookies(configuration);
+            _pageSize = configuration.GetValue<int>("Pagination:PageSize");
         }
 
         [HttpGet]
@@ -42,6 +43,7 @@ namespace Pegasus.Controllers
         {
             var taskFilterId = GetTaskFilterIdAndUpdateCookie();
             var projectId = GetProjectIdAndUpdateCookie();
+            var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
@@ -50,6 +52,8 @@ namespace Pegasus.Controllers
             {
                 ProjectId = projectId,
                 TaskFilterId = taskFilterId,
+                Page = page,
+                PageSize = _pageSize,
                 Projects = await _projectsEndpoint.GetAllProjects(),
                 TaskFilters = _taskFilterService.GetTaskFilters(),
                 Project = project
@@ -180,6 +184,12 @@ namespace Pegasus.Controllers
             var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
             _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
             return taskFilterId;
+        }
+
+        private int GetPage()
+        {
+            var page = _settings.GetSetting(Request, "Page");
+            return page;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Profiles;
+using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Library.Models;
 
 namespace Pegasus.Extensions
@@ -37,6 +38,11 @@ namespace Pegasus.Extensions
         private static IEnumerable<TaskModel> IsObsolete(this IEnumerable<TaskModel> projectTasks)
         {
             return projectTasks.Where(pt => pt.TaskStatusId == (int)TaskStatusEnum.Obsolete);
+        }
+
+        public static IEnumerable<TaskModel> Sorted(this IEnumerable<TaskModel> projectTasks, ISorter sorter)
+        {
+            return sorter.Sort(projectTasks);
         }
 
         internal static IEnumerable<TaskModel> Filtered(this IEnumerable<TaskModel> projectTasks, int taskFilterId)

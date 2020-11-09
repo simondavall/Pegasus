@@ -1,13 +1,14 @@
-﻿using NUnit.Framework;
-using Pegasus.Entities.Enumerations;
-using Pegasus.Entities.Sorters.ProjectTask;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using Pegasus.Entities.Enumerations;
+using Pegasus.Entities.Sorters.ProjectTask;
+using Pegasus.Extensions;
 using Pegasus.Library.Models;
 using Pegasus.Models.TaskList;
 
-namespace PegasusTests
+namespace PegasusTests.ProjectTask_Tests
 {
     class ProjectTaskTests
     {
