@@ -1,13 +1,14 @@
-﻿using NUnit.Framework;
-using Pegasus.Entities.Enumerations;
-using Pegasus.Entities.Sorters.ProjectTask;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using Pegasus.Entities.Enumerations;
+using Pegasus.Entities.Sorters.ProjectTask;
+using Pegasus.Extensions;
 using Pegasus.Library.Models;
 using Pegasus.Models.TaskList;
 
-namespace PegasusTests
+namespace PegasusTests.ProjectTask_Tests
 {
     class ProjectTaskTests
     {
@@ -20,7 +21,7 @@ namespace PegasusTests
                 new TaskModel { Modified = new DateTime(2020, 2, 1) }
             };
 
-            var sut = new IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
             var sorter = new ModifiedDescSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -36,7 +37,7 @@ namespace PegasusTests
                 new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
         
-            var sut = new IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
             var sorter = new PriorityDescSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -53,7 +54,7 @@ namespace PegasusTests
                 new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
 
-            var sut = new IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
             var sorter = new PriorityAscSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -70,7 +71,7 @@ namespace PegasusTests
                 new TaskModel { TaskRef = "3" }
             };
         
-            var sut = new IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
             var sorter = new TaskRefDescSorter();
         
             Assert.IsNotEmpty(sut.ProjectTasks);

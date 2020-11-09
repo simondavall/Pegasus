@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
-using TokenOptions = Pegasus.Library.JwtAuthentication.Models.TokenOptions;
 
 namespace Pegasus
 {

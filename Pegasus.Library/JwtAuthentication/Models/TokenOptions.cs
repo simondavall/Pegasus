@@ -57,18 +57,6 @@ namespace Pegasus.Library.JwtAuthentication.Models
             }
         }
 
-        private int GetExpiryTime(string tokenExpiryInMinutes)
-        {
-            var expiryTime = 0;
-            if (string.IsNullOrWhiteSpace(tokenExpiryInMinutes) || !int.TryParse(tokenExpiryInMinutes, out expiryTime))
-            {
-                return expiryTime;
-            }
-
-            return DefaultExpiryTimeInMinutes;
-        }
-
-
         public SecurityKey SigningKey { get; }
 
         public string Issuer { get; }

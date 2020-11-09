@@ -57,6 +57,7 @@ $(function () {
     };
 
     $(".body-content").on("click", ".project-list-item", function () {
+        $("#page").val(1); // reset display back to page 1
         currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectListItems));
         // need to disable Create button if All projects selected
         setCreateTaskButton();
@@ -64,7 +65,13 @@ $(function () {
     });
 
     $(".body-content").on("click", ".task-filter", function () {
+        $("#page").val(1); // reset display back to page 1
         sidebarAction($(this), $("#taskFilterId"), $(taskFilterList));
+        return false;
+    });
+
+    $(".body-content").on("click", ".pagination-list-item", function () {
+        sidebarAction($(this), $("#page"), null);
         return false;
     });
 
