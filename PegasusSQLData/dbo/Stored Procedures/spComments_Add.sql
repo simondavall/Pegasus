@@ -1,10 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spComments_Add]
 	@TaskId int = 0,
-	@Comment nvarchar(max)
+	@Comment nvarchar(max),
+	@UserId nvarchar(450)
 AS
 	INSERT INTO [dbo].[TaskComments]
-           ([TaskId], [Comment], [Created], [IsDeleted])
+           ([TaskId], [Comment], [IsDeleted], [UserId], [Modified], [Created])
 	VALUES
-           (@TaskId, @Comment, GETUTCDATE(), 0);
+           (@TaskId, @Comment, 0, @UserId, GETUTCDATE(), GETUTCDATE());
 
 RETURN 0
