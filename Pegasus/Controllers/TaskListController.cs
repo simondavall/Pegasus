@@ -48,10 +48,9 @@ namespace Pegasus.Controllers
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
 
-            var model = new IndexViewModel(projectTasks)
+            var model = new IndexViewModel(projectTasks, taskFilterId)
             {
                 ProjectId = projectId,
-                TaskFilterId = taskFilterId,
                 Page = page,
                 PageSize = _pageSize,
                 Projects = await _projectsEndpoint.GetAllProjects(),
@@ -188,7 +187,8 @@ namespace Pegasus.Controllers
 
         private int GetPage()
         {
-            var page = _settings.GetSetting(Request, "Page");
+            const int defaultPageNo = 1;
+            var page = _settings.GetSetting(Request, "Page", defaultPageNo);
             return page;
         }
     }

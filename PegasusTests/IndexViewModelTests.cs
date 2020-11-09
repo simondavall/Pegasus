@@ -20,7 +20,7 @@ namespace PegasusTests
                 new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
 
-            var sut = new IndexViewModel(taskList)
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All)
             {
                 Sorter = new PriorityDescSorter()
             };
@@ -38,7 +38,7 @@ namespace PegasusTests
                 new TaskModel { Modified = new DateTime(2020, 2, 1) }
             };
 
-            var sut = new IndexViewModel(taskList)
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All)
             {
                 Sorter = new ModifiedDescSorter()
             };
@@ -56,7 +56,7 @@ namespace PegasusTests
                 new TaskModel { Modified = new DateTime(2020, 2, 1) }
             };
 
-            var sut = new IndexViewModel(taskList);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
 
             Assert.IsNotEmpty(sut.ProjectTasks);
             Assert.AreEqual(sut.ProjectTasks.ToArray()[0].Modified, new DateTime(2020, 2, 1));
