@@ -166,6 +166,10 @@ html {
     display: none !important;
 }
 
+.nav-link svg {
+    fill: currentColor;
+}
+
 .no-border {
     border: 0;
 }
@@ -209,7 +213,7 @@ html {
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
-.project-list-item, .task-filter {
+.project-list-item, .task-filter, .navbar-content, .settings-link {
 }
 
 .table-row-condensed {
