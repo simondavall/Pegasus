@@ -98,12 +98,23 @@ $(function () {
         updateList();
     });
 
-    $(".navbar-content").on("click", ".settings-link", function () {
+    var toggleSettingsSidebar = function () {
         if ($(".settings-sidebar").hasClass("on")) {
             $(".settings-sidebar").removeClass("on");
         } else {
             $(".settings-sidebar").addClass("on");
         }
         return false;
+    }
+
+    $(".navbar-content").on("click", ".settings-link", function () {
+        toggleSettingsSidebar();
+        return false;
     });
+
+    $(".sidebar").on("click", ".settings-close", function() {
+        toggleSettingsSidebar();
+        return false;
+    });
+
 })

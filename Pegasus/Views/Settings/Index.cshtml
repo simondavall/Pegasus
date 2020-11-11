@@ -15,15 +15,16 @@
             @Html.Hidden("returnUrl", currentUrl)
 
             <div class="card card-default">
-                <div class="card-header">
-                    <span class="settings-title">@SettingsModel.Title</span>
+                <div class="card-header settings-title-section">
+                    <a href="javascript:void(0)" class="settings-close"><i class="fa fa-times"></i></a>
+                    <h5 class="settings-title">@SettingsModel.Title</h5>
                 </div>
                 <div class="card-body">
                     <div class="settings-section">
                         <div class="settings-section-title">PAGE SETTINGS</div>
                         <div class="settings-item">
-                            <label asp-for="@SettingsModel.PageSize" class="settings-label settings-label-font"></label>
-                            <input type="text" asp-for="@SettingsModel.PageSize" style="width: 50px" />
+                            <label class="settings-label settings-label-font" asp-for="@SettingsModel.PageSize"></label>
+                            <input class="settings-input-text" type="text" asp-for="@SettingsModel.PageSize" />
                         </div>
                         <div class="settings-item">
                             <label asp-for="@SettingsModel.ShowPagination" class="settings-label settings-label-font"></label>
@@ -36,7 +37,7 @@
                         <div class="settings-section-title">DEVICE SETTINGS</div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_ScreenSize">Screen Size</label>
-                            <input style="width: 50px" type="number" id="SettingsModel_ScreenSize" name="SettingsModel.ScreenSize" value="0">
+                            <input class="settings-input-text" type="number" id="SettingsModel_ScreenSize" name="SettingsModel.ScreenSize" value="0">
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_FullWidth">Full Width</label>
