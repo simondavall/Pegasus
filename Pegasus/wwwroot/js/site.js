@@ -37,12 +37,13 @@ $(function () {
 
     var updateList = function () {
         var options = {
-            url: $("form").attr("action"),
-            type: $("form").attr("method"),
-            data: $("form").serialize()
+            url: $(".project-list-form").attr("action"),
+            type: $(".project-list-form").attr("method"),
+            data: $(".project-list-form").serialize()
         };
+
         $.ajax(options).done(function (data) {
-            var $target = $($("form").attr("data-pgs-target"));
+            var $target = $($(".project-list-form").attr("data-pgs-target"));
             $target.replaceWith(data);
         });
     }
@@ -95,5 +96,14 @@ $(function () {
     $(".body-content").on('click', ".comment-delete-button", function () {
         $(this).siblings("input").val(true);
         updateList();
+    });
+
+    $(".navbar-content").on("click", ".settings-link", function () {
+        if ($(".settings-sidebar").hasClass("on")) {
+            $(".settings-sidebar").removeClass("on");
+        } else {
+            $(".settings-sidebar").addClass("on");
+        }
+        return false;
     });
 })

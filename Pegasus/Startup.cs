@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
+using Pegasus.Models.Settings;
 
 namespace Pegasus
 {
@@ -22,6 +23,7 @@ namespace Pegasus
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ITaskFilterService, TaskFilterService>();
+            services.AddScoped<ISettingsModel, SettingsModel>();
 
             services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
             services.AddTransient<ITasksEndpoint, TasksEndpoint>();
