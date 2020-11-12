@@ -23,7 +23,6 @@ namespace Pegasus
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ITaskFilterService, TaskFilterService>();
-            services.AddScoped<ISettingsModel, SettingsModel>();
 
             services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
             services.AddTransient<ITasksEndpoint, TasksEndpoint>();
@@ -31,6 +30,7 @@ namespace Pegasus
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
+            services.AddScoped<ISettingsModel, SettingsModel>();
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
+using Pegasus.Models.Settings;
 
 namespace Pegasus.Controllers
 {
@@ -9,8 +10,8 @@ namespace Pegasus.Controllers
     public class HomeController : TaskListController
     {
         public HomeController(IConfiguration configuration, ITaskFilterService taskFilterService, 
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint) 
-            : base(configuration, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint)
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel) 
+            : base(configuration, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsModel)
         { }
     }
 }

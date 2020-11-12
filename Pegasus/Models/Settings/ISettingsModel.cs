@@ -2,8 +2,7 @@
 {
     public interface ISettingsModel
     {
-        string Title { get; set; }
+        bool PaginationDisabled { get; set; }
         int PageSize { get; set; }
-        bool ShowPagination { get; set; }
     }
 }

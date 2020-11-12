@@ -11,6 +11,7 @@ using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 using Pegasus.Models;
+using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
 
 namespace Pegasus.Controllers
@@ -24,18 +25,21 @@ namespace Pegasus.Controllers
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
         private readonly ICommentsEndpoint _commentsEndpoint;
+        private readonly ISettingsModel _settingsModel;
         private readonly int _pageSize;
 
         public TaskListController(IConfiguration configuration, ITaskFilterService taskFilterService, 
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint)
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, 
+            ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel)
         {
             _taskFilterService = taskFilterService;
             _projectsEndpoint = projectsEndpoint;
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
+            _settingsModel = settingsModel;
             _settings = new Settings(configuration);
             _cookies = new Cookies(configuration);
-            _pageSize = configuration.GetValue<int>("Pagination:PageSize");
+            _pageSize = settingsModel.PageSize;
         }
 
         [HttpGet]
@@ -48,7 +52,7 @@ namespace Pegasus.Controllers
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
 
-            var model = new IndexViewModel(projectTasks, taskFilterId)
+            var model = new IndexViewModel(projectTasks, taskFilterId, _settingsModel)
             {
                 ProjectId = projectId,
                 Page = page,

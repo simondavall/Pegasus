@@ -6,12 +6,21 @@ using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
+using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
 
 namespace PegasusTests.ProjectTask_Tests
 {
     class ProjectTaskTests
     {
+        private readonly ISettingsModel _settingsModel = new SettingsModel();
+
+        [SetUp]
+        public void TestSetup()
+        {
+            _settingsModel.PaginationDisabled = false;
+        }
+
         [Test]
         public void ProjectTask_SortsByModifiedDate_ReturnsMostRecentModifiedFirst()
         {
@@ -21,7 +30,7 @@ namespace PegasusTests.ProjectTask_Tests
                 new TaskModel { Modified = new DateTime(2020, 2, 1) }
             };
 
-            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All, _settingsModel);
             var sorter = new ModifiedDescSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -37,7 +46,7 @@ namespace PegasusTests.ProjectTask_Tests
                 new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
         
-            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All, _settingsModel);
             var sorter = new PriorityDescSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -54,7 +63,7 @@ namespace PegasusTests.ProjectTask_Tests
                 new TaskModel { TaskPriorityId = (int)TaskPriorityEnum.Critical }
             };
 
-            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All, _settingsModel);
             var sorter = new PriorityAscSorter();
 
             Assert.IsNotEmpty(sut.ProjectTasks);
@@ -71,7 +80,7 @@ namespace PegasusTests.ProjectTask_Tests
                 new TaskModel { TaskRef = "3" }
             };
         
-            var sut = new IndexViewModel(taskList, (int)TaskFilters.All);
+            var sut = new IndexViewModel(taskList, (int)TaskFilters.All, _settingsModel);
             var sorter = new TaskRefDescSorter();
         
             Assert.IsNotEmpty(sut.ProjectTasks);

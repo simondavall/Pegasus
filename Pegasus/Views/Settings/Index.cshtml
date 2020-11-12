@@ -1,6 +1,7 @@
 ﻿@using Pegasus.Models.Settings
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Extensions
+@using Pegasus.Extensions
 @inject ISettingsModel SettingsModel
 @inject IHttpContextAccessor HttpAccessor
 
@@ -8,7 +9,6 @@
     <div class="settings-sidebar">
         @using (Html.BeginForm("SaveSettings", "Settings", FormMethod.Post))
         {
-
             var rq = HttpAccessor.HttpContext.Request;
             var currentUrl = UriHelper.BuildRelative(rq.PathBase, rq.Path, rq.QueryString);
 
@@ -17,18 +17,19 @@
             <div class="card card-default">
                 <div class="card-header settings-title-section">
                     <a href="javascript:void(0)" class="settings-close"><i class="fa fa-times"></i></a>
-                    <h5 class="settings-title">@SettingsModel.Title</h5>
+                    <h5 class="settings-title">Settings</h5>
                 </div>
                 <div class="card-body">
                     <div class="settings-section">
                         <div class="settings-section-title">PAGE SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" asp-for="@SettingsModel.PageSize"></label>
-                            <input class="settings-input-text" type="text" asp-for="@SettingsModel.PageSize" />
+                            <label class="settings-label settings-label-font" for="PageSize">@SettingsModel.GetDisplayName("PageSize")</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@SettingsModel.PageSize">
                         </div>
                         <div class="settings-item">
-                            <label asp-for="@SettingsModel.ShowPagination" class="settings-label settings-label-font"></label>
-                            <input asp-for="@SettingsModel.ShowPagination" />
+                            <label class="settings-label settings-label-font" for="PaginationDisabled">@SettingsModel.GetDisplayName("PaginationDisabled")</label>
+                            <input id="PaginationDisabled" name="PaginationDisabled" type="checkbox" value="true" @(SettingsModel.PaginationDisabled ? "checked=\"checked\"" : "") />
+                            <input type="hidden" value="false" name="PaginationDisabled" />
                         </div>
                     </div>
                     

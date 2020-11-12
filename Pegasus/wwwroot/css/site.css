@@ -213,7 +213,7 @@ html {
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
-.project-list-item, .task-filter, .navbar-content, .settings-link {
+.project-list-item, .project-list-form, .task-filter, .navbar-content {
 }
 
 a.settings-close {
@@ -302,7 +302,7 @@ a.settings-close i {
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
-.sidebar {
+.sidebar, .settings-link {
 }
 
 .table-row-condensed {
