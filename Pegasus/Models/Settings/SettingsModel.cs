@@ -34,7 +34,7 @@ namespace Pegasus.Models.Settings
                 return JsonSerializer.Deserialize<Dictionary<string, object>>(settingsJson);
             }
 
-            return null;
+            return new Dictionary<string, object>();
         }
 
         private void InitializeSettings(IReadOnlyDictionary<string, object> propertiesFromCookie)
