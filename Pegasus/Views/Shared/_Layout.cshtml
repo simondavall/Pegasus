@@ -20,7 +20,7 @@
 </head>
 <body>
     <div class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top navbar-expand-md">
-        <div class="container">
+        <div class="container navbar-content">
             <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Pegasus</a>
             <div class="nav-item float-right">
                 <a id="createButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create">Create Task</a>
@@ -47,6 +47,7 @@
 
         </div>
     </div>
+    <partial name="../Settings/Index" />
     <div class="container body-content">
         @RenderBody()
         <hr />
@@ -72,6 +73,6 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 
-    @RenderSection("scripts", required: false)
+    @await RenderSectionAsync("scripts", required: false)
 </body>
 </html>

@@ -5,18 +5,22 @@ using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
+using Pegasus.Models.Settings;
 
 namespace Pegasus.Models.TaskList
 {
     public class IndexViewModel : BaseViewModel
     {
+        private readonly ISettingsModel _settingsModel;
         private readonly IList<TaskModel> _filteredProjectTasks;
         private const int DefaultPageSize = 10;
 
-        public IndexViewModel(IEnumerable<TaskModel> projectTasks, int taskFilterId)
+        public IndexViewModel(IEnumerable<TaskModel> projectTasks, int taskFilterId, ISettingsModel settingsModel)
         {
+            _settingsModel = settingsModel;
             _filteredProjectTasks = projectTasks.Filtered(taskFilterId).ToList();
             TaskFilterId = taskFilterId;
+            PaginationEnabled = !settingsModel.PaginationDisabled;
         }
 
         public IEnumerable<ProjectModel> Projects { get; set; }
@@ -25,17 +29,18 @@ namespace Pegasus.Models.TaskList
         public int TaskFilterId { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = DefaultPageSize;
+        public bool PaginationEnabled { get; set; }
 
         public IEnumerable<TaskFilter> TaskFilters { get; set; }
 
         public IEnumerable<TaskModel> ProjectTasks => _filteredProjectTasks
             .Sorted(Sorter)
-            .Paginated(Page, PageSize);
+            .Paginated(Page, PageSize, PaginationEnabled);
 
         public PaginationViewModel PaginationViewModel 
         {
             get {
-                var paginationViewModel = new PaginationViewModel()
+                var paginationViewModel = new PaginationViewModel(_settingsModel)
                 {
                     Action = "Index",
                     CurrentPage = Page,

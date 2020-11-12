@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
+using Pegasus.Models.Settings;
 
 namespace Pegasus
 {
@@ -29,10 +30,12 @@ namespace Pegasus
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
+            services.AddScoped<ISettingsModel, SettingsModel>();
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
