@@ -27,7 +27,7 @@ namespace Pegasus.Models
 
         public bool ShowPagination
         {
-            get { return !_settingsModel.PaginationDisabled && TotalPages > 1; }
+            get { return _settingsModel.PaginationEnabled && TotalPages > 1; }
         }
 
         public bool ShowPrevPage

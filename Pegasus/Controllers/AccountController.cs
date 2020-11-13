@@ -16,14 +16,14 @@ namespace Pegasus.Controllers
     {
         private readonly ILogger _logger;
         private readonly IApiHelper _apiHelper;
-        private readonly IJwtTokenGenerator _tokenGenerator;
+        private readonly IJwtTokenAccessor _tokenAccessor;
 
         public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, 
-            IJwtTokenGenerator tokenGenerator)
+            IJwtTokenAccessor tokenAccessor)
         {
             _logger = logger;
             _apiHelper = apiHelper;
-            _tokenGenerator = tokenGenerator;
+            _tokenAccessor = tokenAccessor;
         }
 
         [AllowAnonymous]
@@ -53,7 +53,7 @@ namespace Pegasus.Controllers
                 {
                     _logger.LogInformation("User logged in.");
 
-                    var accessTokenResult = _tokenGenerator.GetAccessTokenWithClaimsPrincipal(result);
+                    var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(result);
                     await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
 
                     _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
@@ -84,14 +84,12 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        //TODO Should this be POST only?
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
+        [HttpGet]
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             _apiHelper.RemoveTokenFromHeaders();
-            _logger.LogInformation("User logged in.");
+            _logger.LogInformation("User logged out.");
             ViewData["ReturnUrl"] = returnUrl;
             return RedirectToLocal("/Account/Login");
         }

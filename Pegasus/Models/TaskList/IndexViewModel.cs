@@ -20,7 +20,7 @@ namespace Pegasus.Models.TaskList
             _settingsModel = settingsModel;
             _filteredProjectTasks = projectTasks.Filtered(taskFilterId).ToList();
             TaskFilterId = taskFilterId;
-            PaginationEnabled = !settingsModel.PaginationDisabled;
+            PaginationEnabled = settingsModel.PaginationEnabled;
         }
 
         public IEnumerable<ProjectModel> Projects { get; set; }

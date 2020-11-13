@@ -21,18 +21,18 @@
                 </div>
                 <div class="card-body">
                     <div class="settings-section">
-                        <div class="settings-section-title">PAGE SETTINGS</div>
+                        <div class="settings-section-title">PAGINATION SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PageSize">@SettingsModel.GetDisplayName("PageSize")</label>
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@SettingsModel.GetDisplayName(nameof(SettingsModel.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(SettingsModel.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <input type="hidden" value="false" name="PaginationEnabled" />
+                        </div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="PageSize">@SettingsModel.GetDisplayName(nameof(SettingsModel.PageSize))</label>
                             <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@SettingsModel.PageSize">
                         </div>
-                        <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PaginationDisabled">@SettingsModel.GetDisplayName("PaginationDisabled")</label>
-                            <input id="PaginationDisabled" name="PaginationDisabled" type="checkbox" value="true" @(SettingsModel.PaginationDisabled ? "checked=\"checked\"" : "") />
-                            <input type="hidden" value="false" name="PaginationDisabled" />
-                        </div>
                     </div>
-                    
+
                     <!-- Placeholder Setting-->
                     <div class="settings-section">
                         <div class="settings-section-title">DEVICE SETTINGS</div>
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="settings-submit-button">
-                        <input type="submit" name="SaveSettings" value="Apply" class="btn btn-primary" />
+                        <input type="submit" name="SaveSettings" value="Apply" class="btn btn-primary"/>
                     </div>
                 </div>
             </div>
