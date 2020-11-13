@@ -15,7 +15,7 @@ namespace PegasusTests
         public void Setup()
         {
             // setup configuration from json string
-            var myJsonConfig = "{\"DefaultSettings\": {\"taskFilterId\": \"125\",\"cookieExpiryDays\":  20}}";
+            var myJsonConfig = "{\"PegasusSettings\": {\"taskFilterId\": \"125\",\"cookieExpiryDays\":  20}}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
 
             _configuration = new ConfigurationBuilder()
@@ -28,7 +28,7 @@ namespace PegasusTests
         {
             var sut = new Settings(_configuration);
             var result = sut.GetSetting("taskFilterId", 30);
-            Assert.AreEqual(result, 125);
+            Assert.AreEqual(125, result);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace PegasusTests
         {
             var sut = new Settings(_configuration);
             var result = sut.GetSetting("DoesNotExist", 30);
-            Assert.AreEqual(result, 30);
+            Assert.AreEqual(30, result);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace PegasusTests
 
             var sut = new Settings(_configuration);
             var result = sut.GetSetting(request, "taskFilterId", 35);
-            Assert.AreEqual(result, 789);
+            Assert.AreEqual(789, result);
         }
 
         [Test]
@@ -56,11 +56,10 @@ namespace PegasusTests
         {
             var httpContext = new DefaultHttpContext();
             var request = httpContext.Request;
-            //request.QueryString = new QueryString("?taskFilterId=789");
 
             var sut = new Settings(_configuration);
             var result = sut.GetSetting(request, "taskFilterId", 35);
-            Assert.AreEqual(result, 125);
+            Assert.AreEqual(125, result);
         }
 
         [Test]
@@ -68,11 +67,87 @@ namespace PegasusTests
         {
             var httpContext = new DefaultHttpContext();
             var request = httpContext.Request;
-            //request.QueryString = new QueryString("?taskFilterId=789");
 
             var sut = new Settings(_configuration);
-            var result = sut.GetSetting(request, "doesnotexist", 35);
-            Assert.AreEqual(result, 35);
+            var result = sut.GetSetting(request, "DoesNotExist", 35);
+            Assert.AreEqual(35, result);
+        }
+
+        [Test]
+        public void SettingsFromConfig_RequestWithWrongType_ReturnsDefaultValue()
+        {
+            // setup configuration from json string
+            var myJsonConfig = "{\"PegasusSettings\": {\"taskFilterId\": \"TextSetting\",\"cookieExpiryDays\":  20}}";
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
+
+            _configuration = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting("taskFilterId", 35);
+            Assert.AreEqual(35, result);
+        }
+
+        [Test]
+        public void SettingsFromCookie_RequestWithValidKey_ReturnsCorrectValue()
+        {
+            var httpContext = new DefaultHttpContext();
+            var request = httpContext.Request;
+            request.Headers["Cookie"] = new[] {"testKey=1234"};
+
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting(request, "testKey", 4321);
+
+            Assert.AreEqual(1234, result);
+        }
+
+        [Test]
+        public void SettingsFromCookie_RequestWithInvalidKey_ReturnsDefaultValue()
+        {
+            var httpContext = new DefaultHttpContext();
+            var request = httpContext.Request;
+            request.Headers["Cookie"] = new[] {"testKey=1234"};
+            
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting(request, "WrongKey", 4321);
+            Assert.AreEqual(4321, result);
+        }
+
+        [Test]
+        public void SettingsFromCookie_RequestForPoorlyTypedValue_ReturnsDefaultValue()
+        {
+            var httpContext = new DefaultHttpContext();
+            var request = httpContext.Request;
+            request.Headers["Cookie"] = new[] {"testKey=stringValue"};
+            
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting(request, "testKey", 4321);
+            Assert.AreEqual(4321, result);
+        }
+
+        [Test]
+        public void SettingsFromCookie_RequestForWithEmptyCookieValue_ReturnsDefaultValue()
+        {
+            var httpContext = new DefaultHttpContext();
+            var request = httpContext.Request;
+            request.Headers["Cookie"] = new[] {"testKey="};
+            
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting(request, "testKey", 4321);
+            Assert.AreEqual(4321, result);
+        }
+
+        [Test]
+        public void SettingsFromCookie_RequestForWithEmptyCookieValueAndNoDefault_ReturnsNull()
+        {
+            var httpContext = new DefaultHttpContext();
+            var request = httpContext.Request;
+            request.Headers["Cookie"] = new[] {"testKey="};
+            
+            var sut = new Settings(_configuration);
+            var result = sut.GetSetting<string>(request, "testKey");
+            Assert.AreEqual(null, result);
         }
     }
 }

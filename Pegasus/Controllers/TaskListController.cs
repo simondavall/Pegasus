@@ -73,7 +73,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
+            var projectId = _settings.GetSetting<int>(Request, "Project.Id");
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -177,14 +177,14 @@ namespace Pegasus.Controllers
 
         private int GetProjectIdAndUpdateCookie()
         {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
+            var projectId = _settings.GetSetting<int>(Request, "Project.Id");
             _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
             return projectId;
         }
 
         private int GetTaskFilterIdAndUpdateCookie()
         {
-            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
+            var taskFilterId = _settings.GetSetting<int>(Request, "taskFilterId");
             _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
             return taskFilterId;
         }

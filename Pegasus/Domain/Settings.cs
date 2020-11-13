@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Domain
@@ -12,11 +14,22 @@ namespace Pegasus.Domain
             _configuration = configuration;
         }
 
-        public int GetSetting(HttpRequest request, string settingName, int defaultReturnVal = 0)
+        /// <summary>
+        /// This attempts to return a setting value from the following places, in this order
+        ///     - QueryString
+        ///     - Cookie
+        ///     - Appsettings.json
+        ///     - Returns default value supplied.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="settingName"></param>
+        /// <param name="defaultReturnVal"></param>
+        /// <returns></returns>
+        public T GetSetting<T>(HttpRequest request, string settingName, T defaultReturnVal = default)
         {
             if (request != null)
             {
-                if (TryGetFromQueryString(request, settingName, out var id))
+                if (TryGetFromQueryString(request, settingName, out T id))
                     return id;
 
                 if (TryGetFromCookie(request, settingName, out id))
@@ -26,31 +39,61 @@ namespace Pegasus.Domain
             return GetSetting(settingName, defaultReturnVal);
         }
 
-        public int GetSetting(string settingName, int defaultReturnVal = 0)
+        /// <summary>
+        /// This attempts to return a setting value from the following places, in this order
+        ///     - Appsettings.json
+        ///     - Returns default value supplied. 
+        /// </summary>
+        /// <param name="settingName"></param>
+        /// <param name="defaultReturnVal"></param>
+        /// <returns></returns>
+        public T GetSetting<T>(string settingName, T defaultReturnVal = default)
         {
-            return TryGetFromConfiguration(settingName, out var id) ? id : defaultReturnVal;
+            return GetFromConfiguration(settingName, defaultReturnVal);
         }
 
-        private bool TryGetFromQueryString(HttpRequest request, string settingName, out int id)
+        private bool TryGetFromQueryString<T>(HttpRequest request, string settingName, out T value)
         {
-            return IsValidSetting(request.Query[settingName], out id);
+            var qs = request.Query[settingName].FirstOrDefault();
+            return ConvertTo(qs, out value);
         }
 
-        private bool TryGetFromCookie(HttpRequest request, string settingName, out int id)
+        private bool TryGetFromCookie<T>(HttpRequest request, string settingName, out T value)
         {
-            return IsValidSetting(request.Cookies[settingName], out id);
+            var cookieValue = request.Cookies[settingName];
+            return ConvertTo(cookieValue, out value);
         }
 
-        private bool TryGetFromConfiguration(string settingName, out int id)
+        private bool ConvertTo<T>(string input, out T value)
         {
-            return IsValidSetting(_configuration[$"DefaultSettings:{settingName}"], out id);
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    value = (T) Convert.ChangeType(input, typeof(T));
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+            catch (Exception)
+            {
+                value = default;
+                return false;
+            }
         }
 
-        private bool IsValidSetting(string setting, out int id)
+        private T GetFromConfiguration<T>(string settingName, T defaultValue)
         {
-            return int.TryParse(setting, out id);
+            try
+            {
+                return _configuration.GetValue($"PegasusSettings:{settingName}", defaultValue);
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
         }
-
-
     }
 }
