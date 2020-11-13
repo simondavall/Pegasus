@@ -40,7 +40,7 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                 .SetApplicationName(applicationName);
 
             services.AddScoped<IDataSerializer<AuthenticationTicket>, TicketSerializer>();
-            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(serviceProvider => new JwtTokenGenerator(tokenOptions));
+            services.AddScoped<IJwtTokenAccessor, JwtTokenAccessor>(serviceProvider => new JwtTokenAccessor(tokenOptions));
 
             services.AddAuthentication(options =>
                 {

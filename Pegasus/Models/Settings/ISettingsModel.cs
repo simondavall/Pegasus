@@ -2,7 +2,7 @@
 {
     public interface ISettingsModel
     {
-        bool PaginationDisabled { get; set; }
+        bool PaginationEnabled { get; set; }
         int PageSize { get; set; }
     }
 }

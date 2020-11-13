@@ -11,11 +11,11 @@ using Pegasus.Library.Models;
 
 namespace Pegasus.Library.JwtAuthentication
 {
-    public sealed class JwtTokenGenerator : IJwtTokenGenerator
+    public sealed class JwtTokenAccessor : IJwtTokenAccessor
     {
         private readonly TokenOptions _tokenOptions;
 
-        public JwtTokenGenerator(TokenOptions tokenOptions)
+        public JwtTokenAccessor(TokenOptions tokenOptions)
         {
             this._tokenOptions = tokenOptions ??
                 throw new ArgumentNullException(

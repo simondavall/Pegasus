@@ -23,8 +23,8 @@ namespace Pegasus.Models.Settings
 
         [DisplayName("Page Size")]
         public int PageSize { get; set; }
-        [DisplayName("Disable Pagination")] 
-        public bool PaginationDisabled { get; set; }
+        [DisplayName("Pagination Enabled")] 
+        public bool PaginationEnabled { get; set; }
 
         private Dictionary<string, object> LoadSettingsFromCookies(IHttpContextAccessor httpContextAccessor)
         {
@@ -63,17 +63,17 @@ namespace Pegasus.Models.Settings
                 PageSize = _configuration.GetValue<int>("Pagination:PageSize");
             }
 
-            //Disable Pagination
-            if (propertiesFromCookie.TryGetValue("PaginationDisabled", out var paginationDisabledObj))
+            //PaginationEnabled
+            if (propertiesFromCookie.TryGetValue("PaginationEnabled", out var paginationEnabledObj))
             {
-                if (bool.TryParse(paginationDisabledObj.ToString(), out bool paginationDisabled))
+                if (bool.TryParse(paginationEnabledObj.ToString(), out bool paginationEnabled))
                 {
-                    PaginationDisabled = paginationDisabled;
+                    PaginationEnabled = paginationEnabled;
                 }
             }
             else
             {
-                PaginationDisabled = _configuration.GetValue<bool>("Pagination:PaginationDisabled");
+                PaginationEnabled = _configuration.GetValue<bool>("Pagination:PaginationEnabled");
             }
         }
     }

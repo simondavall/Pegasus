@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Pegasus.Domain;
 using Pegasus.Models.Settings;
 
@@ -14,12 +15,14 @@ namespace Pegasus.Controllers
     {
         private readonly ISettingsModel _settingsModel;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<SettingsController> _logger;
         private readonly Cookies _cookies;
 
-        public SettingsController(ISettingsModel settingsModel, IConfiguration configuration)
+        public SettingsController(ISettingsModel settingsModel, IConfiguration configuration, ILogger<SettingsController> logger)
         {
             _settingsModel = settingsModel;
             _configuration = configuration;
+            _logger = logger;
             _cookies = new Cookies(configuration);
         }
 
@@ -29,7 +32,7 @@ namespace Pegasus.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveSettings([Bind("PageSize,PaginationDisabled")] SettingsModel settings, string returnUrl)
+        public IActionResult SaveSettings([Bind("PageSize,PaginationEnabled")] SettingsModel settings, string returnUrl)
         {
             var cookieData = SerializeProperties(settings);
             var expiryDays = GetUserSettingsExpiryDays();
@@ -65,9 +68,8 @@ namespace Pegasus.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                //TODO Implement logging to application
-                //_logger.LogError(ex,
-                //    "The value for 'Cookies:UserSettings:ExpiryDays' in appsettings.json must be an integer.");
+                _logger.LogError(ex,
+                    "The value for 'Cookies:UserSettings:ExpiryDays' in appsettings.json must be an integer.");
                 return 0;
             }
         }

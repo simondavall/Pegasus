@@ -18,7 +18,7 @@ namespace PegasusTests.ProjectTask_Tests
         [SetUp]
         public void TestSetup()
         {
-            _settingsModel.PaginationDisabled = false;
+            _settingsModel.PaginationEnabled = true;
         }
 
         [Test]
