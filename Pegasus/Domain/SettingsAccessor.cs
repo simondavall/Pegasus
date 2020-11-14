@@ -5,11 +5,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Domain
 {
-    public class Settings
+    public class SettingsAccessor
     {
         private readonly IConfiguration _configuration;
 
-        public Settings(IConfiguration configuration)
+        public SettingsAccessor(IConfiguration configuration)
         {
             _configuration = configuration;
         }

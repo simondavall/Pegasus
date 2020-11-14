@@ -20,7 +20,7 @@ namespace Pegasus.Controllers
     public class TaskListController : Controller
     {
         private readonly Cookies _cookies;
-        private readonly Settings _settings;
+        private readonly SettingsAccessor _settingsAccessor;
         private readonly ITaskFilterService _taskFilterService;
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
@@ -37,7 +37,7 @@ namespace Pegasus.Controllers
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
             _settingsModel = settingsModel;
-            _settings = new Settings(configuration);
+            _settingsAccessor = new SettingsAccessor(configuration);
             _cookies = new Cookies(configuration);
             _pageSize = settingsModel.PageSize;
         }
@@ -73,7 +73,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settings.GetSetting<int>(Request, "Project.Id");
+            var projectId = _settingsAccessor.GetSetting<int>(Request, "Project.Id");
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -177,14 +177,14 @@ namespace Pegasus.Controllers
 
         private int GetProjectIdAndUpdateCookie()
         {
-            var projectId = _settings.GetSetting<int>(Request, "Project.Id");
+            var projectId = _settingsAccessor.GetSetting<int>(Request, "Project.Id");
             _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
             return projectId;
         }
 
         private int GetTaskFilterIdAndUpdateCookie()
         {
-            var taskFilterId = _settings.GetSetting<int>(Request, "taskFilterId");
+            var taskFilterId = _settingsAccessor.GetSetting<int>(Request, "taskFilterId");
             _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
             return taskFilterId;
         }
@@ -192,7 +192,7 @@ namespace Pegasus.Controllers
         private int GetPage()
         {
             const int defaultPageNo = 1;
-            var page = _settings.GetSetting(Request, "Page", defaultPageNo);
+            var page = _settingsAccessor.GetSetting(Request, "Page", defaultPageNo);
             return page;
         }
     }

@@ -7,11 +7,11 @@ namespace Pegasus.Domain
     public class Cookies
     {
         private const int FallbackExpiryDate = 30;
-        private readonly Settings _settings;
+        private readonly SettingsAccessor _settingsAccessor;
 
         public Cookies(IConfiguration configuration)
         {
-            _settings = new Settings(configuration);
+            _settingsAccessor = new SettingsAccessor(configuration);
         }
 
         public void WriteCookie(HttpResponse response, string setting, string settingValue)
@@ -30,7 +30,7 @@ namespace Pegasus.Domain
 
         private int GetDefaultExpiryDays()
         {
-            return _settings.GetSetting("cookieExpiryDays", FallbackExpiryDate);
+            return _settingsAccessor.GetSetting("cookieExpiryDays", FallbackExpiryDate);
         }
     }
 }

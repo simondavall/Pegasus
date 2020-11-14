@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace PegasusTests
 {
-    class SettingsTests
+    class SettingsAccessorTests
     {
         private IConfiguration _configuration;
 
@@ -26,7 +26,7 @@ namespace PegasusTests
         [Test]
         public void Settings_TestInMemoryConfig_ReturnsDefaultValue()
         {
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting("taskFilterId", 30);
             Assert.AreEqual(125, result);
         }
@@ -34,7 +34,7 @@ namespace PegasusTests
         [Test]
         public void Settings_NonExistentSetting_ReturnsDefaultValue()
         {
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting("DoesNotExist", 30);
             Assert.AreEqual(30, result);
         }
@@ -46,7 +46,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.QueryString = new QueryString("?taskFilterId=789");
 
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "taskFilterId", 35);
             Assert.AreEqual(789, result);
         }
@@ -57,7 +57,7 @@ namespace PegasusTests
             var httpContext = new DefaultHttpContext();
             var request = httpContext.Request;
 
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "taskFilterId", 35);
             Assert.AreEqual(125, result);
         }
@@ -68,7 +68,7 @@ namespace PegasusTests
             var httpContext = new DefaultHttpContext();
             var request = httpContext.Request;
 
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "DoesNotExist", 35);
             Assert.AreEqual(35, result);
         }
@@ -84,7 +84,7 @@ namespace PegasusTests
                 .AddJsonStream(stream)
                 .Build();
 
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting("taskFilterId", 35);
             Assert.AreEqual(35, result);
         }
@@ -96,7 +96,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.Headers["Cookie"] = new[] {"testKey=1234"};
 
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "testKey", 4321);
 
             Assert.AreEqual(1234, result);
@@ -109,7 +109,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.Headers["Cookie"] = new[] {"testKey=1234"};
             
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "WrongKey", 4321);
             Assert.AreEqual(4321, result);
         }
@@ -121,7 +121,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.Headers["Cookie"] = new[] {"testKey=stringValue"};
             
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "testKey", 4321);
             Assert.AreEqual(4321, result);
         }
@@ -133,7 +133,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.Headers["Cookie"] = new[] {"testKey="};
             
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting(request, "testKey", 4321);
             Assert.AreEqual(4321, result);
         }
@@ -145,7 +145,7 @@ namespace PegasusTests
             var request = httpContext.Request;
             request.Headers["Cookie"] = new[] {"testKey="};
             
-            var sut = new Settings(_configuration);
+            var sut = new SettingsAccessor(_configuration);
             var result = sut.GetSetting<string>(request, "testKey");
             Assert.AreEqual(null, result);
         }
