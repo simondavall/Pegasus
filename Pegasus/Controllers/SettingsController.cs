@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Pegasus.Domain;
 using Pegasus.Models.Settings;
 
 namespace Pegasus.Controllers
@@ -11,16 +8,10 @@ namespace Pegasus.Controllers
     public class SettingsController : Controller
     {
         private readonly ISettingsModel _settingsModel;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<SettingsController> _logger;
-        private readonly Cookies _cookies;
 
-        public SettingsController(ISettingsModel settingsModel, IConfiguration configuration, ILogger<SettingsController> logger)
+        public SettingsController(ISettingsModel settingsModel)
         {
             _settingsModel = settingsModel;
-            _configuration = configuration;
-            _logger = logger;
-            _cookies = new Cookies(configuration);
         }
 
         public IActionResult Index()

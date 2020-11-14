@@ -4,8 +4,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Pegasus.Domain;
 using Pegasus.Domain.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
@@ -19,8 +17,6 @@ namespace Pegasus.Controllers
     [Authorize(Roles = "PegasusUser")]
     public class TaskListController : Controller
     {
-        private readonly Cookies _cookies;
-        private readonly SettingsAccessor _settingsAccessor;
         private readonly ITaskFilterService _taskFilterService;
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
@@ -28,7 +24,7 @@ namespace Pegasus.Controllers
         private readonly ISettingsModel _settingsModel;
         private readonly int _pageSize;
 
-        public TaskListController(IConfiguration configuration, ITaskFilterService taskFilterService, 
+        public TaskListController(ITaskFilterService taskFilterService, 
             IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, 
             ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel)
         {
@@ -37,16 +33,14 @@ namespace Pegasus.Controllers
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
             _settingsModel = settingsModel;
-            _settingsAccessor = new SettingsAccessor(configuration);
-            _cookies = new Cookies(configuration);
             _pageSize = settingsModel.PageSize;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var taskFilterId = GetTaskFilterIdAndUpdateCookie();
-            var projectId = GetProjectIdAndUpdateCookie();
+            var taskFilterId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.TaskFilterId));
+            var projectId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.ProjectId));
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
@@ -73,7 +67,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settingsAccessor.GetSetting<int>(Request, "Project.Id");
+            var projectId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -116,8 +110,9 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var projectTask = await _tasksEndpoint.GetTask(id);
+            _settingsModel.ProjectId = projectTask.ProjectId;
+            _settingsModel.SaveSettings();
 
-            _cookies.WriteCookie(Response,"Project.Id", projectTask.ProjectId.ToString());
             var model = await TaskViewModel.Create(new TaskViewModelArgs {
                 ProjectsEndpoint = _projectsEndpoint, 
                 TasksEndpoint = _tasksEndpoint, 
@@ -175,25 +170,11 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        private int GetProjectIdAndUpdateCookie()
-        {
-            var projectId = _settingsAccessor.GetSetting<int>(Request, "Project.Id");
-            _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
-            return projectId;
-        }
-
-        private int GetTaskFilterIdAndUpdateCookie()
-        {
-            var taskFilterId = _settingsAccessor.GetSetting<int>(Request, "taskFilterId");
-            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
-            return taskFilterId;
-        }
-
         private int GetPage()
         {
             const int defaultPageNo = 1;
-            var page = _settingsAccessor.GetSetting(Request, "Page", defaultPageNo);
-            return page;
+            var qsPage = Request.Query["page"];
+            return int.TryParse(qsPage, out var pageNo) ? pageNo : defaultPageNo;
         }
     }
 }

@@ -1,36 +1,29 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Pegasus.Models.Settings;
 
 namespace Pegasus.Domain
 {
     public class Cookies
     {
-        private const int FallbackExpiryDate = 30;
-        private readonly SettingsAccessor _settingsAccessor;
+        private readonly ISettingsModel _settingsModel;
 
-        public Cookies(IConfiguration configuration)
+        public Cookies(ISettingsModel settingsModel)
         {
-            _settingsAccessor = new SettingsAccessor(configuration);
+            _settingsModel = settingsModel;
         }
 
         public void WriteCookie(HttpResponse response, string setting, string settingValue)
         {
-            var cookieExpiryDays = GetDefaultExpiryDays();
-            WriteCookie(response, setting, settingValue, cookieExpiryDays);
+            WriteCookie(response, setting, settingValue, _settingsModel.CookieExpiryDays);
         }
 
         public void WriteCookie(HttpResponse response, string setting, string settingValue, int expiryDays)
         {
             if (expiryDays == 0)
-                expiryDays = GetDefaultExpiryDays();
+                expiryDays = _settingsModel.CookieExpiryDays;
             var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
             response.Cookies.Append(setting, settingValue, options);
-        }
-
-        private int GetDefaultExpiryDays()
-        {
-            return _settingsAccessor.GetSetting("cookieExpiryDays", FallbackExpiryDate);
         }
     }
 }
