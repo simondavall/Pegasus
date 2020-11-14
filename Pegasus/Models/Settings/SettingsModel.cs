@@ -14,7 +14,7 @@ namespace Pegasus.Models.Settings
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
-        private const string Position = "Pagination";
+        private const string Position = "PegasusSettings";
         private readonly Cookies _cookies;
 
         public SettingsModel()
@@ -48,7 +48,7 @@ namespace Pegasus.Models.Settings
             }
 
             var cookieData =  JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, "userSettings", cookieData, CookieExpiryDays);
+            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, "UserSettings", cookieData, CookieExpiryDays);
         }
 
         public void WriteCookie(HttpResponse response, string setting, string settingValue, int expiryDays)

@@ -15,7 +15,7 @@ namespace PegasusTests
         public void Setup()
         {
             // setup configuration from json string
-            var myJsonConfig = "{\"PegasusSettings\": {\"taskFilterId\": \"125\",\"cookieExpiryDays\":  20}}";
+            var myJsonConfig = "{\"ToBeRemoved\": {\"taskFilterId\": \"125\",\"cookieExpiryDays\":  20}}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
 
             _configuration = new ConfigurationBuilder()
@@ -77,7 +77,7 @@ namespace PegasusTests
         public void SettingsFromConfig_RequestWithWrongType_ReturnsDefaultValue()
         {
             // setup configuration from json string
-            var myJsonConfig = "{\"PegasusSettings\": {\"taskFilterId\": \"TextSetting\",\"cookieExpiryDays\":  20}}";
+            var myJsonConfig = "{\"ToBeRemoved\": {\"taskFilterId\": \"TextSetting\",\"cookieExpiryDays\":  20}}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
 
             _configuration = new ConfigurationBuilder()

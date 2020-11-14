@@ -88,7 +88,7 @@ namespace Pegasus.Domain
         {
             try
             {
-                return _configuration.GetValue($"PegasusSettings:{settingName}", defaultValue);
+                return _configuration.GetValue($"ToBeRemoved:{settingName}", defaultValue);
             }
             catch (Exception)
             {
