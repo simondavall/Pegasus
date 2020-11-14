@@ -4,5 +4,6 @@
     {
         bool PaginationEnabled { get; set; }
         int PageSize { get; set; }
+        void SaveSettings();
     }
 }

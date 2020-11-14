@@ -4,12 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json;
+using Pegasus.Domain;
 
 namespace Pegasus.Models.Settings
 {
     public class SettingsModel : ISettingsModel
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
         private const string Position = "Pagination";
+        private readonly Cookies _cookies;
 
         public SettingsModel()
         {
@@ -17,15 +21,22 @@ namespace Pegasus.Models.Settings
 
         public SettingsModel(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
+            _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
             configuration.GetSection(Position).Bind(this);
             var cookieSettings = LoadSettingsFromCookies(httpContextAccessor);
             InitializeSettings(cookieSettings);
+            _cookies = new Cookies(configuration);
         }
 
         [DisplayName("Page Size")]
         public int PageSize { get; set; }
         [DisplayName("Pagination Enabled")] 
         public bool PaginationEnabled { get; set; }
+
+        //public int TaskFilterId { get; set; }
+        //public int ProjectId { get; set; }
+
 
         private Dictionary<string, object> LoadSettingsFromCookies(IHttpContextAccessor httpContextAccessor)
         {
@@ -36,6 +47,34 @@ namespace Pegasus.Models.Settings
             }
 
             return new Dictionary<string, object>();
+        }
+
+        public void SaveSettings()
+        {
+            var propertyValues = new Dictionary<string, object>();
+            var properties = typeof(SettingsModel).GetProperties();
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(this, null);
+                propertyValues.Add(property.Name, value);
+            }
+
+            var cookieData =  JsonSerializer.Serialize(propertyValues);
+            var expiryDays = GetUserSettingsExpiryDays();
+            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, "userSettings", cookieData, expiryDays);
+        }
+
+        private int GetUserSettingsExpiryDays()
+        {
+            try
+            {
+                return _configuration.GetValue<int>("Cookies:UserSettings:ExpiryDays");
+            }
+            catch (InvalidOperationException ex)
+            {
+                //TODO Handle this exception better
+                return 0;
+            }
         }
 
         private void InitializeSettings(IReadOnlyDictionary<string, object> propertiesFromCookie)
@@ -50,9 +89,11 @@ namespace Pegasus.Models.Settings
 
             foreach (var property in typeof(SettingsModel).GetProperties())
             {
-                propertiesFromCookie.TryGetValue(property.Name, out var value);
-                var convertedValue = Convert.ChangeType(value?.ToString(), property.PropertyType);
-                property.SetValue(this, convertedValue);
+                if (propertiesFromCookie.TryGetValue(property.Name, out var value))
+                {
+                    var convertedValue = Convert.ChangeType(value?.ToString(), property.PropertyType);
+                    property.SetValue(this, convertedValue);
+                };
             }
         }
     }
