@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace Pegasus.Models.Settings
 {
     public class SettingsModel : ISettingsModel
     {
-        private readonly IConfiguration _configuration;
+        private const string Position = "Pagination";
 
         public SettingsModel()
         {
@@ -16,7 +17,7 @@ namespace Pegasus.Models.Settings
 
         public SettingsModel(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
-            _configuration = configuration;
+            configuration.GetSection(Position).Bind(this);
             var cookieSettings = LoadSettingsFromCookies(httpContextAccessor);
             InitializeSettings(cookieSettings);
         }
@@ -39,41 +40,19 @@ namespace Pegasus.Models.Settings
 
         private void InitializeSettings(IReadOnlyDictionary<string, object> propertiesFromCookie)
         {
-            //I chose to treat each property individually rather than just serialize/deserialize the SettingsModel
-            //as a whole, as this would lead to issues when adding a new setting later on. It would be difficult to 
+            //I chose to treat each property individually in a dictionary, rather than just serialize/deserialize the SettingsModel
+            //as a whole, as this would lead to an issue when adding a new setting later on. It would be impossible to 
             //workout whether the new setting is already stored in the cookie or not, as default values returned during
             //deserialization could be misleading.
-            // E.g Say a new bool property is added, ShowWidget. This would not currently exist in the settings stored
-            //in the cookie. But deserialize would return the default value 'false'. But it might be desirable to set
-            //the new field to 'true' by default in appsettings, which would then be carried forward to the cookie on
-            //the next save.
-            //So I currently see no alternative than to save each property to the cookie individually, so that missing
-            //'new' properties can be read from appsettings.json
+            // E.g Say a new bool property is added, ShowWidget, with a config setting of 'true'. This setting would
+            // not currently exist in the cookie data and would default to 'false' upon retrieval from the cook and overwrite the
+            // value set by config.
 
-            //PageSize
-            if (propertiesFromCookie.TryGetValue("PageSize", out var pageSizeObj))
+            foreach (var property in typeof(SettingsModel).GetProperties())
             {
-                if (int.TryParse(pageSizeObj.ToString(), out int pageSize))
-                {
-                    PageSize = pageSize;
-                }
-            }
-            else
-            {
-                PageSize = _configuration.GetValue<int>("Pagination:PageSize");
-            }
-
-            //PaginationEnabled
-            if (propertiesFromCookie.TryGetValue("PaginationEnabled", out var paginationEnabledObj))
-            {
-                if (bool.TryParse(paginationEnabledObj.ToString(), out bool paginationEnabled))
-                {
-                    PaginationEnabled = paginationEnabled;
-                }
-            }
-            else
-            {
-                PaginationEnabled = _configuration.GetValue<bool>("Pagination:PaginationEnabled");
+                propertiesFromCookie.TryGetValue(property.Name, out var value);
+                var convertedValue = Convert.ChangeType(value?.ToString(), property.PropertyType);
+                property.SetValue(this, convertedValue);
             }
         }
     }
