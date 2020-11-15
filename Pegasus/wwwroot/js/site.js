@@ -94,9 +94,19 @@ $(function () {
     });
 
     $(".body-content").on('click', ".comment-delete-button", function () {
-        $(this).siblings("input").val(true);
+        var editSection = $(this).parents(".comment-edit-section");
+        if (editSection.hasClass("task-comment-deleted")) {
+            $(this).siblings("input").val(false);
+            $(editSection).find(".comment-edit-button").removeClass("hide");
+            $(editSection).find(".task-comment-date").removeClass("task-comment-deleted");
+            $(editSection).removeClass("task-comment-deleted");
+        } else {
 
-        updateList(".project-task-form");
+            $(this).siblings("input").val(true);
+            $(editSection).find(".comment-edit-button").addClass("hide");
+            $(editSection).find(".task-comment-date").addClass("task-comment-deleted");
+            $(editSection).addClass("task-comment-deleted");
+        }
     });
 
     var toggleSettingsSidebar = function () {

@@ -340,6 +340,11 @@ a.settings-close i {
     font-size: 11px;
 }
 
+.task-comment-deleted {
+    text-decoration: line-through;
+    color: red;
+}
+
 .task-completed-strike a {
     color: lightgrey;
     text-decoration: line-through;
@@ -369,5 +374,3 @@ a.settings-close i {
     text-align: right;
 }
 
-/* ReSharper restore RedundantUnits */
-/* ReSharper restore RedundantUnits */
