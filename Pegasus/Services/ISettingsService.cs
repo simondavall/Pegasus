@@ -1,6 +1,6 @@
-﻿namespace Pegasus.Models.Settings
+﻿namespace Pegasus.Services
 {
-    public interface ISettingsModel
+    public interface ISettingsService
     {
         public int CookieExpiryDays { get; set; }
         int PageSize { get; set; }

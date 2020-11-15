@@ -8,9 +8,9 @@ using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 using Pegasus.Models;
-using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
 using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Controllers
 {
@@ -21,32 +21,32 @@ namespace Pegasus.Controllers
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
         private readonly ICommentsEndpoint _commentsEndpoint;
-        private readonly ISettingsModel _settingsModel;
+        private readonly ISettingsService _settingsService;
         private readonly int _pageSize;
 
         public TaskListController(ITaskFilterService taskFilterService, 
             IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, 
-            ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel)
+            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService)
         {
             _taskFilterService = taskFilterService;
             _projectsEndpoint = projectsEndpoint;
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
-            _settingsModel = settingsModel;
-            _pageSize = settingsModel.PageSize;
+            _settingsService = settingsService;
+            _pageSize = settingsService.PageSize;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var taskFilterId = _settingsModel.GetSetting<int>(nameof(_settingsModel.TaskFilterId));
-            var projectId = _settingsModel.GetSetting<int>(nameof(_settingsModel.ProjectId));
+            var taskFilterId = _settingsService.GetSetting<int>(nameof(_settingsService.TaskFilterId));
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
 
-            var model = new IndexViewModel(projectTasks, taskFilterId, _settingsModel)
+            var model = new IndexViewModel(projectTasks, taskFilterId, (SettingsModel)_settingsService)
             {
                 ProjectId = projectId,
                 Page = page,
@@ -67,7 +67,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settingsModel.GetSetting<int>(nameof(_settingsModel.ProjectId));
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -110,8 +110,8 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var projectTask = await _tasksEndpoint.GetTask(id);
-            _settingsModel.ProjectId = projectTask.ProjectId;
-            _settingsModel.SaveSettings();
+            _settingsService.ProjectId = projectTask.ProjectId;
+            _settingsService.SaveSettings();
 
             var model = await TaskViewModel.Create(new TaskViewModelArgs {
                 ProjectsEndpoint = _projectsEndpoint, 

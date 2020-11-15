@@ -1,27 +1,27 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Pegasus.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Pegasus.Domain;
+using Pegasus.Services.Models;
 
-namespace Pegasus.Models.Settings
+namespace Pegasus.Services
 {
-    public class SettingsModel : ISettingsModel
+    public class SettingsService : SettingsModel, ISettingsService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private const string Position = "PegasusSettings";
         private readonly Cookies _cookies;
 
-        public SettingsModel()
+        public SettingsService()
         {
         }
 
-        public SettingsModel(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public SettingsService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
@@ -29,18 +29,10 @@ namespace Pegasus.Models.Settings
             InitializeSettings();
         }
 
-        public int CookieExpiryDays { get; set; }
-        [DisplayName("Page Size")]
-        public int PageSize { get; set; }
-        [DisplayName("Pagination Enabled")] 
-        public bool PaginationEnabled { get; set; }
-        public int ProjectId { get; set; }
-        public int TaskFilterId { get; set; }
-
         public void SaveSettings()
         {
             var propertyValues = new Dictionary<string, object>();
-            var properties = typeof(SettingsModel).GetProperties();
+            var properties = typeof(SettingsService).GetProperties();
             foreach (var property in properties)
             {
                 var value = property.GetValue(this, null);
@@ -49,12 +41,6 @@ namespace Pegasus.Models.Settings
 
             var cookieData =  JsonSerializer.Serialize(propertyValues);
             _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, "UserSettings", cookieData, CookieExpiryDays);
-        }
-
-        public void WriteCookie(HttpResponse response, string setting, string settingValue, int expiryDays)
-        {
-            var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
-            response.Cookies.Append(setting, settingValue, options);
         }
 
         private void InitializeSettings()

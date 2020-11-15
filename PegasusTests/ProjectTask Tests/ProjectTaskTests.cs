@@ -6,14 +6,14 @@ using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
-using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
+using Pegasus.Services.Models;
 
 namespace PegasusTests.ProjectTask_Tests
 {
     class ProjectTaskTests
     {
-        private readonly ISettingsModel _settingsModel = new SettingsModel();
+        private readonly SettingsModel _settingsModel = new SettingsModel();
 
         [SetUp]
         public void TestSetup()
