@@ -39,8 +39,8 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var taskFilterId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.TaskFilterId));
-            var projectId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.ProjectId));
+            var taskFilterId = _settingsModel.GetSetting<int>(nameof(_settingsModel.TaskFilterId));
+            var projectId = _settingsModel.GetSetting<int>(nameof(_settingsModel.ProjectId));
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
@@ -67,7 +67,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settingsModel.GetSetting<int>(Request,nameof(_settingsModel.ProjectId));
+            var projectId = _settingsModel.GetSetting<int>(nameof(_settingsModel.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {

@@ -81,8 +81,9 @@ namespace Pegasus.Models.Settings
             }
         }
 
-        public T GetSetting<T>(HttpRequest request, string settingName)
+        public T GetSetting<T>(string settingName)
         {
+            var request = _httpContextAccessor.HttpContext.Request; 
             var property = GetProperty<T>(settingName);
             var currentValue = property.GetValue(this);
 
@@ -103,12 +104,12 @@ namespace Pegasus.Models.Settings
             if (property == null)
             {
                 // ReSharper disable once ConstantNullCoalescingCondition
-                throw new Exception($"Property '{settingName ?? "null"}' not found");
+                throw new PropertyNotFoundException($"Property '{settingName ?? "null"}' not found");
             }
 
             if (property.PropertyType != typeof(T))
             {
-                throw new Exception($"Property '{settingName}' is not of type {typeof(T)}");
+                throw new PropertyTypeInvalidException($"Property '{settingName}' is not of type {typeof(T)}");
             }
 
             return property;
@@ -125,5 +126,17 @@ namespace Pegasus.Models.Settings
             return new Dictionary<string, object>();
         }
 
+    }
+
+    public class PropertyNotFoundException : Exception
+    {
+        public PropertyNotFoundException(string message):base(message)
+        { }
+    }
+
+    public class PropertyTypeInvalidException : Exception
+    {
+        public PropertyTypeInvalidException(string message):base(message)
+        { }
     }
 }

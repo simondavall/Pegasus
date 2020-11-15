@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Pegasus.Models.Settings
+﻿namespace Pegasus.Models.Settings
 {
     public interface ISettingsModel
     {
@@ -10,7 +8,7 @@ namespace Pegasus.Models.Settings
         public int ProjectId { get; set; }
         public int TaskFilterId { get; set; }
 
-        T GetSetting<T>(HttpRequest request, string settingName);
+        T GetSetting<T>(string settingName);
         void SaveSettings();
     }
 }
