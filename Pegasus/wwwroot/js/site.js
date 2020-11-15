@@ -35,15 +35,15 @@ $(function () {
         $(taskFilterList[currentSettings.taskFilterId]).find("i").removeClass("hide");
     });
 
-    var updateList = function () {
+    var updateList = function (form) {
         var options = {
-            url: $(".project-list-form").attr("action"),
-            type: $(".project-list-form").attr("method"),
-            data: $(".project-list-form").serialize()
+            url: $(form).attr("action"),
+            type: $(form).attr("method"),
+            data: $(form).serialize()
         };
 
         $.ajax(options).done(function (data) {
-            var $target = $($(".project-list-form").attr("data-pgs-target"));
+            var $target = $($(form).attr("data-pgs-target"));
             $target.replaceWith(data);
         });
     }
@@ -53,7 +53,7 @@ $(function () {
         $(hiddenItem).val(selectedId);
         $(itemList).find("i").addClass("hide");
         $(item).find("i").removeClass("hide");
-        updateList();
+        updateList(".project-list-form");
         return selectedId;
     };
 
@@ -95,7 +95,8 @@ $(function () {
 
     $(".body-content").on('click', ".comment-delete-button", function () {
         $(this).siblings("input").val(true);
-        updateList();
+
+        updateList(".project-task-form");
     });
 
     var toggleSettingsSidebar = function () {
