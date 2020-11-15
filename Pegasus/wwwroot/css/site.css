@@ -114,6 +114,7 @@ html {
     font-size: 12px;
     line-height: 1.5;
     border-radius: 3px;
+    cursor: pointer;
 }
 
 .card-default {
@@ -213,7 +214,7 @@ html {
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
-.project-list-item, .project-list-form, .task-filter, .navbar-content {
+.project-list-item, .project-list-form, .task-filter, .project-task-form, .navbar-content {
 }
 
 a.settings-close {
@@ -339,6 +340,11 @@ a.settings-close i {
     font-size: 11px;
 }
 
+.task-comment-deleted {
+    text-decoration: line-through;
+    color: red;
+}
+
 .task-completed-strike a {
     color: lightgrey;
     text-decoration: line-through;
@@ -368,5 +374,3 @@ a.settings-close i {
     text-align: right;
 }
 
-/* ReSharper restore RedundantUnits */
-/* ReSharper restore RedundantUnits */
