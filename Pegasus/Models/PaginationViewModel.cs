@@ -1,14 +1,14 @@
-﻿using Pegasus.Models.Settings;
+﻿using Pegasus.Services.Models;
 
 namespace Pegasus.Models
 {
     public class PaginationViewModel
     {
-        private readonly ISettingsModel _settingsModel;
+        private readonly bool _paginationEnabled;
 
-        public PaginationViewModel(ISettingsModel settingsModel)
+        public PaginationViewModel(SettingsModel settingsModel)
         {
-            _settingsModel = settingsModel;
+            _paginationEnabled = settingsModel.PaginationEnabled;
         }
 
         public string Action { get; set; }
@@ -27,7 +27,7 @@ namespace Pegasus.Models
 
         public bool ShowPagination
         {
-            get { return _settingsModel.PaginationEnabled && TotalPages > 1; }
+            get { return _paginationEnabled && TotalPages > 1; }
         }
 
         public bool ShowPrevPage

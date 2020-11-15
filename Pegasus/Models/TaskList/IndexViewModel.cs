@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
-using Pegasus.Models.Settings;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Models.TaskList
 {
     public class IndexViewModel : BaseViewModel
     {
-        private readonly ISettingsModel _settingsModel;
+        private readonly SettingsModel _settingsModel;
         private readonly IList<TaskModel> _filteredProjectTasks;
         private const int DefaultPageSize = 10;
 
-        public IndexViewModel(IEnumerable<TaskModel> projectTasks, int taskFilterId, ISettingsModel settingsModel)
+        public IndexViewModel(IEnumerable<TaskModel> projectTasks, int taskFilterId, SettingsModel settingsModel)
         {
             _settingsModel = settingsModel;
             _filteredProjectTasks = projectTasks.Filtered(taskFilterId).ToList();
@@ -31,7 +30,7 @@ namespace Pegasus.Models.TaskList
         public int PageSize { get; set; } = DefaultPageSize;
         public bool PaginationEnabled { get; set; }
 
-        public IEnumerable<TaskFilter> TaskFilters { get; set; }
+        public IEnumerable<TaskFilterModel> TaskFilters { get; set; }
 
         public IEnumerable<TaskModel> ProjectTasks => _filteredProjectTasks
             .Sorted(Sorter)

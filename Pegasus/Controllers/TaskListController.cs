@@ -4,55 +4,49 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Pegasus.Domain;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 using Pegasus.Models;
-using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
+using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Controllers
 {
     [Authorize(Roles = "PegasusUser")]
     public class TaskListController : Controller
     {
-        private readonly Cookies _cookies;
-        private readonly Settings _settings;
         private readonly ITaskFilterService _taskFilterService;
         private readonly IProjectsEndpoint _projectsEndpoint;
         private readonly ITasksEndpoint _tasksEndpoint;
         private readonly ICommentsEndpoint _commentsEndpoint;
-        private readonly ISettingsModel _settingsModel;
+        private readonly ISettingsService _settingsService;
         private readonly int _pageSize;
 
-        public TaskListController(IConfiguration configuration, ITaskFilterService taskFilterService, 
+        public TaskListController(ITaskFilterService taskFilterService, 
             IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, 
-            ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel)
+            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService)
         {
             _taskFilterService = taskFilterService;
             _projectsEndpoint = projectsEndpoint;
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
-            _settingsModel = settingsModel;
-            _settings = new Settings(configuration);
-            _cookies = new Cookies(configuration);
-            _pageSize = settingsModel.PageSize;
+            _settingsService = settingsService;
+            _pageSize = settingsService.PageSize;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var taskFilterId = GetTaskFilterIdAndUpdateCookie();
-            var projectId = GetProjectIdAndUpdateCookie();
+            var taskFilterId = _settingsService.GetSetting<int>(nameof(_settingsService.TaskFilterId));
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
             var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
 
-            var model = new IndexViewModel(projectTasks, taskFilterId, _settingsModel)
+            var model = new IndexViewModel(projectTasks, taskFilterId, (SettingsModel)_settingsService)
             {
                 ProjectId = projectId,
                 Page = page,
@@ -73,7 +67,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -116,8 +110,9 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var projectTask = await _tasksEndpoint.GetTask(id);
+            _settingsService.ProjectId = projectTask.ProjectId;
+            _settingsService.SaveSettings();
 
-            _cookies.WriteCookie(Response,"Project.Id", projectTask.ProjectId.ToString());
             var model = await TaskViewModel.Create(new TaskViewModelArgs {
                 ProjectsEndpoint = _projectsEndpoint, 
                 TasksEndpoint = _tasksEndpoint, 
@@ -175,25 +170,11 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        private int GetProjectIdAndUpdateCookie()
-        {
-            var projectId = _settings.GetSetting(Request, "Project.Id");
-            _cookies.WriteCookie(Response, "Project.Id", projectId.ToString());
-            return projectId;
-        }
-
-        private int GetTaskFilterIdAndUpdateCookie()
-        {
-            var taskFilterId = _settings.GetSetting(Request, "taskFilterId");
-            _cookies.WriteCookie(Response, "taskFilterId", taskFilterId.ToString());
-            return taskFilterId;
-        }
-
         private int GetPage()
         {
             const int defaultPageNo = 1;
-            var page = _settings.GetSetting(Request, "Page", defaultPageNo);
-            return page;
+            var qsPage = Request.Query["page"];
+            return int.TryParse(qsPage, out var pageNo) ? pageNo : defaultPageNo;
         }
     }
 }

@@ -5,14 +5,14 @@ using NUnit.Framework;
 using Pegasus.Entities.Enumerations;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Library.Models;
-using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
+using Pegasus.Services.Models;
 
 namespace PegasusTests
 {
     class IndexViewModelTests
     {
-        private readonly ISettingsModel _settingsModel = new SettingsModel();
+        private readonly SettingsModel _settingsModel = new SettingsModel();
 
         [SetUp]
         public void TestSetup()

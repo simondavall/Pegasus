@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
-using Pegasus.Models.Settings;
+using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
     [Authorize(Roles = "PegasusUser")]
     public class HomeController : TaskListController
     {
-        public HomeController(IConfiguration configuration, ITaskFilterService taskFilterService, 
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsModel settingsModel) 
-            : base(configuration, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsModel)
+        public HomeController(ITaskFilterService taskFilterService, 
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService) 
+            : base(taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService)
         { }
     }
 }

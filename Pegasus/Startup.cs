@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
-using Pegasus.Models.Settings;
+using Pegasus.Services;
 
 namespace Pegasus
 {
@@ -30,7 +29,7 @@ namespace Pegasus
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
-            services.AddScoped<ISettingsModel, SettingsModel>();
+            services.AddScoped<ISettingsService, SettingsService>();
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 

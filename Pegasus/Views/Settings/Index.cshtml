@@ -1,8 +1,8 @@
-﻿@using Pegasus.Models.Settings
-@using Microsoft.AspNetCore.Http
+﻿@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Extensions
 @using Pegasus.Extensions
-@inject ISettingsModel SettingsModel
+@using Pegasus.Services
+@inject ISettingsService Settings
 @inject IHttpContextAccessor HttpAccessor
 
 <div class="sidebar">
@@ -23,13 +23,13 @@
                     <div class="settings-section">
                         <div class="settings-section-title">PAGINATION SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PaginationEnabled">@SettingsModel.GetDisplayName(nameof(SettingsModel.PaginationEnabled))</label>
-                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(SettingsModel.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@Settings.GetDisplayName(nameof(Settings.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
                             <input type="hidden" value="false" name="PaginationEnabled" />
                         </div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PageSize">@SettingsModel.GetDisplayName(nameof(SettingsModel.PageSize))</label>
-                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@SettingsModel.PageSize">
+                            <label class="settings-label settings-label-font" for="PageSize">@Settings.GetDisplayName(nameof(Settings.PageSize))</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@Settings.PageSize">
                         </div>
                     </div>
 

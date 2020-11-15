@@ -6,12 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Pegasus.Domain.Cache;
 using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
+using Pegasus.Services.Models;
 
-namespace Pegasus.Domain.ProjectTask
+namespace Pegasus.Services
 {
     public interface ITaskFilterService
     {
-        IEnumerable<TaskFilter> GetTaskFilters();
+        IEnumerable<TaskFilterModel> GetTaskFilters();
     }
 
     public class TaskFilterService : ITaskFilterService
@@ -25,7 +26,7 @@ namespace Pegasus.Domain.ProjectTask
             _configuration = configuration;
         }
 
-        public IEnumerable<TaskFilter> GetTaskFilters()
+        public IEnumerable<TaskFilterModel> GetTaskFilters()
         {
             if (FiltersExistInCache(out var filters))
                 return filters;
@@ -36,20 +37,20 @@ namespace Pegasus.Domain.ProjectTask
             return filters;
         }
 
-        private bool FiltersExistInCache(out IList<TaskFilter> filters)
+        private bool FiltersExistInCache(out IList<TaskFilterModel> filters)
         {
             return _cache.TryGetValue(CacheKeys.TaskFilters, out filters);
         }
 
-        private IList<TaskFilter> CreateListOfTaskFilters()
+        private IList<TaskFilterModel> CreateListOfTaskFilters()
         {
             const TaskFilters taskValue = TaskFilters.All;
             return EnumHelper<TaskFilters>.GetValues(taskValue)
-                .Select(task => new TaskFilter() { Name = EnumHelper<TaskFilters>.GetDisplayValue(task), Value = (int)task })
+                .Select(task => new TaskFilterModel() { Name = EnumHelper<TaskFilters>.GetDisplayValue(task), Value = (int)task })
                 .ToList();
         }
 
-        private void SaveToCache(IList<TaskFilter> filters)
+        private void SaveToCache(IList<TaskFilterModel> filters)
         {
             const int fallbackExpiryDays = 1;
             var expiryDays = _configuration.FromConfig("Cache:TaskFilters:ExpiryDays", fallbackExpiryDays);
