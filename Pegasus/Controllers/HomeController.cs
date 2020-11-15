@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Library.Api;
 using Pegasus.Models.Settings;
+using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {

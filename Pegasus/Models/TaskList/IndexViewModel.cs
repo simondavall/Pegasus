@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
 using Pegasus.Models.Settings;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Models.TaskList
 {
@@ -31,7 +31,7 @@ namespace Pegasus.Models.TaskList
         public int PageSize { get; set; } = DefaultPageSize;
         public bool PaginationEnabled { get; set; }
 
-        public IEnumerable<TaskFilter> TaskFilters { get; set; }
+        public IEnumerable<TaskFilterModel> TaskFilters { get; set; }
 
         public IEnumerable<TaskModel> ProjectTasks => _filteredProjectTasks
             .Sorted(Sorter)

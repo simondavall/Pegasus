@@ -4,13 +4,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pegasus.Domain.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 using Pegasus.Models;
 using Pegasus.Models.Settings;
 using Pegasus.Models.TaskList;
+using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
