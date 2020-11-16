@@ -74,7 +74,6 @@ body {
 /* css specific to Pegasus */
 
 body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -103,10 +102,6 @@ textarea {
 /* Actual site css*/
 html {
     overflow-y: scroll;
-}
-
-.body-content {
-    padding-top: 20px;
 }
 
 .btn-group-xs > .btn, .btn-xs {
@@ -272,8 +267,7 @@ a.settings-close i {
 
 /* ReSharper disable once RedundantUnits */
 .settings-sidebar {
-    padding: 20px 0 0 0;
-    position: fixed;
+    position: absolute;
     width: 0;
     right: 0;
     overflow-x: hidden;
