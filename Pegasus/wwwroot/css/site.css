@@ -124,6 +124,12 @@ html {
     font-size: 1.15rem;
 }
 
+@media (min-width: 768px) {
+    .card-expand-md .card-toggler {
+         display: none;
+    }
+}
+
 /* ReSharper disable once DeclarationIsEmpty */
 .comment-cancel-button,
 .comment-delete-button,
@@ -298,6 +304,14 @@ a.settings-close i {
 
 /* ReSharper disable once DeclarationIsEmpty */
 .sidebar, .settings-link {
+}
+
+.stretched-link::after {
+    cursor: pointer;
+}
+
+.stretch-limit {
+    position: relative;
 }
 
 .table-row-condensed {

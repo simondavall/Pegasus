@@ -1,39 +1,51 @@
 ﻿@model Pegasus.Models.TaskList.IndexViewModel
 
-<div class="card card-default">
+<div class="card card-default card-expand-md">
     <input id="page" type="hidden" asp-for="Page" />
-    <div class="card-header">
-        <input id="projectId" type="hidden" asp-for="ProjectId" />
-        <h5>Projects</h5>
-    </div>
-    <div class="card-body project-list">
-        <div>
-            <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
-        </div>
-        @foreach (var project in Model.Projects)
-        {
-            <div>
-                <a class="project-list-item" asp-action="Index" value="@project.Id">
-                    <i class="fa fa-angle-right"></i>@project.Name
-                </a>
-            </div>
-        }
-    </div>
-</div>
-<div class="card card-default">
-    <div class="card-header">
-        <h5>Task Filters</h5>
-    </div>
+    <input id="projectId" type="hidden" asp-for="ProjectId" />
     <input id="taskFilterId" type="hidden" asp-for="TaskFilterId"/>
 
-    <div class="card-body project-list">
-        @foreach (var taskFilter in Model.TaskFilters)
-        {
+    <div id="project-list">
+        <div class="card-header stretch-limit">
             <div>
-                <a class="task-filter" asp-action="Index" value="@taskFilter.Value">
-                    <i class="fa fa-angle-right"></i>@taskFilter.Name
-                </a>
+                <h5>Projects</h5>
+                <a class="card-toggler stretched-link" data-toggle="collapse" href="#project-list-items" aria-label="Toggle projects list"></a>
             </div>
-        }
+        </div>
+        <div id="project-list-items" class="collapse d-sm-inline-flex" data-parent="#project-list">
+            <div class="card-body project-list">
+                <div>
+                    <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
+                </div>
+                @foreach (var project in Model.Projects)
+                {
+                    <div>
+                        <a class="project-list-item" asp-action="Index" value="@project.Id">
+                            <i class="fa fa-angle-right"></i>@project.Name
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-default card-expand-md">
+    <div id="taskfilter-list">
+        <div class="card-header stretch-limit">
+            <h5>Task Filters</h5>
+            <a class="card-toggler stretched-link" data-toggle="collapse" href="#taskfilter-list-items" aria-label="Toggle task filter list"></a>
+        </div>
+        <div id="taskfilter-list-items" class="collapse d-sm-inline-flex" data-parent="#taskfilter-list">
+            <div class="card-body taskfilter-list">
+                @foreach (var taskFilter in Model.TaskFilters)
+                {
+                    <div>
+                        <a class="task-filter" asp-action="Index" value="@taskFilter.Value">
+                            <i class="fa fa-angle-right"></i>@taskFilter.Name
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
