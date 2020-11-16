@@ -74,7 +74,6 @@ body {
 /* css specific to Pegasus */
 
 body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -105,10 +104,6 @@ html {
     overflow-y: scroll;
 }
 
-.body-content {
-    padding-top: 20px;
-}
-
 .btn-group-xs > .btn, .btn-xs {
     padding: 1px 5px;
     font-size: 12px;
@@ -127,6 +122,12 @@ html {
 .card-header h5 {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 1.15rem;
+}
+
+@media (min-width: 768px) {
+    .card-expand-md .card-toggler {
+         display: none;
+    }
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
@@ -272,8 +273,7 @@ a.settings-close i {
 
 /* ReSharper disable once RedundantUnits */
 .settings-sidebar {
-    padding: 20px 0 0 0;
-    position: fixed;
+    position: absolute;
     width: 0;
     right: 0;
     overflow-x: hidden;
@@ -304,6 +304,14 @@ a.settings-close i {
 
 /* ReSharper disable once DeclarationIsEmpty */
 .sidebar, .settings-link {
+}
+
+.stretched-link::after {
+    cursor: pointer;
+}
+
+.stretch-limit {
+    position: relative;
 }
 
 .table-row-condensed {
