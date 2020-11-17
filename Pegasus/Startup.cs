@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Extensions;
 using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace Pegasus
 {
@@ -32,6 +34,9 @@ namespace Pegasus
             services.AddScoped<ISettingsService, SettingsService>();
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
