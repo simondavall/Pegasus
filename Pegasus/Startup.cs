@@ -28,6 +28,7 @@ namespace Pegasus
             services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
             services.AddTransient<ITasksEndpoint, TasksEndpoint>();
             services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
+            services.AddTransient<IAccountsEndpoint, AccountsEndpoint>();
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();

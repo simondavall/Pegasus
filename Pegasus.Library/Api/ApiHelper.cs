@@ -113,7 +113,7 @@ namespace Pegasus.Library.Api
             }
         }
 
-        public async Task PostAsync<T>(T model, string requestUri)
+        public async Task<T> PostAsync<T>(T model, string requestUri)
         {
             HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
             using (var response = await ApiClient.PostAsync(requestUri, content))
@@ -122,6 +122,8 @@ namespace Pegasus.Library.Api
                 {
                     throw new Exception(response.ReasonPhrase);
                 }
+                var result = await response.Content.ReadAsAsync<T>();
+                return result;
             }
         }
     }

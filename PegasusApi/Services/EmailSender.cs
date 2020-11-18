@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Pegasus.Services.Models;
+using PegasusApi.Models;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace Pegasus.Services
+namespace PegasusApi.Services
 {
     public class EmailSender : IEmailSender
     {
