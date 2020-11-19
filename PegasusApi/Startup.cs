@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using PegasusApi.Data;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,9 @@ using Microsoft.Extensions.Hosting;
 using PegasusApi.Extensions;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.JwtAuthentication.Extensions;
-using JwtModels = PegasusApi.Library.JwtAuthentication.Models;
+using PegasusApi.Models;
+using PegasusApi.Services;
+
 
 namespace PegasusApi
 {
@@ -38,6 +41,9 @@ namespace PegasusApi
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddControllersWithViews();
             services.AddRazorPages();

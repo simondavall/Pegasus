@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models;
@@ -17,13 +20,15 @@ namespace Pegasus.Controllers
         private readonly ILogger _logger;
         private readonly IApiHelper _apiHelper;
         private readonly IJwtTokenAccessor _tokenAccessor;
+        private readonly IAccountsEndpoint _accountsEndpoint;
 
-        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, 
-            IJwtTokenAccessor tokenAccessor)
+        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper,
+            IJwtTokenAccessor tokenAccessor, IAccountsEndpoint accountsEndpoint)
         {
             _logger = logger;
             _apiHelper = apiHelper;
             _tokenAccessor = tokenAccessor;
+            _accountsEndpoint = accountsEndpoint;
         }
 
         [AllowAnonymous]
@@ -92,6 +97,75 @@ namespace Pegasus.Controllers
             _logger.LogInformation("User logged out.");
             ViewData["ReturnUrl"] = returnUrl;
             return RedirectToLocal("/Account/Login");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.BaseUrl = Url.ResetPasswordBaseUrl(Request.Scheme);
+                await _accountsEndpoint.ForgotPassword(model);
+                return View("ForgotPasswordConfirmation");
+            }
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ResetPassword(string userId = null, string code = null)
+        {
+            if (code == null)
+            {
+                return BadRequest("A code must be supplied for password reset.");
+            }
+            else
+            {
+                var resetPasswordViewModel = new ResetPasswordModel
+                {
+                    Input = new ResetPasswordModel.InputModel
+                    {
+                        UserId = userId, Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
+                    }
+                };
+
+                return View(resetPasswordViewModel);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var response = await _accountsEndpoint.ResetPassword(model);
+
+            if (response.Succeeded)
+            {
+                return View("ResetPasswordConfirmation");
+            }
+
+            //TODO Does this not leave us security vulnerable. i.e. Email/User exists?
+            foreach (var error in response.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            return View(model);
         }
 
         [AllowAnonymous]

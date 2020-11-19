@@ -13,6 +13,6 @@ namespace Pegasus.Library.Api
 		HttpClient ApiClient { get; }
         Task<T> GetFromUri<T>(string requestUri);
         Task<List<T>> GetListFromUri<T>(string requestUri);
-        Task PostAsync<T>(T model, string requestUri);
+        Task<T> PostAsync<T>(T model, string requestUri);
     }
 }
