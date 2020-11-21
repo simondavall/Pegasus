@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pegasus.Entities.Attributes;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -15,6 +16,7 @@ using Pegasus.Services.Models;
 namespace Pegasus.Controllers
 {
     [Authorize(Roles = "PegasusUser")]
+    [Require2Fa]
     public class TaskListController : Controller
     {
         private readonly ITaskFilterService _taskFilterService;

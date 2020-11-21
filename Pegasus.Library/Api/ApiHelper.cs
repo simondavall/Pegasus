@@ -93,7 +93,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<T>();
                 return result;
@@ -106,7 +106,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<List<T>>();
                 return result;
@@ -120,7 +120,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<T>();
                 return result;
