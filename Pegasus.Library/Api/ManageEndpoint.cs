@@ -44,14 +44,14 @@ namespace Pegasus.Library.Api
             return await _apiHelper.GetFromUri<GetTwoFactorEnabledModel>($"api/Account/Manage/GetTwoFactorEnabled/{email}");
         }
 
-        public async Task<List<string>> GenerateNewRecoveryCodesAsync(string email)
+        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string email)
         {
-            return await _apiHelper.GetFromUri<List<string>>($"api/Account/Manage/GenerateNewRecoveryCodes/{email}");
+            return await _apiHelper.GetFromUri<GenerateRecoveryCodesModel>($"api/Account/Manage/GenerateNewRecoveryCodes/{email}");
         }
 
-        public async Task<List<string>> NeedRecoveryCodeReset(string email)
+        public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model)
         {
-            return await _apiHelper.GetFromUri<List<string>>($"api/Account/Manage/NeedRecoveryCodeReset/{email}");
+            return await _apiHelper.PostAsync(model,$"api/Account/Manage/CheckRecoveryCodesStatus");
         }
 
         public async Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model)

@@ -2,8 +2,10 @@
 
 namespace Pegasus.Library.Models.Manage
 {
-    public class GenerateRecoveryCodesModel : ManageBaseModel
+    public class RecoveryCodeStatusModel : ManageBaseModel
     {
+        public string Email { get; set; }
+        public bool NeededReset { get; set; }
         public IEnumerable<string> RecoveryCodes { get; set; }
-    }
+     }
 }

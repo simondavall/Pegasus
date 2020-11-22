@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Pegasus.Library.Models.Manage
+﻿namespace PegasusApi.Library.Models.Manage
 {
     public class GetTwoFactorEnabledModel : ManageBaseModel
     {

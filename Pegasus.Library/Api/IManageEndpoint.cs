@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Pegasus.Library.Models.Manage;
 
 namespace Pegasus.Library.Api
@@ -12,8 +11,8 @@ namespace Pegasus.Library.Api
         Task<VerifyTwoFactorTokenModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorTokenModel model);
         Task<SetTwoFactorEnabledModel> SetTwoFactorEnabledAsync(SetTwoFactorEnabledModel model);
         Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string email);
-        Task<List<string>> GenerateNewRecoveryCodesAsync(string email);
-        Task<List<string>> NeedRecoveryCodeReset(string email);
+        Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string email);
         Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model);
+        Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Pegasus.Library.Models.Manage
+namespace PegasusApi.Library.Models.Manage
 {
     public class GenerateRecoveryCodesModel : ManageBaseModel
     {

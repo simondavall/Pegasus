@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -24,8 +25,8 @@ namespace Pegasus.Controllers
         [Route(nameof(TwoFactorAuthentication))]
         public async Task<IActionResult> TwoFactorAuthentication()
         {
-            var twoFactorViewModel = await _manageEndpoint.TwoFactorAuthentication(User.Identity.Name);
-            return View(twoFactorViewModel);
+            var model = await _manageEndpoint.TwoFactorAuthentication(User.Identity.Name);
+            return View(model);
         }
 
         [Route(nameof(TwoFactorAuthentication))]
@@ -95,10 +96,14 @@ namespace Pegasus.Controllers
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", set2FaEnabled.UserId);
             model.StatusMessage = "Your authenticator app has been verified.";
 
-            var newRecoveryCodes = await _manageEndpoint.NeedRecoveryCodeReset(User.Identity.Name);
-            if (newRecoveryCodes.Count > 0)
+            var recoveryCodeStatus = new RecoveryCodeStatusModel
             {
-                model.RecoveryCodes = newRecoveryCodes.ToArray();
+                Email = User.Identity.Name
+            };
+            recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatus(recoveryCodeStatus);
+            if (recoveryCodeStatus.NeededReset)
+            {
+                model.RecoveryCodes = recoveryCodeStatus.RecoveryCodes.ToArray();
                 return RedirectToAction("ShowRecoveryCodes");
             }
 
@@ -190,10 +195,10 @@ namespace Pegasus.Controllers
                 throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{response.UserId}' as they do not have 2FA enabled.");
             }
 
-            var recoveryCodes = await _manageEndpoint.GenerateNewRecoveryCodesAsync(User.Identity.Name);
+            model = await _manageEndpoint.GenerateNewRecoveryCodesAsync(User.Identity.Name);
             var showRecoveryCodes = new ShowRecoveryCodesModel
             {
-                RecoveryCodes = recoveryCodes.ToArray()
+                RecoveryCodes = model.RecoveryCodes.ToArray()
             };
 
             _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", response.UserId);
