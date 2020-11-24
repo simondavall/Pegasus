@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using PegasusApi.Models;
+using PegasusApi.Models.Account;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -77,6 +78,16 @@ namespace PegasusApi.Controllers
             }
 
             return new ResetPasswordModel {Errors = result.Errors};
+        }
+
+        [Route("VerifyTwoFactorToken")]
+        [HttpPost]
+        public async Task<VerifyTwoFactorModel> VerifyTwoFactorToken(VerifyTwoFactorModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            var tokenOptions = new TokenOptions();
+            model.Verified = await _userManager.VerifyTwoFactorTokenAsync(user, tokenOptions.AuthenticatorTokenProvider, model.Code);
+            return model;
         }
     }
 }

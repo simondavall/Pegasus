@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 
-namespace PegasusApi.Models
+namespace PegasusApi.Models.Account
 {
     public class ResetPasswordModel
     {

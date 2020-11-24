@@ -43,7 +43,7 @@ namespace PegasusApi
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.Configure<AuthMessageSenderOptions>(Configuration);
+            services.Configure<EmailSenderOptions>(Configuration);
 
             services.AddControllersWithViews();
             services.AddRazorPages();

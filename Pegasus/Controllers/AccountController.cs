@@ -9,8 +9,9 @@ using Microsoft.Extensions.Logging;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
-using Pegasus.Library.Models;
+using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
+
 
 namespace Pegasus.Controllers
 {
@@ -21,14 +22,16 @@ namespace Pegasus.Controllers
         private readonly IApiHelper _apiHelper;
         private readonly IJwtTokenAccessor _tokenAccessor;
         private readonly IAccountsEndpoint _accountsEndpoint;
+        private readonly IAuthenticationEndpoint _authenticationEndpoint;
 
-        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper,
-            IJwtTokenAccessor tokenAccessor, IAccountsEndpoint accountsEndpoint)
+        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor, 
+            IAccountsEndpoint accountsEndpoint, IAuthenticationEndpoint authenticationEndpoint)
         {
             _logger = logger;
             _apiHelper = apiHelper;
             _tokenAccessor = tokenAccessor;
             _accountsEndpoint = accountsEndpoint;
+            _authenticationEndpoint = authenticationEndpoint;
         }
 
         [AllowAnonymous]
@@ -47,12 +50,8 @@ namespace Pegasus.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                //// This doesn't count login failures towards account lockout
-                //// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, lockoutOnFailure: false);
-                //TODO PGS-72 Consider enabling lockoutOnFailure
                 var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
-                var result = await _apiHelper.Authenticate(credentials);
+                var result = await _authenticationEndpoint.Authenticate(credentials);
 
                 if (result.Succeeded)
                 {
@@ -63,29 +62,68 @@ namespace Pegasus.Controllers
 
                     _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
 
+                    if (result.RequiresTwoFactor)
+                    {
+                        return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
+                    }
+
                     return RedirectToLocal(returnUrl);
                 }
-                //TODO PGS-73 Add this next line if we need 2fa
-                //if (result.RequiresTwoFactor)
-                //{
-                //    return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
-                //}
-                // TODO PGS-72 Implement Lockout recovery
-                //if (result.IsLockedOut)
-                //{
-                //    _logger.LogWarning("User account locked out.");
-                //    return RedirectToAction(nameof(Lockout));
-                //}
-                //else
-                //{
-                //    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                //    return View(model);
-                //}
+                
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult LoginWith2Fa(string returnUrl = null)
+        {
+            var model = new LoginWith2FaViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWith2Fa(LoginWith2FaViewModel model, string returnUrl = null)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            returnUrl ??= Url.Content("~/");
+
+            var verify2FaToken = new VerifyTwoFactorModel
+            {
+                Email = User.Identity.Name,
+                Code = model.Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty),
+            };
+            var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
+
+            if (result.Verified)
+            {
+                var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(verify2FaToken.Email);
+                var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
+                
+                //Need to re-sign in with 2fa
+                await HttpContext.SignOutAsync();
+                await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
+
+                _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
+
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", authenticatedUser.Username);
+                return LocalRedirect(returnUrl);
+            }
+
+            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  result.Email);
+            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
             return View(model);
         }
 

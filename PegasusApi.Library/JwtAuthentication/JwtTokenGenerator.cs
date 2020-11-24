@@ -16,11 +16,6 @@ namespace PegasusApi.Library.JwtAuthentication
     {
         private readonly TokenOptions _tokenOptions;
 
-        /// <summary>
-        /// Create a token generator instance
-        /// </summary>
-        /// <param name="tokenOptions"></param>
-
         public JwtTokenGenerator(TokenOptions tokenOptions)
         {
             _tokenOptions = tokenOptions ??
@@ -42,7 +37,6 @@ namespace PegasusApi.Library.JwtAuthentication
 
         private IEnumerable<Claim> MergeUserClaimsWithDefaultClaims(IdentityUser user, IEnumerable<Claim> userClaims)
         {
-            // TODO change this to the JwtSecurityToken creator with arguments
             var claims = new List<Claim>(userClaims)
             {
                 new Claim(ClaimTypes.Name, user.UserName),

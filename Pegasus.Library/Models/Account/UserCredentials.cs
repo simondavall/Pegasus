@@ -1,4 +1,4 @@
-﻿namespace Pegasus.Library.Models
+﻿namespace Pegasus.Library.Models.Account
 {
     public class UserCredentials
     {

@@ -41,6 +41,15 @@ namespace PegasusApi.Controllers
             }
         }
 
+        [Authorize(Roles="PegasusUser")]
+        [Route("/2fa_token")]
+        [HttpPost]
+        public async Task<IActionResult> Create(string username)
+        {
+            var claims = new List<Claim> {new Claim("amr", "mfa")};
+            return new ObjectResult(await GenerateToken(username, claims));
+        }
+
         private async Task<bool> IsValidUsernameAndPassword(string username, string password)
         {
             var user = await _userManager.FindByEmailAsync(username);
@@ -48,7 +57,7 @@ namespace PegasusApi.Controllers
             return result;
         }
 
-        private async Task<dynamic> GenerateToken(string username)
+        private async Task<dynamic> GenerateToken(string username, ICollection<Claim> claims = null)
         {
             var user = await _userManager.FindByEmailAsync(username);
             var roles = from ur in _context.UserRoles
@@ -56,7 +65,7 @@ namespace PegasusApi.Controllers
                 where ur.UserId == user.Id
                 select new {ur.UserId, ur.RoleId, r.Name};
 
-            var claims = new List<Claim>();
+            claims ??= new List<Claim>();
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -65,7 +74,8 @@ namespace PegasusApi.Controllers
             var output = new TokenModel
             {
                 AccessToken = _jwtTokenGenerator.GenerateAccessToken(user, claims),
-                Username = username
+                Username = username,
+                RequiresTwoFactor = user.TwoFactorEnabled
             };
 
             return output;

@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pegasus.Library.Models;
 
 namespace Pegasus.Library.Api
 {
     public interface IApiHelper
     {
-        Task<AuthenticatedUser> Authenticate(UserCredentials credentials);
         void AddTokenToHeaders(string token);
         void RemoveTokenFromHeaders();
 		HttpClient ApiClient { get; }

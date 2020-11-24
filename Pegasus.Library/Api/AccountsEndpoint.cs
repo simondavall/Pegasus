@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Pegasus.Library.Models;
+using Pegasus.Library.Models.Account;
 
 namespace Pegasus.Library.Api
 {
@@ -7,6 +7,7 @@ namespace Pegasus.Library.Api
     {
         Task<ForgotPasswordModel> ForgotPassword(ForgotPasswordModel model);
         Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model);
+        Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model);
     }
 
     public class AccountsEndpoint : IAccountsEndpoint
@@ -26,6 +27,11 @@ namespace Pegasus.Library.Api
         public async Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model)
         {
             return await _apiHelper.PostAsync(model, "api/Account/ResetPassword");
+        }
+
+        public async Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model)
+        {
+            return await _apiHelper.PostAsync(model, "api/Account/VerifyTwoFactorToken");
         }
     }
 }

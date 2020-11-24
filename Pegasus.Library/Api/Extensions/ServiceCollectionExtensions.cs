@@ -6,6 +6,7 @@ namespace Pegasus.Library.Api.Extensions
     {
         public static IServiceCollection AddApiEndpoints(this IServiceCollection services)
         {
+            services.AddTransient<IAuthenticationEndpoint, AuthenticationEndpoint>();
             services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
             services.AddTransient<ITasksEndpoint, TasksEndpoint>();
             services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Pegasus.Library.Models.Manage;
 
 namespace Pegasus.Library.Api
