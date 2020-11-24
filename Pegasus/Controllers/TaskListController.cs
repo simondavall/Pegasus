@@ -46,11 +46,11 @@ namespace Pegasus.Controllers
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel { Id = 0, Name = "All" };
-            var projectTasks = projectId > 0 ? await _tasksEndpoint.GetTasks(projectId) : await _tasksEndpoint.GetAllTasks();
+            var projectTasks = project.Id > 0 ? await _tasksEndpoint.GetTasks(project.Id) : await _tasksEndpoint.GetAllTasks();
 
             var model = new IndexViewModel(projectTasks, taskFilterId, (SettingsModel)_settingsService)
             {
-                ProjectId = projectId,
+                ProjectId = project.Id,
                 Page = page,
                 PageSize = _pageSize,
                 Projects = await _projectsEndpoint.GetAllProjects(),
