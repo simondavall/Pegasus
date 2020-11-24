@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Pegasus.Library.JwtAuthentication.Extensions;
 using Pegasus.Library.JwtAuthentication.Models;
-using Pegasus.Library.Models;
 
 
 namespace Pegasus.Library.JwtAuthentication

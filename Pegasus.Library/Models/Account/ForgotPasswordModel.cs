@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Pegasus.Library.Models
+namespace Pegasus.Library.Models.Account
 {
     public class ForgotPasswordModel
     {

@@ -1,4 +1,4 @@
-﻿namespace PegasusApi.Models
+﻿namespace PegasusApi.Models.Account
 {
     public class ForgotPasswordModel
     {

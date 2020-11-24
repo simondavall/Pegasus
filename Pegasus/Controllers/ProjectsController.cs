@@ -2,12 +2,14 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pegasus.Entities.Attributes;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 
 namespace Pegasus.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [Require2Fa]
     public class ProjectsController : Controller
     {
         private readonly IProjectsEndpoint _projectsEndpoint;

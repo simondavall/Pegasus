@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Pegasus.Library.Models;
 
 namespace Pegasus.Library.Api
 {
@@ -46,36 +45,6 @@ namespace Pegasus.Library.Api
             AddTokenToHeaders(token.Result);
         }
 
-        public async Task<AuthenticatedUser> Authenticate(UserCredentials credentials)
-        {
-            var data = new FormUrlEncodedContent(
-                new[]
-                {
-                    new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", credentials?.Username),
-                    new KeyValuePair<string, string>("password", credentials?.Password)
-                });
-
-            using (var response = await ApiClient.PostAsync("/token", data))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
-                    result.Succeeded = true;
-                    return result;
-                }
-                else
-                {
-                    var result = new AuthenticatedUser
-                    {
-                        Succeeded = false,
-                        FailedReason = response.ReasonPhrase
-                    };
-                    return result;
-                }
-            }
-        }
-
         public void AddTokenToHeaders(string token)
         {
             ApiClient.DefaultRequestHeaders.Remove("Authorization");
@@ -93,7 +62,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<T>();
                 return result;
@@ -106,7 +75,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<List<T>>();
                 return result;
@@ -120,7 +89,7 @@ namespace Pegasus.Library.Api
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 }
                 var result = await response.Content.ReadAsAsync<T>();
                 return result;

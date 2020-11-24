@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pegasus.Library.Api;
+using Pegasus.Library.Api.Extensions;
 using Pegasus.Library.JwtAuthentication.Extensions;
 using Pegasus.Services;
 using Pegasus.Services.Models;
@@ -25,10 +26,7 @@ namespace Pegasus
         {
             services.AddScoped<ITaskFilterService, TaskFilterService>();
 
-            services.AddTransient<IProjectsEndpoint, ProjectsEndpoint>();
-            services.AddTransient<ITasksEndpoint, TasksEndpoint>();
-            services.AddTransient<ICommentsEndpoint, CommentsEndpoint>();
-            services.AddTransient<IAccountsEndpoint, AccountsEndpoint>();
+            services.AddApiEndpoints();
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
@@ -38,6 +36,10 @@ namespace Pegasus
 
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
+
+            services.AddAuthorization(options =>
+                options.AddPolicy("TwoFactorEnabled",
+                    x => x.RequireClaim("amr", "mfa")));
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
