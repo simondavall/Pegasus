@@ -31,10 +31,36 @@ namespace Pegasus.Extensions
             return TaskProfileResolver.GetTaskProfile((TaskStatusEnum)model.TaskStatusId);
         }
 
+        private static IEnumerable<TaskModel> IsNotClosed(this IEnumerable<TaskModel> projectTasks)
+        {
+            return projectTasks.IsNotCompleted().IsNotObsolete();
+        }
+
+        private static IEnumerable<TaskModel> IsNotCompleted(this IEnumerable<TaskModel> projectTasks)
+        {
+            return projectTasks.Where(pt => pt.TaskStatusId != (int)TaskStatusEnum.Completed);
+        }
+
+        private static IEnumerable<TaskModel> IsHighPriority(this IEnumerable<TaskModel> projectTasks)
+        {
+            return projectTasks.Where(pt => pt.TaskPriorityId >= (int)TaskPriorityEnum.High);
+        }
+
+        private static IEnumerable<TaskModel> IsInBacklog(this IEnumerable<TaskModel> projectTasks)
+        {
+            return projectTasks.Where(pt => pt.TaskStatusId == (int)TaskStatusEnum.Backlog);
+        }
+
         private static IEnumerable<TaskModel> IsNotObsolete(this IEnumerable<TaskModel> projectTasks)
         {
             return projectTasks.Where(pt => pt.TaskStatusId != (int)TaskStatusEnum.Obsolete);
         }
+
+        private static IEnumerable<TaskModel> IsNotInBacklog(this IEnumerable<TaskModel> projectTasks)
+        {
+            return projectTasks.Where(pt => pt.TaskStatusId != (int)TaskStatusEnum.Backlog);
+        }
+
         private static IEnumerable<TaskModel> IsObsolete(this IEnumerable<TaskModel> projectTasks)
         {
             return projectTasks.Where(pt => pt.TaskStatusId == (int)TaskStatusEnum.Obsolete);
@@ -50,9 +76,11 @@ namespace Pegasus.Extensions
             switch ((TaskFilters)taskFilterId)
             {
                 case TaskFilters.Open:
-                    return projectTasks.Where(pt => !pt.IsClosed()).IsNotObsolete();
+                    return projectTasks.IsNotClosed().IsNotInBacklog();
+                case TaskFilters.Backlog:
+                    return projectTasks.IsInBacklog();
                 case TaskFilters.HighPriority:
-                    return projectTasks.Where(pt => pt.TaskPriorityId > 3).IsNotObsolete();
+                    return projectTasks.IsHighPriority().IsNotObsolete();
                 case TaskFilters.Obsolete:
                     return projectTasks.IsObsolete();
                 default:
