@@ -8,6 +8,8 @@ namespace Pegasus.Entities.Enumerations
         All = 0,
         [Display(Name = "Open Tasks")]
         Open,
+        [Display(Name = "Backlog Tasks")]
+        Backlog,
         [Display(Name = "High Priority")]
         HighPriority,
         [Display(Name = "Obsolete Tasks")]

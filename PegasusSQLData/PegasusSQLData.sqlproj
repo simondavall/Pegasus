@@ -67,6 +67,7 @@
     <None Include="PublishLocations\Development -PegasusSQLData.publish.xml" />
     <None Include="PublishLocations\Production-PegasusSQLData.publish.xml" />
     <None Include="dbo\Scripts\pgs-78 - Polulate new UserId and Modified fields.sql" />
+    <None Include="dbo\Scripts\pgs-94 - Add Backlog status.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Projects.sql" />
