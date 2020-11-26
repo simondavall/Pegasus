@@ -2,6 +2,6 @@
 {
     public static class ClaimTypes
     {
-        public const string Amr = "http://schemas.microsoft.com/claims/authnmethodsreferences";
+        public const string Amr = "amr";
     }
 }

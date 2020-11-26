@@ -8,6 +8,7 @@ namespace Pegasus.Library.Api
         Task<ForgotPasswordModel> ForgotPassword(ForgotPasswordModel model);
         Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model);
         Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model);
+        Task<RememberClientModel> RememberClientAsync(string userId);
     }
 
     public class AccountsEndpoint : IAccountsEndpoint
@@ -32,6 +33,12 @@ namespace Pegasus.Library.Api
         public async Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model)
         {
             return await _apiHelper.PostAsync(model, "api/Account/VerifyTwoFactorToken");
+        }
+
+        public async Task<RememberClientModel> RememberClientAsync(string userId)
+        {
+            var model = new RememberClientModel {UserId = userId};
+            return await _apiHelper.PostAsync(model,"api/Account/RememberClient");
         }
     }
 }

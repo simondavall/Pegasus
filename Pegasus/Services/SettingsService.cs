@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain;
+using Pegasus.Library.JwtAuthentication.Constants;
 using Pegasus.Services.Models;
 
 namespace Pegasus.Services
@@ -40,7 +41,7 @@ namespace Pegasus.Services
             }
 
             var cookieData =  JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, "UserSettings", cookieData, CookieExpiryDays);
+            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, CookieExpiryDays);
         }
 
         private void InitializeSettings()
@@ -103,7 +104,7 @@ namespace Pegasus.Services
 
         private Dictionary<string, object> LoadSettingsFromCookies()
         {
-            var settingsJson = _httpContextAccessor.HttpContext.Request.Cookies["userSettings"];
+            var settingsJson = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.UserSettings];
             if (!string.IsNullOrWhiteSpace(settingsJson))
             {
                 return JsonSerializer.Deserialize<Dictionary<string, object>>(settingsJson);
@@ -111,7 +112,6 @@ namespace Pegasus.Services
 
             return new Dictionary<string, object>();
         }
-
     }
 
     public class PropertyNotFoundException : Exception

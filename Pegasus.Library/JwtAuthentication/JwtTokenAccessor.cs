@@ -40,9 +40,11 @@ namespace Pegasus.Library.JwtAuthentication
 
             // ReSharper disable once NotAccessedVariable
             SecurityToken validatedToken;
-            ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out validatedToken);
 
-            return principal;
+            var tokenHandler = new JwtSecurityTokenHandler {MapInboundClaims = false};
+            var claimsPrincipal = tokenHandler.ValidateToken(jwtToken, validationParameters, out validatedToken);
+
+            return claimsPrincipal;
         }
 
         private static AuthenticationProperties CreateAuthenticationProperties(string accessToken)
