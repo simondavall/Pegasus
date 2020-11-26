@@ -35,11 +35,7 @@ namespace Pegasus
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.Configure<AuthMessageSenderOptions>(Configuration);
-
-            services.AddAuthorization(options =>
-                options.AddPolicy("TwoFactorEnabled",
-                    x => x.RequireClaim("amr", "mfa")));
+            services.Configure<EmailSenderOptions>(Configuration);
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();

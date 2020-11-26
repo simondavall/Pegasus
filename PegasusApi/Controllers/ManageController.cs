@@ -95,7 +95,7 @@ namespace PegasusApi.Controllers
                     return model;
                 }
                 model.UserId = user.Id;
-                await _userManager.SetTwoFactorEnabledAsync(user, true);;
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
                 model.Succeeded = true;
                 model.Enabled = user.TwoFactorEnabled;
             }

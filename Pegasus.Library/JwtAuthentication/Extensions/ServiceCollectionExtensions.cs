@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pegasus.Library.JwtAuthentication.Constants;
 using Pegasus.Library.JwtAuthentication.Models;
 
 
@@ -48,8 +49,15 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
+                .AddCookie(CookieConstants.TwoFactorRememberMeScheme, o => o.Cookie.Name = CookieConstants.TwoFactorRememberMeScheme)
+                .AddCookie(CookieConstants.TwoFactorUserIdScheme, o =>
+                {
+                    o.Cookie.Name = CookieConstants.TwoFactorUserIdScheme;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
+                    options.Cookie.Name = CookieConstants.ApplicationScheme;
                     // cookie expiration should be set the same as the token expiry (the default is 5
                     // mins). The token generator doesn't provide auto-refresh of an expired token so the
                     // user will be logged out the next time they try to access a secured endpoint. They
@@ -67,7 +75,6 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                     // that if the incoming token is invalid (may be it was tampered or spoofed) the
                     // Unprotect() method in JwtAuthTicketFormat will simply return null and the
                     // authentication will fail.
-                    options.Cookie.Name = "PegasusAuth";
                     options.TicketDataFormat = new JwtAuthTicketFormat(
                         tokenOptions.ToTokenValidationParams(),
                         services.BuildServiceProvider().GetService<IDataSerializer<AuthenticationTicket>>(),

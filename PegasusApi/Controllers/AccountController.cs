@@ -80,13 +80,25 @@ namespace PegasusApi.Controllers
             return new ResetPasswordModel {Errors = result.Errors};
         }
 
+        [AllowAnonymous]
         [Route("VerifyTwoFactorToken")]
         [HttpPost]
         public async Task<VerifyTwoFactorModel> VerifyTwoFactorToken(VerifyTwoFactorModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             var tokenOptions = new TokenOptions();
             model.Verified = await _userManager.VerifyTwoFactorTokenAsync(user, tokenOptions.AuthenticatorTokenProvider, model.Code);
+            return model;
+        }
+
+        [AllowAnonymous]
+        [Route("RememberClient")]
+        [HttpPost]
+        public async Task<RememberClientModel> RememberClient(RememberClientModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            model.SupportsUserSecurityStamp = _userManager.SupportsUserSecurityStamp;
+            model.SecurityStamp = user.SecurityStamp;
             return model;
         }
     }

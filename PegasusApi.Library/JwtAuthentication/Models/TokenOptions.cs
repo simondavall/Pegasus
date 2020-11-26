@@ -65,9 +65,4 @@ namespace PegasusApi.Library.JwtAuthentication.Models
 
         public int TokenExpiryInMinutes { get; }
     }
-
-    public struct TokenConstants
-    {
-        public const string TokenName = "jwt";
-    }
 }

@@ -12,13 +12,13 @@ namespace Pegasus.Services
     {
         private readonly IConfiguration _configuration;
 
-        public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor, IConfiguration configuration)
+        public EmailSender(IOptions<EmailSenderOptions> optionsAccessor, IConfiguration configuration)
         {
             _configuration = configuration;
             Options = optionsAccessor.Value;
         }
 
-        public AuthMessageSenderOptions Options { get; } //set only via Secret Manager
+        public EmailSenderOptions Options { get; } //set only via Secret Manager
 
         public Task SendEmailAsync(string email, string subject, string message)
         {

@@ -35,12 +35,12 @@ namespace Pegasus.Library.Api
         }
 
         [Authorize(Roles = "PegasusUser")]
-        public async Task<AuthenticatedUser> Authenticate2Fa(string username)
+        public async Task<AuthenticatedUser> Authenticate2Fa(string userId)
         {
             var data = new FormUrlEncodedContent(
                 new[]
                 {
-                    new KeyValuePair<string, string>("username", username)
+                    new KeyValuePair<string, string>("userId", userId)
                 });
 
             return await PostAsync("/2fa_token", data);
@@ -53,7 +53,7 @@ namespace Pegasus.Library.Api
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
-                    result.Succeeded = true;
+                    result.Authenticated = true;
                     return result;
                 }
                 else

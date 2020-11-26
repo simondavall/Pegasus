@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -11,6 +13,7 @@ using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
+using Pegasus.Services;
 
 
 namespace Pegasus.Controllers
@@ -18,20 +21,22 @@ namespace Pegasus.Controllers
     [Authorize(Roles = "PegasusUser")]
     public class AccountController : Controller
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<AccountController> _logger;
         private readonly IApiHelper _apiHelper;
         private readonly IJwtTokenAccessor _tokenAccessor;
         private readonly IAccountsEndpoint _accountsEndpoint;
         private readonly IAuthenticationEndpoint _authenticationEndpoint;
+        private readonly SignInManager _signInManager;
 
         public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor, 
-            IAccountsEndpoint accountsEndpoint, IAuthenticationEndpoint authenticationEndpoint)
+            IAccountsEndpoint accountsEndpoint, IAuthenticationEndpoint authenticationEndpoint, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _apiHelper = apiHelper;
             _tokenAccessor = tokenAccessor;
             _accountsEndpoint = accountsEndpoint;
             _authenticationEndpoint = authenticationEndpoint;
+            _signInManager = new SignInManager(httpContextAccessor, accountsEndpoint, apiHelper, tokenAccessor);
         }
 
         [AllowAnonymous]
@@ -51,23 +56,21 @@ namespace Pegasus.Controllers
             if (ModelState.IsValid)
             {
                 var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
-                var result = await _authenticationEndpoint.Authenticate(credentials);
+                var authenticatedUser = await _authenticationEndpoint.Authenticate(credentials);
 
-                if (result.Succeeded)
+                if (authenticatedUser.Authenticated)
                 {
-                    _logger.LogInformation("User logged in.");
-
-                    var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(result);
-                    await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
-
-                    _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
-
-                    if (result.RequiresTwoFactor)
+                    var signInResult = await _signInManager.SignInOrTwoFactor(authenticatedUser);
+                    if (signInResult.Success)
+                    {
+                        _logger.LogInformation("User logged in.");
+                        returnUrl ??= Url.Content("~/");
+                        return RedirectToLocal(returnUrl);
+                    }
+                    if (signInResult.RequiresTwoFactor)
                     {
                         return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
                     }
-
-                    return RedirectToLocal(returnUrl);
                 }
                 
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -78,9 +81,17 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpGet]
-        public IActionResult LoginWith2Fa(string returnUrl = null)
+        public async Task<IActionResult> LoginWith2Fa(string returnUrl = null)
         {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+            {
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+            }
+
             var model = new LoginWith2FaViewModel
             {
                 ReturnUrl = returnUrl
@@ -89,6 +100,7 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWith2Fa(LoginWith2FaViewModel model, string returnUrl = null)
@@ -98,20 +110,29 @@ namespace Pegasus.Controllers
                 return View(model);
             }
 
-            returnUrl ??= Url.Content("~/");
+            var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (userId == null)
+            {
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+            }
 
             var verify2FaToken = new VerifyTwoFactorModel
             {
-                Email = User.Identity.Name,
+                UserId = userId,
                 Code = model.Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty),
+                RememberMachine = model.Input.RememberMachine
             };
-            var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
 
+            var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
             if (result.Verified)
             {
-                var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(verify2FaToken.Email);
+                var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
                 var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
-                
+
+                if (model.Input.RememberMachine)
+                {
+                    await _signInManager.RememberTwoFactorClientAsync(userId);
+                }
                 //Need to re-sign in with 2fa
                 await HttpContext.SignOutAsync();
                 await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
@@ -119,10 +140,11 @@ namespace Pegasus.Controllers
                 _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
 
                 _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", authenticatedUser.Username);
+                returnUrl ??= Url.Content("~/");
                 return LocalRedirect(returnUrl);
             }
 
-            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  result.Email);
+            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  userId);
             ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
             return View(model);
         }

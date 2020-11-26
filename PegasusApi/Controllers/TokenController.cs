@@ -33,7 +33,8 @@ namespace PegasusApi.Controllers
         {
             if (await IsValidUsernameAndPassword(username, password))
             {
-                return new ObjectResult(await GenerateToken(username));
+                var user = await _userManager.FindByEmailAsync(username);
+                return new ObjectResult(GenerateToken(user));
             }
             else
             {
@@ -41,13 +42,14 @@ namespace PegasusApi.Controllers
             }
         }
 
-        [Authorize(Roles="PegasusUser")]
+        [AllowAnonymous]
         [Route("/2fa_token")]
         [HttpPost]
-        public async Task<IActionResult> Create(string username)
+        public async Task<IActionResult> Create(string userId)
         {
             var claims = new List<Claim> {new Claim("amr", "mfa")};
-            return new ObjectResult(await GenerateToken(username, claims));
+            var user = await _userManager.FindByIdAsync(userId);
+            return new ObjectResult(GenerateToken(user, claims));
         }
 
         private async Task<bool> IsValidUsernameAndPassword(string username, string password)
@@ -57,9 +59,8 @@ namespace PegasusApi.Controllers
             return result;
         }
 
-        private async Task<dynamic> GenerateToken(string username, ICollection<Claim> claims = null)
+        private dynamic GenerateToken(IdentityUser user, ICollection<Claim> claims = null)
         {
-            var user = await _userManager.FindByEmailAsync(username);
             var roles = from ur in _context.UserRoles
                 join r in _context.Roles on ur.RoleId equals r.Id
                 where ur.UserId == user.Id
@@ -74,7 +75,8 @@ namespace PegasusApi.Controllers
             var output = new TokenModel
             {
                 AccessToken = _jwtTokenGenerator.GenerateAccessToken(user, claims),
-                Username = username,
+                Username = user.UserName,
+                UserId = user.Id,
                 RequiresTwoFactor = user.TwoFactorEnabled
             };
 
