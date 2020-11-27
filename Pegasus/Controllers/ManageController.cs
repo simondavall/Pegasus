@@ -22,6 +22,27 @@ namespace Pegasus.Controllers
             _logger = logger;
         }
 
+        [Route(nameof(Index))]
+        [HttpGet]
+        public IActionResult Index()
+        {
+            //TODO Implement get personal details
+            var model = new IndexModel
+            {
+                Username = "<Username here>",
+                PhoneNumber = "07777 123456"
+            };
+            return View(model);
+        }
+
+        [Route(nameof(Index))]
+        [HttpPost]
+        public IActionResult Index(IndexModel model)
+        {
+            //TODO Implement saving personal details
+            return View(model);
+        }
+
         [Route(nameof(TwoFactorAuthentication))]
         public async Task<IActionResult> TwoFactorAuthentication()
         {
