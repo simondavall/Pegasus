@@ -193,10 +193,8 @@ namespace Pegasus.Controllers
             {
                 var resetPasswordViewModel = new ResetPasswordModel
                 {
-                    Input = new ResetPasswordModel.InputModel
-                    {
-                        UserId = userId, Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                    }
+                    UserId = userId,
+                    ResetCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
                 };
 
                 return View(resetPasswordViewModel);
