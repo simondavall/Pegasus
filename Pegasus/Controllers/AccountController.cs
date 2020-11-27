@@ -119,8 +119,8 @@ namespace Pegasus.Controllers
             var verify2FaToken = new VerifyTwoFactorModel
             {
                 UserId = userId,
-                Code = model.Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty),
-                RememberMachine = model.Input.RememberMachine
+                Code = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty),
+                RememberMachine = model.RememberMachine
             };
 
             var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
@@ -129,7 +129,7 @@ namespace Pegasus.Controllers
                 var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
                 var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
 
-                if (model.Input.RememberMachine)
+                if (model.RememberMachine)
                 {
                     await _signInManager.RememberTwoFactorClientAsync(userId);
                 }
@@ -193,10 +193,8 @@ namespace Pegasus.Controllers
             {
                 var resetPasswordViewModel = new ResetPasswordModel
                 {
-                    Input = new ResetPasswordModel.InputModel
-                    {
-                        UserId = userId, Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                    }
+                    UserId = userId,
+                    ResetCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
                 };
 
                 return View(resetPasswordViewModel);

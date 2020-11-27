@@ -31,7 +31,7 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<ForgotPasswordModel> ForgotPassword(ForgotPasswordModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Input.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
             {
                 // Don't reveal that the user does not exist or is not confirmed
@@ -51,7 +51,7 @@ namespace PegasusApi.Controllers
             var callbackUrl = new Uri(QueryHelpers.AddQueryString(model.BaseUrl, queryStringParams));
 
             await _emailSender.SendEmailAsync(
-                model.Input.Email,
+                model.Email,
                 "Reset Password",
                 $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl.ToString())}'>clicking here</a>.");
 
@@ -64,14 +64,14 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Input.Email);
-            if (user == null || user.Id != model.Input.UserId)
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || user.Id != model.UserId)
             {
                 // Don't reveal that the user does not exist
                 return new ResetPasswordModel {Succeeded = true};
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, model.Input.Code, model.Input.Password);
+            var result = await _userManager.ResetPasswordAsync(user, model.ResetCode, model.Password);
             if (result.Succeeded)
             {
                 return new ResetPasswordModel {Succeeded = true};
