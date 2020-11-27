@@ -69,7 +69,7 @@ namespace Pegasus.Controllers
             }
 
             // Strip spaces and hypens
-            var verificationCode = model.Input.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
             var verifyTwoFactorTokenModel = new VerifyTwoFactorTokenModel()
             {
