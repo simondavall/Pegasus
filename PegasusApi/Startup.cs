@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using PegasusApi.Extensions;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.JwtAuthentication.Extensions;
+using PegasusApi.Library.Models.Manage;
 using PegasusApi.Models;
 using PegasusApi.Services;
 
@@ -32,6 +33,7 @@ namespace PegasusApi
             services.AddTransient<IProjectsData, ProjectsData>();
             services.AddTransient<ITasksData, TasksData>();
             services.AddTransient<ICommentsData, CommentsData>();
+            services.AddTransient<IUsersData, UsersData>();
             
 
             services.AddDbContext<ApplicationDbContext>(options =>

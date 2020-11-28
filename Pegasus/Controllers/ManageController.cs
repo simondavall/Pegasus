@@ -30,8 +30,6 @@ namespace Pegasus.Controllers
         {
             var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
             var model = await _manageEndpoint.GetUserDetails(userId);
-
-            model.DisplayName = "<to be implemented>";
             return View(model);
         }
 
@@ -39,13 +37,19 @@ namespace Pegasus.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(UserDetailsModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                model.Username = User.Identity.Name;
+                return View(model);
+            }
+
             model = await _manageEndpoint.SetUserDetails(model);
             if (model.Errors.Count > 0)
             {
                 var statusMessage = new StringBuilder("Details were not updated.");
                 foreach (var error in model.Errors)
                 {
-                    statusMessage.AppendLine(error);
+                    statusMessage.Append($" - {error}");
                 }
                 model.StatusMessage = statusMessage.ToString();
                 return View(model);

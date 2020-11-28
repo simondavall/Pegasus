@@ -7,6 +7,7 @@ namespace PegasusApi.Library.Models.Manage
         public string UserId  { get; set; }
         public string Username { get; set; }
         public string PhoneNumber { get; set; }
+        public string DisplayName { get; set; }
         public IList<string> Errors { get; } = new List<string>();
     }
 }
