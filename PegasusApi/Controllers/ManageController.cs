@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models.Manage;
 
 namespace PegasusApi.Controllers
@@ -17,19 +19,89 @@ namespace PegasusApi.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IUsersData _usersData;
         private readonly UrlEncoder _urlEncoder;
         private readonly ILogger<ManageController> _logger;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        public ManageController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, 
+        public ManageController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUsersData usersData, 
             UrlEncoder urlEncoder, ILogger<ManageController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _usersData = usersData;
             _urlEncoder = urlEncoder;
             _logger = logger;
         }
         
+        [Route("GetUserDetails/{userId}")]
+        [HttpGet]
+        public async Task<UserDetailsModel> GetUserDetails(string userId)
+        {
+            var model = new UserDetailsModel
+            {
+                UserId = userId
+            };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                return model;
+            }
+            model.UserId = user.Id;
+            model.Username = user.UserName;
+            model.PhoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
+            var customData = await _usersData.GetUser(userId);
+            model.DisplayName = customData?.DisplayName;
+
+            return model;
+        }
+
+        [Route("SetUserDetails")]
+        [HttpPost]
+        public async Task<UserDetailsModel> SetUserDetails(UserDetailsModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                return model;
+            }
+
+            model.Username = user.UserName;
+            var phoneValidator = new PhoneAttribute();
+            if (!phoneValidator.IsValid(model.PhoneNumber))
+            {
+                model.Errors.Add("Invalid phone number format.");
+            }
+
+            if (model.Errors.Count != 0)
+            {
+                return model;
+            }
+
+            try
+            {
+                await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+            }
+            catch (Exception e)
+            {
+                model.Errors.Add($"Error when saving User Settings. Message: {e.Message}");
+            }
+
+            try
+            {
+                await _usersData.UpdateUser(new UserModel {Id = model.UserId, DisplayName = model.DisplayName});
+            }
+            catch (Exception e)
+            {
+                model.Errors.Add($"Error when saving custom User Settings. Message: {e.Message}");
+            }
+
+            return model;
+        }
+
         [AllowAnonymous]
         [Route("TwoFactorAuthentication/{email}")]
         [HttpGet]

@@ -99,5 +99,7 @@
     <Build Include="dbo\Stored Procedures\spTasks_AddTaskPriority.sql" />
     <Build Include="dbo\Stored Procedures\spTasks_GetStatusHistory.sql" />
     <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Stored Procedures\spUsers_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\spUsers_Update.sql" />
   </ItemGroup>
 </Project>

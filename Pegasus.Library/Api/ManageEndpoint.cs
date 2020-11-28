@@ -53,6 +53,16 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model,$"api/Account/Manage/CheckRecoveryCodesStatus");
         }
 
+        public async Task<UserDetailsModel> GetUserDetails(string userId)
+        {
+            return await _apiHelper.GetFromUri<UserDetailsModel>($"api/Account/Manage/GetUserDetails/{userId}");
+        }
+
+        public async Task<UserDetailsModel> SetUserDetails(UserDetailsModel model)
+        {
+            return await _apiHelper.PostAsync(model,$"api/Account/Manage/SetUserDetails");
+        }
+
         public async Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model)
         {
             return await _apiHelper.PostAsync(model,$"api/Account/Manage/ResetAuthenticator");

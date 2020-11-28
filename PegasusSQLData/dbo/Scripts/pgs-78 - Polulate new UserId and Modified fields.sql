@@ -11,8 +11,7 @@ Change the declared variables to correct values for Production and Execute.
 */
 
 declare @UserId nvarchar(450) = 'f7d69a12-ab97-4cf4-916a-da96f403a0e7'
-declare @Username nvarchar(256) = 'Simon Da Vall'
-declare @Email nvarchar(256) = 'simon.davall@gmail.com'
+declare @DisplayName nvarchar(256) = 'Simon Da Vall'
 
 
 update TaskComments
@@ -31,5 +30,5 @@ Update StatusHistory
 Set UserId = @UserId
 where UserId IS NULL
 
-Insert Users (Id, UserName, Email)
-Values (@UserId, @Username, @Email)
+Insert Users (Id, DisplayName)
+Values (@UserId, @DisplayName)
