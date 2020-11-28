@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,61 @@ namespace PegasusApi.Controllers
             _logger = logger;
         }
         
+        [Route("GetUserDetails/{userId}")]
+        [HttpGet]
+        public async Task<UserDetailsModel> GetUserDetails(string userId)
+        {
+            var model = new UserDetailsModel
+            {
+                UserId = userId
+            };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                return model;
+            }
+            model.UserId = user.Id;
+            model.Username = user.UserName;
+            model.PhoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            return model;
+        }
+
+        [Route("SetUserDetails")]
+        [HttpPost]
+        public async Task<UserDetailsModel> SetUserDetails(UserDetailsModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                return model;
+            }
+
+            model.Username = user.UserName;
+            var phoneValidator = new PhoneAttribute();
+            if (!phoneValidator.IsValid(model.PhoneNumber))
+            {
+                model.Errors.Add("Invalid phone number format.");
+            }
+
+            if (model.Errors.Count != 0)
+            {
+                return model;
+            }
+
+            try
+            {
+                await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+            }
+            catch (Exception e)
+            {
+                model.Errors.Add($"Error when saving User Settings. Message: {e.Message}, Error:{e}");
+            }
+
+            return model;
+        }
+
         [AllowAnonymous]
         [Route("TwoFactorAuthentication/{email}")]
         [HttpGet]

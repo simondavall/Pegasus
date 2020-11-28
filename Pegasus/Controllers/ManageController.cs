@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -24,22 +26,32 @@ namespace Pegasus.Controllers
 
         [Route(nameof(Index))]
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            //TODO Implement get personal details
-            var model = new IndexModel
-            {
-                Username = "<Username here>",
-                PhoneNumber = "07777 123456"
-            };
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            var model = await _manageEndpoint.GetUserDetails(userId);
+
+            model.DisplayName = "<to be implemented>";
             return View(model);
         }
 
         [Route(nameof(Index))]
         [HttpPost]
-        public IActionResult Index(IndexModel model)
+        public async Task<IActionResult> Index(UserDetailsModel model)
         {
-            //TODO Implement saving personal details
+            model = await _manageEndpoint.SetUserDetails(model);
+            if (model.Errors.Count > 0)
+            {
+                var statusMessage = new StringBuilder("Details were not updated.");
+                foreach (var error in model.Errors)
+                {
+                    statusMessage.AppendLine(error);
+                }
+                model.StatusMessage = statusMessage.ToString();
+                return View(model);
+            }
+
+            model.StatusMessage = "User details were updated.";
             return View(model);
         }
 

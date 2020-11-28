@@ -14,5 +14,7 @@ namespace Pegasus.Library.Api
         Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string email);
         Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model);
         Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model);
+        Task<UserDetailsModel> GetUserDetails(string userId);
+        Task<UserDetailsModel> SetUserDetails(UserDetailsModel model);
     }
 }
