@@ -45,7 +45,7 @@ namespace PegasusTests.ManageController
         [Test]
         public async Task EnableAuthenticator_CallGetMethod_ReturnsCorrectType()
         {
-            var sut = new Pegasus.Controllers.ManageController(_manageEndpoint.Object, _logger.Object)
+            var sut = new Pegasus.Controllers.ManageController(_manageEndpoint.Object, null, _logger.Object)
             {
                 ControllerContext = _controllerContext
             };
@@ -59,7 +59,7 @@ namespace PegasusTests.ManageController
         [Test]
         public async Task EnableAuthenticator_ModelStateNotValid_ReturnsCurrentView()
         {
-            var sut = new Pegasus.Controllers.ManageController(_manageEndpoint.Object, _logger.Object)
+            var sut = new Pegasus.Controllers.ManageController(_manageEndpoint.Object,null, _logger.Object)
             {
                 ControllerContext = _controllerContext
             };

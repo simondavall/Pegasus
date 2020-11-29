@@ -4,16 +4,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
-using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
 using Pegasus.Services;
+using Pegasus.Services.Models;
 
 
 namespace Pegasus.Controllers
@@ -23,20 +22,18 @@ namespace Pegasus.Controllers
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IApiHelper _apiHelper;
-        private readonly IJwtTokenAccessor _tokenAccessor;
         private readonly IAccountsEndpoint _accountsEndpoint;
         private readonly IAuthenticationEndpoint _authenticationEndpoint;
-        private readonly SignInManager _signInManager;
+        private readonly ISignInManager _signInManager;
 
-        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor, 
-            IAccountsEndpoint accountsEndpoint, IAuthenticationEndpoint authenticationEndpoint, IHttpContextAccessor httpContextAccessor)
+        public AccountController(ILogger<AccountController> logger, IApiHelper apiHelper, ISignInManager signInManager,
+            IAccountsEndpoint accountsEndpoint, IAuthenticationEndpoint authenticationEndpoint)
         {
             _logger = logger;
             _apiHelper = apiHelper;
-            _tokenAccessor = tokenAccessor;
             _accountsEndpoint = accountsEndpoint;
             _authenticationEndpoint = authenticationEndpoint;
-            _signInManager = new SignInManager(httpContextAccessor, accountsEndpoint, apiHelper, tokenAccessor);
+            _signInManager = signInManager;
         }
 
         [AllowAnonymous]
@@ -86,7 +83,6 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> LoginWith2Fa(string returnUrl = null)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
             if (user == null)
             {
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
@@ -126,27 +122,64 @@ namespace Pegasus.Controllers
             var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
             if (result.Verified)
             {
-                //TODO Need to refactor this out to signInManager (similar to SignInOrTwoFactor above)
-                var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
-                var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
+                var info = new TwoFactorAuthenticationInfo {UserId = userId};
+                await _signInManager.DoTwoFactorSignInAsync(info, model.RememberMachine);
 
-                if (model.RememberMachine)
-                {
-                    await _signInManager.RememberTwoFactorClientAsync(userId);
-                }
-                //Need to re-sign in with 2fa
-                await HttpContext.SignOutAsync();
-                await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
-
-                _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
-
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", authenticatedUser.Username);
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", userId);
                 returnUrl ??= Url.Content("~/");
                 return LocalRedirect(returnUrl);
             }
 
             _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  userId);
             ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
+        {
+            // Ensure the user has gone through the username & password screen first
+            var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (userId == null)
+            {
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+            }
+            
+            var model = new LoginWithRecoveryCodeModel()
+            {
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (userId == null)
+            {
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+            }
+
+            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(model.RecoveryCode);
+            
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", userId);
+                return LocalRedirect(model.ReturnUrl ?? Url.Content("~/"));
+            }
+
+            _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", userId);
+            ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
             return View(model);
         }
 
