@@ -83,7 +83,14 @@ namespace PegasusApi.Controllers
 
             try
             {
-                await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                var setPhoneNumber = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                if (!setPhoneNumber.Succeeded)
+                {
+                    foreach (var error in setPhoneNumber.Errors)
+                    {
+                        model.Errors.Add(error.Description);
+                    }
+                }
             }
             catch (Exception e)
             {
