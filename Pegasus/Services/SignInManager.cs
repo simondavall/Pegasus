@@ -52,7 +52,7 @@ namespace Pegasus.Services
             {
                 if (await IsTwoFactorClientRememberedAsync(authenticatedUser.UserId))
                 {
-                    additionalClaims.Add(new Claim("amr", "pwd"));
+                    additionalClaims.Add(new Claim("amr", "mfa"));
                 }
                 else
                 {

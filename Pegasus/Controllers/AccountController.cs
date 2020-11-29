@@ -126,6 +126,7 @@ namespace Pegasus.Controllers
             var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
             if (result.Verified)
             {
+                //TODO Need to refactor this out to signInManager (similar to SignInOrTwoFactor above)
                 var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
                 var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
 
