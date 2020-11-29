@@ -9,25 +9,37 @@ using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.JwtAuthentication.Constants;
 using Pegasus.Library.JwtAuthentication.Models;
+using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
 using Pegasus.Services.Models;
 using ClaimTypes = System.Security.Claims.ClaimTypes;
 
 namespace Pegasus.Services
 {
-    public class SignInManager
+    public interface ISignInManager
+    {
+        Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser);
+        Task<string> GetTwoFactorAuthenticationUserAsync();
+        Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode);
+        Task DoTwoFactorSignInAsync(TwoFactorAuthenticationInfo twoFactorInfo, bool rememberClient);
+    }
+
+    public class SignInManager : ISignInManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAccountsEndpoint _accountsEndpoint;
         private readonly IApiHelper _apiHelper;
         private readonly IJwtTokenAccessor _tokenAccessor;
+        private readonly IAuthenticationEndpoint _authenticationEndpoint;
 
-        public SignInManager(IHttpContextAccessor httpContextAccessor, IAccountsEndpoint accountsEndpoint, IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor)
+        public SignInManager(IHttpContextAccessor httpContextAccessor, IAccountsEndpoint accountsEndpoint, IApiHelper apiHelper,
+            IJwtTokenAccessor tokenAccessor, IAuthenticationEndpoint authenticationEndpoint)
         {
             _httpContextAccessor = httpContextAccessor;
             _accountsEndpoint = accountsEndpoint;
             _apiHelper = apiHelper;
             _tokenAccessor = tokenAccessor;
+            _authenticationEndpoint = authenticationEndpoint;
         }
 
         private HttpContext HttpContext
@@ -35,7 +47,7 @@ namespace Pegasus.Services
             get { return _httpContextAccessor.HttpContext; }
         }
 
-        public async Task RememberTwoFactorClientAsync(string userId)
+        private async Task RememberTwoFactorClientAsync(string userId)
         {
             var principal = await StoreRememberClient(userId);
             await HttpContext.SignInAsync(CookieConstants.TwoFactorRememberMeScheme,
@@ -74,6 +86,48 @@ namespace Pegasus.Services
             var info = await RetrieveTwoFactorInfoAsync();
             return info == null ? null : info.UserId;
         }
+
+        public async Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
+        {
+            var twoFactorInfo = await RetrieveTwoFactorInfoAsync();
+            if (twoFactorInfo == null || twoFactorInfo.UserId == null)
+            {
+                return SignInResult.Failed;
+            }
+
+            var model = new RedeemTwoFactorRecoveryCodeModel
+            {
+                UserId = twoFactorInfo.UserId,
+                RecoveryCode = recoveryCode
+            };
+
+            var result = await _accountsEndpoint.RedeemTwoFactorRecoveryCodeAsync(model);
+            if (result.Succeeded)
+            {
+                await DoTwoFactorSignInAsync(twoFactorInfo, false);
+                return SignInResult.Success;
+            }
+
+            // We don't protect against brute force attacks since codes are expected to be random.
+            return SignInResult.Failed;
+        }
+
+        public async Task DoTwoFactorSignInAsync(TwoFactorAuthenticationInfo twoFactorInfo, bool rememberClient)
+        {
+            var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(twoFactorInfo.UserId);
+            var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
+
+            if (rememberClient)
+            {
+                await RememberTwoFactorClientAsync(twoFactorInfo.UserId);
+            }
+            //Need to re-sign in with 2fa
+            await HttpContext.SignOutAsync();
+            await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
+
+            _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
+        }
+
 
         private static ClaimsPrincipal StoreTwoFactorInfo(string userId, string loginProvider)
         {

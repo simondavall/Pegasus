@@ -37,7 +37,7 @@ namespace PegasusTests
             var result = sut.GetTaskFilters();
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(5, result.Count());
         }
 
         [Test]

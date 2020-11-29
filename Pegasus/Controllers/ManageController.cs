@@ -4,13 +4,12 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
-using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Controllers
 {
@@ -19,18 +18,13 @@ namespace Pegasus.Controllers
     public class ManageController : Controller
     {
         private readonly IManageEndpoint _manageEndpoint;
-        private readonly IAuthenticationEndpoint _authenticationEndpoint;
-        private readonly IApiHelper _apiHelper;
-        private readonly IJwtTokenAccessor _tokenAccessor;
+        private readonly ISignInManager _signInManager;
         private readonly ILogger<ManageController> _logger;
 
-        public ManageController(IManageEndpoint manageEndpoint, IAuthenticationEndpoint authenticationEndpoint,
-            IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor, ILogger<ManageController> logger)
+        public ManageController(IManageEndpoint manageEndpoint, ISignInManager signInManager, ILogger<ManageController> logger)
         {
             _manageEndpoint = manageEndpoint;
-            _authenticationEndpoint = authenticationEndpoint;
-            _apiHelper = apiHelper;
-            _tokenAccessor = tokenAccessor;
+            _signInManager = signInManager;
             _logger = logger;
         }
 
@@ -135,16 +129,8 @@ namespace Pegasus.Controllers
                 return View(model);
             }
 
-            //TODO This is repeated in the Login2fa controller action (see if extract method possible)
-            // refresh sign in with 2fa
-            var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
-            var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
-
-            //Need to re-sign in with 2fa
-            await HttpContext.SignOutAsync();
-            await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
-
-            _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
+            var info = new TwoFactorAuthenticationInfo {UserId = userId};
+            await _signInManager.DoTwoFactorSignInAsync(info, false);
 
             var setTwoFactorEnabledModel = new SetTwoFactorEnabledModel
             {

@@ -101,5 +101,22 @@ namespace PegasusApi.Controllers
             model.SecurityStamp = user.SecurityStamp;
             return model;
         }
+
+        [AllowAnonymous]
+        [Route("RedeemTwoFactorRecoveryCode")]
+        [HttpPost]
+        public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCode(RedeemTwoFactorRecoveryCodeModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.Succeeded = false;
+                return model;
+            }
+            var result = await _userManager.RedeemTwoFactorRecoveryCodeAsync(user, model.RecoveryCode);
+            model.Succeeded = result.Succeeded;
+
+            return model;
+        }
     }
 }
