@@ -13,21 +13,15 @@ namespace Pegasus.Entities.Attributes
         private readonly string _controllerName = nameof(ManageController).Replace(nameof(Controller), string.Empty);
         private const object RouteValues = null;
         private const string MultiFactorAuthentication = "mfa";
-        private const string PasswordAuthentication = "pwd";
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var claimTwoFactorEnabled = context.HttpContext.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Amr);
+            var amrClaims = context.HttpContext.User.Claims.Where(t => t.Type == ClaimTypes.Amr);
 
-            if (claimTwoFactorEnabled == null || !ValidAuthenticationValue(claimTwoFactorEnabled.Value))
+            if (amrClaims.All(t => t.Value != MultiFactorAuthentication))
             {
                 context.Result = new RedirectToActionResult(ActionName, _controllerName, RouteValues);
             }
-        }
-
-        private bool ValidAuthenticationValue(string claimValue)
-        {
-            return MultiFactorAuthentication.Equals(claimValue) || PasswordAuthentication.Equals(claimValue);
         }
     }
 }

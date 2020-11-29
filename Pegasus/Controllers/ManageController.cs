@@ -4,10 +4,13 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
+using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.Models.Manage;
+using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
@@ -16,11 +19,18 @@ namespace Pegasus.Controllers
     public class ManageController : Controller
     {
         private readonly IManageEndpoint _manageEndpoint;
+        private readonly IAuthenticationEndpoint _authenticationEndpoint;
+        private readonly IApiHelper _apiHelper;
+        private readonly IJwtTokenAccessor _tokenAccessor;
         private readonly ILogger<ManageController> _logger;
 
-        public ManageController(IManageEndpoint manageEndpoint, ILogger<ManageController> logger)
+        public ManageController(IManageEndpoint manageEndpoint, IAuthenticationEndpoint authenticationEndpoint,
+            IApiHelper apiHelper, IJwtTokenAccessor tokenAccessor, ILogger<ManageController> logger)
         {
             _manageEndpoint = manageEndpoint;
+            _authenticationEndpoint = authenticationEndpoint;
+            _apiHelper = apiHelper;
+            _tokenAccessor = tokenAccessor;
             _logger = logger;
         }
 
@@ -97,6 +107,7 @@ namespace Pegasus.Controllers
         [HttpPost]
         public async Task<IActionResult> EnableAuthenticator(EnableAuthenticatorModel model)
         {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
             if (!ModelState.IsValid)
             {
                 var authenticatorKey =  await _manageEndpoint.LoadSharedKeyAndQrCodeUriAsync(User.Identity.Name);
@@ -124,6 +135,17 @@ namespace Pegasus.Controllers
                 return View(model);
             }
 
+            //TODO This is repeated in the Login2fa controller action (see if extract method possible)
+            // refresh sign in with 2fa
+            var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
+            var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
+
+            //Need to re-sign in with 2fa
+            await HttpContext.SignOutAsync();
+            await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
+
+            _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
+
             var setTwoFactorEnabledModel = new SetTwoFactorEnabledModel
             {
                 Email = User.Identity.Name,
@@ -140,8 +162,11 @@ namespace Pegasus.Controllers
             recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatus(recoveryCodeStatus);
             if (recoveryCodeStatus.NeededReset)
             {
-                model.RecoveryCodes = recoveryCodeStatus.RecoveryCodes.ToArray();
-                return RedirectToAction("ShowRecoveryCodes");
+                var showRecoveryCodesModel = new ShowRecoveryCodesModel()
+                {
+                    RecoveryCodes = recoveryCodeStatus.RecoveryCodes.ToArray()
+                };
+                return RedirectToAction("ShowRecoveryCodes", showRecoveryCodesModel);
             }
 
             return RedirectToAction("TwoFactorAuthentication");
