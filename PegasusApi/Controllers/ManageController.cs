@@ -61,6 +61,36 @@ namespace PegasusApi.Controllers
             return model;
         }
 
+        [Route("HasPassword")]
+        [HttpPost]
+        public async Task<HasPasswordModel> HasPassword(HasPasswordModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.Error = $"Unable to load user with ID '{model.UserId}'.";
+                return model;
+            }
+            model.HasPassword = await _userManager.HasPasswordAsync(user);
+            return model;
+        }
+
+        [Route("ChangePassword")]
+        [HttpPost]
+        public async Task<ChangePasswordModel> ChangePassword(ChangePasswordModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.UserNotFound = true;
+                return model;
+            }
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            model.Succeeded = changePasswordResult.Succeeded;
+            model.Errors = changePasswordResult.Errors;
+            return model;
+        }
+
         [Route("SetUserDetails")]
         [HttpPost]
         public async Task<UserDetailsModel> SetUserDetails(UserDetailsModel model)

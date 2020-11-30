@@ -29,7 +29,7 @@ namespace PegasusApi.Controllers
         [AllowAnonymous]
         [Route("/token")]
         [HttpPost]
-        public async Task<IActionResult> Create(string username, string password, string grantType)
+        public async Task<IActionResult> CreateToken(string username, string password, string grantType)
         {
             if (await IsValidUsernameAndPassword(username, password))
             {
@@ -43,9 +43,18 @@ namespace PegasusApi.Controllers
         }
 
         [AllowAnonymous]
+        [Route("/refresh_token")]
+        [HttpPost]
+        public async Task<IActionResult> RefreshToken(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return new ObjectResult(GenerateToken(user));
+        }
+
+        [AllowAnonymous]
         [Route("/2fa_token")]
         [HttpPost]
-        public async Task<IActionResult> Create(string userId)
+        public async Task<IActionResult> Create2FaToken(string userId)
         {
             var claims = new List<Claim> {new Claim("amr", "mfa")};
             var user = await _userManager.FindByIdAsync(userId);
