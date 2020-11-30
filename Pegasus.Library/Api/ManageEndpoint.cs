@@ -73,6 +73,11 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model,$"api/Account/Manage/ChangePassword");
         }
 
+        public async Task<SetPasswordModel> AddPasswordAsync(SetPasswordModel model)
+        {
+            return await _apiHelper.PostAsync(model,$"api/Account/Manage/AddPassword");
+        }
+
         public async Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model)
         {
             return await _apiHelper.PostAsync(model,$"api/Account/Manage/ResetAuthenticator");

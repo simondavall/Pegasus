@@ -35,14 +35,14 @@ namespace Pegasus.Controllers
             var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
 
             var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
-            if (!string.IsNullOrWhiteSpace(hasPasswordModel.Error))
+            if (hasPasswordModel.UserNotFound)
             {
-                return NotFound(hasPasswordModel.Error);
+                return NotFound($"Unable to load user with ID '{userId}'.");
             }
+
             if (!hasPasswordModel.HasPassword)
             {
-                //TODO Implement SetPassword
-                return RedirectToPage("./SetPassword");
+                return RedirectToAction(nameof(SetPassword));
             }
 
             return View();
@@ -84,6 +84,59 @@ namespace Pegasus.Controllers
                 StatusMessage = "Your password has been changed."
             };
 
+            return View(model);
+        }
+
+        [Route(nameof(SetPassword))]
+        [HttpGet]
+        public async Task<IActionResult> SetPassword()
+        {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
+            if (hasPasswordModel.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (hasPasswordModel.HasPassword)
+            {
+                return RedirectToAction(nameof(ChangePassword));
+            }
+
+            return View();
+        }
+
+        [Route(nameof(SetPassword))]
+        [HttpPost]
+        public async Task<IActionResult> SetPassword(SetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            model.UserId = userId;
+            var addPasswordResult = await _manageEndpoint.AddPasswordAsync(model);
+
+            if (addPasswordResult.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (!addPasswordResult.Succeeded)
+            {
+                foreach (var error in addPasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            await _signInManager.RefreshSignInAsync(model.UserId);
+
+            model = new SetPasswordModel {StatusMessage = "Your password has been set."};
             return View(model);
         }
 

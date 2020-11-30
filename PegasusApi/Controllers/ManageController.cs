@@ -68,7 +68,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.Error = $"Unable to load user with ID '{model.UserId}'.";
+                model.UserNotFound = true;
                 return model;
             }
             model.HasPassword = await _userManager.HasPasswordAsync(user);
@@ -88,6 +88,22 @@ namespace PegasusApi.Controllers
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
             model.Succeeded = changePasswordResult.Succeeded;
             model.Errors = changePasswordResult.Errors;
+            return model;
+        }
+
+        [Route("AddPassword")]
+        [HttpPost]
+        public async Task<SetPasswordModel> AddPassword(SetPasswordModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.UserNotFound = true;
+                return model;
+            }
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
+            model.Succeeded = addPasswordResult.Succeeded;
+            model.Errors = addPasswordResult.Errors;
             return model;
         }
 

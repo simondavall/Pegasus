@@ -18,5 +18,6 @@ namespace Pegasus.Library.Api
         Task<UserDetailsModel> SetUserDetails(UserDetailsModel model);
         Task<HasPasswordModel> HasPasswordAsync(HasPasswordModel model);
         Task<ChangePasswordModel> ChangePasswordAsync(ChangePasswordModel model);
+        Task<SetPasswordModel> AddPasswordAsync(SetPasswordModel model);
     }
 }
