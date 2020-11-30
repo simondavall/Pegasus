@@ -16,5 +16,8 @@ namespace Pegasus.Library.Api
         Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model);
         Task<UserDetailsModel> GetUserDetails(string userId);
         Task<UserDetailsModel> SetUserDetails(UserDetailsModel model);
+        Task<HasPasswordModel> HasPasswordAsync(HasPasswordModel model);
+        Task<ChangePasswordModel> ChangePasswordAsync(ChangePasswordModel model);
+        Task<SetPasswordModel> AddPasswordAsync(SetPasswordModel model);
     }
 }

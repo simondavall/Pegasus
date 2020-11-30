@@ -12,7 +12,6 @@ using Pegasus.Library.Api;
 using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
 using Pegasus.Services;
-using Pegasus.Services.Models;
 
 
 namespace Pegasus.Controllers
@@ -122,8 +121,7 @@ namespace Pegasus.Controllers
             var result = await _accountsEndpoint.VerifyTwoFactorTokenAsync(verify2FaToken);
             if (result.Verified)
             {
-                var info = new TwoFactorAuthenticationInfo {UserId = userId};
-                await _signInManager.DoTwoFactorSignInAsync(info, model.RememberMachine);
+                await _signInManager.DoTwoFactorSignInAsync(userId, model.RememberMachine);
 
                 _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", userId);
                 returnUrl ??= Url.Content("~/");

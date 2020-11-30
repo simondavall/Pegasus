@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Services;
-using Pegasus.Services.Models;
+
 
 namespace Pegasus.Controllers
 {
@@ -26,6 +26,118 @@ namespace Pegasus.Controllers
             _manageEndpoint = manageEndpoint;
             _signInManager = signInManager;
             _logger = logger;
+        }
+
+        [Route(nameof(ChangePassword))]
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword()
+        {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
+            if (hasPasswordModel.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (!hasPasswordModel.HasPassword)
+            {
+                return RedirectToAction(nameof(SetPassword));
+            }
+
+            return View();
+        }
+
+        [Route(nameof(ChangePassword))]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            model.UserId = userId;
+
+            var changePasswordResult = await _manageEndpoint.ChangePasswordAsync(model);
+            if (changePasswordResult.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            await _signInManager.RefreshSignInAsync(userId);
+
+
+            _logger.LogInformation("User with UserId {userId} changed their password successfully.", userId);
+            model = new ChangePasswordModel
+            {
+                StatusMessage = "Your password has been changed."
+            };
+
+            return View(model);
+        }
+
+        [Route(nameof(SetPassword))]
+        [HttpGet]
+        public async Task<IActionResult> SetPassword()
+        {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
+            if (hasPasswordModel.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (hasPasswordModel.HasPassword)
+            {
+                return RedirectToAction(nameof(ChangePassword));
+            }
+
+            return View();
+        }
+
+        [Route(nameof(SetPassword))]
+        [HttpPost]
+        public async Task<IActionResult> SetPassword(SetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            model.UserId = userId;
+            var addPasswordResult = await _manageEndpoint.AddPasswordAsync(model);
+
+            if (addPasswordResult.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (!addPasswordResult.Succeeded)
+            {
+                foreach (var error in addPasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            await _signInManager.RefreshSignInAsync(model.UserId);
+
+            model = new SetPasswordModel {StatusMessage = "Your password has been set."};
+            return View(model);
         }
 
         [Route(nameof(Index))]
@@ -129,8 +241,7 @@ namespace Pegasus.Controllers
                 return View(model);
             }
 
-            var info = new TwoFactorAuthenticationInfo {UserId = userId};
-            await _signInManager.DoTwoFactorSignInAsync(info, false);
+            await _signInManager.DoTwoFactorSignInAsync(userId, false);
 
             var setTwoFactorEnabledModel = new SetTwoFactorEnabledModel
             {
