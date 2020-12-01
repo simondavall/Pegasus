@@ -10,6 +10,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace Pegasus.Library.Api
 {
+    public interface IApiHelper
+    {
+        HttpClient ApiClient { get; }
+        void AddTokenToHeaders(string token);
+        Task<T> GetFromUri<T>(string requestUri);
+        Task<List<T>> GetListFromUri<T>(string requestUri);
+        Task<T> PostAsync<T>(T model, string requestUri);
+        void RemoveTokenFromHeaders();
+    }
+
     public class ApiHelper : IApiHelper
     {
         private readonly IConfiguration _configuration;
@@ -24,6 +34,51 @@ namespace Pegasus.Library.Api
 
         public HttpClient ApiClient { get; private set; }
 
+        public void AddTokenToHeaders(string token)
+        {
+            ApiClient.DefaultRequestHeaders.Remove("Authorization");
+            ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        }
+
+        public async Task<T> GetFromUri<T>(string requestUri)
+        {
+            using (var response = await ApiClient.GetAsync(requestUri))
+            {
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
+                var result = await response.Content.ReadAsAsync<T>();
+                return result;
+            }
+        }
+
+        public async Task<List<T>> GetListFromUri<T>(string requestUri)
+        {
+            using (var response = await ApiClient.GetAsync(requestUri))
+            {
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
+                var result = await response.Content.ReadAsAsync<List<T>>();
+                return result;
+            }
+        }
+
+        public async Task<T> PostAsync<T>(T model, string requestUri)
+        {
+            HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
+            using (var response = await ApiClient.PostAsync(requestUri, content))
+            {
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
+                var result = await response.Content.ReadAsAsync<T>();
+                return result;
+            }
+        }
+
+        public void RemoveTokenFromHeaders()
+        {
+            ApiClient.DefaultRequestHeaders.Remove("Authorization");
+        }
+
         private void InitializeClient()
         {
             var apiRoot = _configuration["apiRoot"];
@@ -37,63 +92,12 @@ namespace Pegasus.Library.Api
             {
                 BaseAddress = new Uri(apiRoot)
             };
-            
+
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var token = _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             AddTokenToHeaders(token.Result);
-        }
-
-        public void AddTokenToHeaders(string token)
-        {
-            ApiClient.DefaultRequestHeaders.Remove("Authorization");
-            ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-        }
-
-        public void RemoveTokenFromHeaders()
-        {
-            ApiClient.DefaultRequestHeaders.Remove("Authorization");
-        }
-
-        public async Task<T> GetFromUri<T>(string requestUri)
-        {
-            using (var response = await ApiClient.GetAsync(requestUri))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
-                }
-                var result = await response.Content.ReadAsAsync<T>();
-                return result;
-            }
-        }
-
-        public async Task<List<T>> GetListFromUri<T>(string requestUri)
-        {
-            using (var response = await ApiClient.GetAsync(requestUri))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
-                }
-                var result = await response.Content.ReadAsAsync<List<T>>();
-                return result;
-            }
-        }
-
-        public async Task<T> PostAsync<T>(T model, string requestUri)
-        {
-            HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
-            using (var response = await ApiClient.PostAsync(requestUri, content))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
-                }
-                var result = await response.Content.ReadAsAsync<T>();
-                return result;
-            }
         }
     }
 }

@@ -5,6 +5,15 @@ using Pegasus.Library.Models;
 
 namespace Pegasus.Library.Api
 {
+    public interface IProjectsEndpoint
+    {
+        Task AddProject(ProjectModel project);
+        Task DeleteProject(int id);
+        Task<List<ProjectModel>> GetAllProjects();
+        Task<ProjectModel> GetProject(int id);
+        Task UpdateProject(ProjectModel project);
+    }
+
     public class ProjectsEndpoint : IProjectsEndpoint
     {
         private readonly IApiHelper _apiHelper;
@@ -29,15 +38,15 @@ namespace Pegasus.Library.Api
                 }
             }
         }
+        
+        public async Task<List<ProjectModel>> GetAllProjects()
+        {
+            return await _apiHelper.GetListFromUri<ProjectModel>("api/Project/GetAllProjects");
+        }
 
         public async Task<ProjectModel> GetProject(int id)
         {
             return await _apiHelper.GetFromUri<ProjectModel>($"api/Project/GetProject/{id}");
-        }
-
-        public async Task<List<ProjectModel>> GetAllProjects()
-        {
-            return await _apiHelper.GetListFromUri<ProjectModel>("api/Project/GetAllProjects");
         }
 
         public async Task UpdateProject(ProjectModel project)

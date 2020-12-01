@@ -6,10 +6,10 @@ namespace Pegasus.Library.Api
     public interface IAccountsEndpoint
     {
         Task<ForgotPasswordModel> ForgotPassword(ForgotPasswordModel model);
+        Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCodeAsync(RedeemTwoFactorRecoveryCodeModel model);
+        Task<RememberClientModel> RememberClientAsync(string userId);
         Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model);
         Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model);
-        Task<RememberClientModel> RememberClientAsync(string userId);
-        Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCodeAsync(RedeemTwoFactorRecoveryCodeModel model);
     }
 
     public class AccountsEndpoint : IAccountsEndpoint
@@ -26,6 +26,17 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model,$"api/Account/ForgotPassword");
         }
 
+        public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCodeAsync(RedeemTwoFactorRecoveryCodeModel model)
+        {
+            return await _apiHelper.PostAsync(model, "api/Account/RedeemTwoFactorRecoveryCode");
+        }
+        
+        public async Task<RememberClientModel> RememberClientAsync(string userId)
+        {
+            var model = new RememberClientModel {UserId = userId};
+            return await _apiHelper.PostAsync(model,"api/Account/RememberClient");
+        }
+        
         public async Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model)
         {
             return await _apiHelper.PostAsync(model, "api/Account/ResetPassword");
@@ -34,17 +45,6 @@ namespace Pegasus.Library.Api
         public async Task<VerifyTwoFactorModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorModel model)
         {
             return await _apiHelper.PostAsync(model, "api/Account/VerifyTwoFactorToken");
-        }
-
-        public async Task<RememberClientModel> RememberClientAsync(string userId)
-        {
-            var model = new RememberClientModel {UserId = userId};
-            return await _apiHelper.PostAsync(model,"api/Account/RememberClient");
-        }
-
-        public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCodeAsync(RedeemTwoFactorRecoveryCodeModel model)
-        {
-            return await _apiHelper.PostAsync(model, "api/Account/RedeemTwoFactorRecoveryCode");
         }
     }
 }
