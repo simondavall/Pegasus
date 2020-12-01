@@ -19,18 +19,18 @@ namespace PegasusApi.Controllers
             _commentsData = commentsData;
         }
 
-        [Route("GetComments/{taskId}")]
-        [HttpGet]
-        public async Task<IEnumerable<TaskCommentModel>> GetComments(int taskId)
-        {
-             return await _commentsData.GetComments(taskId);
-        }
-
         [Route("AddComment")]
         [HttpPost]
         public async Task AddComment(TaskCommentModel taskComment)
         {
             await _commentsData.AddComment(taskComment);
+        }
+
+        [Route("GetComments/{taskId}")]
+        [HttpGet]
+        public async Task<IEnumerable<TaskCommentModel>> GetComments(int taskId)
+        {
+             return await _commentsData.GetComments(taskId);
         }
 
         [Route("UpdateComments")]

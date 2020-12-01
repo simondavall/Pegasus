@@ -7,7 +7,7 @@
 <h4>@ViewData["Title"]</h4>
 <div>
     <p>To use an authenticator app go through the following steps:</p>
-    <ol class="list">
+    <ol>
         <li>
             <p>
                 Download a two-factor authenticator app like Microsoft Authenticator for
@@ -32,7 +32,7 @@
                 <div class="col-md-6">
                     <form id="send-code" method="post">
                         <div class="form-group">
-                            <label asp-for="@Model.Code" class="control-label">Verification Code</label>
+                            <label asp-for="@Model.Code" class="col-form-label">Verification Code</label>
                             <input asp-for="@Model.Code" class="form-control" autocomplete="off" autofocus/>
                             <span asp-validation-for="@Model.Code" class="text-danger"></span>
                         </div>

@@ -1,7 +1,7 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Moq;
+﻿//using System.Security.Claims;
+//using Microsoft.AspNetCore.Authentication;
+//using Microsoft.AspNetCore.Http;
+//using Moq;
 using NUnit.Framework;
 
 namespace PegasusTests
@@ -32,33 +32,33 @@ namespace PegasusTests
         }
 
 
-        /// <summary>
-        /// Need this to mock the GetTokenAsync function which returns the access token.
-        /// </summary>
-        /// <param name="httpContextAccessorMock"></param>
-        /// <param name="tokenName"></param>
-        /// <param name="tokenValue"></param>
-        /// <param name="scheme"></param>
-        private void MockHttpContextGetToken(
-            Mock<IHttpContextAccessor> httpContextAccessorMock,
-            string tokenName, string tokenValue, string scheme = null)
-        {
-            var authenticationServiceMock = new Mock<IAuthenticationService>();
-            httpContextAccessorMock
-                .Setup(x => x.HttpContext.RequestServices.GetService(typeof(IAuthenticationService)))
-                .Returns(authenticationServiceMock.Object);
+        ///// <summary>
+        ///// Need this to mock the GetTokenAsync function which returns the access token.
+        ///// </summary>
+        ///// <param name="httpContextAccessorMock"></param>
+        ///// <param name="tokenName"></param>
+        ///// <param name="tokenValue"></param>
+        ///// <param name="scheme"></param>
+        //private void MockHttpContextGetToken(
+        //    Mock<IHttpContextAccessor> httpContextAccessorMock,
+        //    string tokenName, string tokenValue, string scheme = null)
+        //{
+        //    var authenticationServiceMock = new Mock<IAuthenticationService>();
+        //    httpContextAccessorMock
+        //        .Setup(x => x.HttpContext.RequestServices.GetService(typeof(IAuthenticationService)))
+        //        .Returns(authenticationServiceMock.Object);
 
-            var authResult = AuthenticateResult.Success(
-                new AuthenticationTicket(new ClaimsPrincipal(), scheme));
+        //    var authResult = AuthenticateResult.Success(
+        //        new AuthenticationTicket(new ClaimsPrincipal(), scheme));
 
-            authResult.Properties.StoreTokens(new[]
-            {
-                new AuthenticationToken { Name = tokenName, Value = tokenValue }
-            });
+        //    authResult.Properties.StoreTokens(new[]
+        //    {
+        //        new AuthenticationToken { Name = tokenName, Value = tokenValue }
+        //    });
 
-            authenticationServiceMock
-                .Setup(x => x.AuthenticateAsync(httpContextAccessorMock.Object.HttpContext, scheme))
-                .ReturnsAsync(authResult);
-        }
+        //    authenticationServiceMock
+        //        .Setup(x => x.AuthenticateAsync(httpContextAccessorMock.Object.HttpContext, scheme))
+        //        .ReturnsAsync(authResult);
+        //}
     }
 }
