@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace PegasusApi.Library.Models.Manage
 {
@@ -8,6 +9,6 @@ namespace PegasusApi.Library.Models.Manage
         public string Username { get; set; }
         public string PhoneNumber { get; set; }
         public string DisplayName { get; set; }
-        public IList<string> Errors { get; } = new List<string>();
+        public List<IdentityError> Errors { get; } = new List<IdentityError>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Pegasus.Library.Models.Manage
 {
@@ -7,7 +8,7 @@ namespace Pegasus.Library.Models.Manage
     {
         public string UserId  { get; set; }
         public string Username { get; set; }
-        public IList<string> Errors { get; } = new List<string>();
+        public IEnumerable<IdentityError> Errors { get; }
 
 
         [Display(Name = "Display Name")]

@@ -108,6 +108,7 @@ namespace Pegasus.Controllers
             {
                 Email = User.Identity.Name
             };
+            //TODO Enable the disable process. At the moment it appears to be setting it up.
             var disable2FaResult = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabled);
 
             if (!disable2FaResult.Succeeded)
@@ -253,14 +254,12 @@ namespace Pegasus.Controllers
             }
 
             model = await _manageEndpoint.SetUserDetails(model);
-            if (model.Errors.Count > 0)
+            if (model.Errors != null && model.Errors.Any())
             {
-                var statusMessage = new StringBuilder("Details were not updated.");
                 foreach (var error in model.Errors)
                 {
-                    statusMessage.Append($" - {error}");
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
-                model.StatusMessage = statusMessage.ToString();
                 return View(model);
             }
 

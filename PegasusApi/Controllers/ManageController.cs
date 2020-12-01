@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ using PegasusApi.Library.Models.Manage;
 
 namespace PegasusApi.Controllers
 {
-    //TODO Add PegasusUser authorization
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/Account/[controller]")]
     [ApiController]
     public class ManageController : ControllerBase
@@ -260,36 +259,16 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                model.Errors.Add(Error($"Unable to load user with userId '{model.UserId}'."));
                 return model;
             }
 
             model.Username = user.UserName;
-            var phoneValidator = new PhoneAttribute();
-            if (!phoneValidator.IsValid(model.PhoneNumber))
+            
+            var setPhoneNumber = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+            if (!setPhoneNumber.Succeeded)
             {
-                model.Errors.Add("Invalid phone number format.");
-            }
-
-            if (model.Errors.Count != 0)
-            {
-                return model;
-            }
-
-            try
-            {
-                var setPhoneNumber = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneNumber.Succeeded)
-                {
-                    foreach (var error in setPhoneNumber.Errors)
-                    {
-                        model.Errors.Add(error.Description);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                model.Errors.Add($"Error when saving User Settings. Message: {e.Message}");
+                model.Errors.AddRange(setPhoneNumber.Errors);
             }
 
             try
@@ -298,7 +277,7 @@ namespace PegasusApi.Controllers
             }
             catch (Exception e)
             {
-                model.Errors.Add($"Error when saving custom User Settings. Message: {e.Message}");
+                model.Errors.Add(Error( $"Error when saving custom User Settings. Message: {e.Message}"));
             }
 
             return model;
@@ -358,7 +337,7 @@ namespace PegasusApi.Controllers
             return model;
         }
 
-        private string FormatKey(string unformattedKey)
+        private static string FormatKey(string unformattedKey)
         {
             var result = new StringBuilder();
             int currentPosition = 0;
@@ -382,6 +361,11 @@ namespace PegasusApi.Controllers
                 _urlEncoder.Encode(_configuration["ProjectName"]),
                 _urlEncoder.Encode(email),
                 unformattedKey);
+        }
+
+        private IdentityError Error(string message)
+        {
+            return new IdentityError() {Code = string.Empty, Description = message};
         }
     }
 }

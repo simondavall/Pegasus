@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Pegasus.Library.Models.Manage;
 
 namespace Pegasus.Library.Api
@@ -21,6 +22,7 @@ namespace Pegasus.Library.Api
         Task<VerifyTwoFactorTokenModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorTokenModel model);
     }
 
+    [Authorize(Roles = "PegasusUser")]
     public class ManageEndpoint : IManageEndpoint
     {
         private readonly IApiHelper _apiHelper;
