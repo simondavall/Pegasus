@@ -346,7 +346,7 @@ namespace Pegasus.Controllers
 
         [Route(nameof(GenerateRecoveryCodes))]
         [HttpPost]
-        public async Task<IActionResult> GenerateRecoveryCodes(GenerateRecoveryCodesModel model)
+        public async Task<IActionResult> GenerateRecoveryCodesPost()
         {
             var response = await _manageEndpoint.GetTwoFactorEnabledAsync(User.Identity.Name);
             if (!response.Enabled)
@@ -354,7 +354,7 @@ namespace Pegasus.Controllers
                 throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{response.UserId}' as they do not have 2FA enabled.");
             }
 
-            model = await _manageEndpoint.GenerateNewRecoveryCodesAsync(User.Identity.Name);
+            var model = await _manageEndpoint.GenerateNewRecoveryCodesAsync(User.Identity.Name);
             var showRecoveryCodes = new ShowRecoveryCodesModel
             {
                 RecoveryCodes = model.RecoveryCodes.ToArray()

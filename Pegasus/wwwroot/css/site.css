@@ -215,7 +215,8 @@ html {
 }
 
 /* ReSharper disable once DeclarationIsEmpty */
-.project-list-item, .project-list-form, .task-filter, .taskfilter-list, .project-task-form, .navbar-content, .btn-default {
+.project-list-item, .project-list-form, .task-filter, .taskfilter-list, .project-task-form,
+.navbar-content, .btn-default, .recovery-code {
 }
 
 a.settings-close {
