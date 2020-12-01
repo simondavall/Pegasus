@@ -60,6 +60,34 @@ namespace PegasusApi.Controllers
         }
 
         [AllowAnonymous]
+        [Route("RedeemTwoFactorRecoveryCode")]
+        [HttpPost]
+        public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCode(RedeemTwoFactorRecoveryCodeModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.Succeeded = false;
+                return model;
+            }
+            var result = await _userManager.RedeemTwoFactorRecoveryCodeAsync(user, model.RecoveryCode);
+            model.Succeeded = result.Succeeded;
+
+            return model;
+        }
+
+        [AllowAnonymous]
+        [Route("RememberClient")]
+        [HttpPost]
+        public async Task<RememberClientModel> RememberClient(RememberClientModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            model.SupportsUserSecurityStamp = _userManager.SupportsUserSecurityStamp;
+            model.SecurityStamp = user.SecurityStamp;
+            return model;
+        }
+        
+        [AllowAnonymous]
         [Route("ResetPassword")]
         [HttpPost]
         public async Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model)
@@ -88,34 +116,6 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             var tokenOptions = new TokenOptions();
             model.Verified = await _userManager.VerifyTwoFactorTokenAsync(user, tokenOptions.AuthenticatorTokenProvider, model.Code);
-            return model;
-        }
-
-        [AllowAnonymous]
-        [Route("RememberClient")]
-        [HttpPost]
-        public async Task<RememberClientModel> RememberClient(RememberClientModel model)
-        {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            model.SupportsUserSecurityStamp = _userManager.SupportsUserSecurityStamp;
-            model.SecurityStamp = user.SecurityStamp;
-            return model;
-        }
-
-        [AllowAnonymous]
-        [Route("RedeemTwoFactorRecoveryCode")]
-        [HttpPost]
-        public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCode(RedeemTwoFactorRecoveryCodeModel model)
-        {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-            {
-                model.Succeeded = false;
-                return model;
-            }
-            var result = await _userManager.RedeemTwoFactorRecoveryCodeAsync(user, model.RecoveryCode);
-            model.Succeeded = result.Succeeded;
-
             return model;
         }
     }

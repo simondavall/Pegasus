@@ -37,6 +37,121 @@ namespace PegasusApi.Controllers
             _configuration = configuration;
         }
         
+        //private async Task<IdentityUser> GetUser<T>(T model) where T : ManageBaseModel
+        //{
+        //    var user = await _userManager.FindByIdAsync(model.UserId);
+        //    model.UserNotFound = user == null;
+        //    return user;
+        //}
+
+        //private async Task<(IdentityUser, T)> GetUser<T>(string userId) where T : ManageBaseModel, new()
+        //{
+        //    var user = await _userManager.FindByIdAsync(userId);
+        //    var model = new T
+        //    {
+        //        UserId = userId,
+        //        UserNotFound = user == null
+        //    };
+        //    return (user, model);
+        //}
+
+        //private async Task<(IdentityUser, T)> GetUserByEmail<T>(string email) where T : ManageBaseModel, new()
+        //{
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    var model = new T
+        //    {
+        //        UserId = user?.Id,
+        //        UserNotFound = user == null
+        //    };
+        //    return (user, model);
+        //}
+
+        [Route("AddPassword")]
+        [HttpPost]
+        public async Task<SetPasswordModel> AddPassword(SetPasswordModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.UserNotFound = true;
+                return model;
+            }
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
+            model.Succeeded = addPasswordResult.Succeeded;
+            model.Errors = addPasswordResult.Errors;
+            return model;
+        }
+        
+        [Route("ChangePassword")]
+        [HttpPost]
+        public async Task<ChangePasswordModel> ChangePassword(ChangePasswordModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                model.UserNotFound = true;
+                return model;
+            }
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            model.Succeeded = changePasswordResult.Succeeded;
+            model.Errors = changePasswordResult.Errors;
+            return model;
+        }
+
+        [Route("CheckRecoveryCodesStatus")]
+        [HttpPost]
+        public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                return model;
+            }
+
+            if (await _userManager.CountRecoveryCodesAsync(user) == 0)
+            {
+                model.NeededReset = true;
+                model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            }
+
+            return model;
+        }
+
+        [Route("GenerateNewRecoveryCodes/{email}")]
+        [HttpGet]
+        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodes(string email)
+        {
+            var model = new GenerateRecoveryCodesModel();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with email '{email}'.";
+                return model;
+            }
+            model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            return model;
+        }
+
+        [Route("GetTwoFactorEnabled/{email}")]
+        [HttpGet]
+        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabled(string email)
+        {
+            var model = new GetTwoFactorEnabledModel
+            {
+                Email = email
+            };
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                return model;
+            }
+            model.UserId = user.Id;
+            model.Enabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            return model;
+        }
+
         [Route("GetUserDetails/{userId}")]
         [HttpGet]
         public async Task<UserDetailsModel> GetUserDetails(string userId)
@@ -75,35 +190,66 @@ namespace PegasusApi.Controllers
             return model;
         }
 
-        [Route("ChangePassword")]
-        [HttpPost]
-        public async Task<ChangePasswordModel> ChangePassword(ChangePasswordModel model)
+        [Route("LoadSharedKeyAndQrCodeUri/{email}")]
+        [HttpGet]
+        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUri(string email)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var model = new AuthenticatorKeyModel();
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                model.UserNotFound = true;
+                model.StatusMessage = $"Unable to load user with email '{email}'.";
                 return model;
             }
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            model.Succeeded = changePasswordResult.Succeeded;
-            model.Errors = changePasswordResult.Errors;
+
+            return await LoadSharedKeyAndQrCodeUriAsync(user);
+        }
+
+        [Route("ResetAuthenticator")]
+        [HttpPost]
+        public async Task<ResetAuthenticatorModel> ResetAuthenticator(ResetAuthenticatorModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                return model;
+            }
+
+            await _userManager.SetTwoFactorEnabledAsync(user, false);
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
+            
+            model.StatusMessage = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
             return model;
         }
 
-        [Route("AddPassword")]
+        [Route("SetTwoFactorEnabled")]
         [HttpPost]
-        public async Task<SetPasswordModel> AddPassword(SetPasswordModel model)
+        public async Task<SetTwoFactorEnabledModel> SetTwoFactorEnabled(SetTwoFactorEnabledModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
+            try
             {
-                model.UserNotFound = true;
-                return model;
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                    model.Succeeded = false;
+                    model.Enabled = false;
+                    return model;
+                }
+                model.UserId = user.Id;
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
+                model.Succeeded = true;
+                model.Enabled = user.TwoFactorEnabled;
             }
-            var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
-            model.Succeeded = addPasswordResult.Succeeded;
-            model.Errors = addPasswordResult.Errors;
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to enable Two Factor Authentication for user {model.Email}. Reason:{e.Message}");
+                model.Succeeded = false;
+                model.StatusMessage = $"Failed to enable Two Factor Authentication. Reason:{e.Message}";
+            }
+
             return model;
         }
 
@@ -179,21 +325,6 @@ namespace PegasusApi.Controllers
             return model;
         }
 
-        [Route("LoadSharedKeyAndQrCodeUri/{email}")]
-        [HttpGet]
-        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUri(string email)
-        {
-            var model = new AuthenticatorKeyModel();
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                model.StatusMessage = $"Unable to load user with email '{email}'.";
-                return model;
-            }
-
-            return await LoadSharedKeyAndQrCodeUriAsync(user);
-        }
-
         [Route("VerifyTwoFactorToken")]
         [HttpPost]
         public async Task<VerifyTwoFactorTokenModel> VerifyTwoFactorToken(VerifyTwoFactorTokenModel model)
@@ -205,108 +336,6 @@ namespace PegasusApi.Controllers
                 return model;
             }
             model.Is2FaTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, model.VerificationCode);
-            return model;
-        }
-
-        [Route("SetTwoFactorEnabled")]
-        [HttpPost]
-        public async Task<SetTwoFactorEnabledModel> SetTwoFactorEnabled(SetTwoFactorEnabledModel model)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
-                    model.Succeeded = false;
-                    model.Enabled = false;
-                    return model;
-                }
-                model.UserId = user.Id;
-                await _userManager.SetTwoFactorEnabledAsync(user, true);
-                model.Succeeded = true;
-                model.Enabled = user.TwoFactorEnabled;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Failed to enable Two Factor Authentication for user {model.Email}. Reason:{e.Message}");
-                model.Succeeded = false;
-                model.StatusMessage = $"Failed to enable Two Factor Authentication. Reason:{e.Message}";
-            }
-
-            return model;
-        }
-
-        [Route("GetTwoFactorEnabled/{email}")]
-        [HttpGet]
-        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabled(string email)
-        {
-            var model = new GetTwoFactorEnabledModel
-            {
-                Email = email
-            };
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
-                return model;
-            }
-            model.UserId = user.Id;
-            model.Enabled = await _userManager.GetTwoFactorEnabledAsync(user);
-            return model;
-        }
-
-        [Route("GenerateNewRecoveryCodes/{email}")]
-        [HttpGet]
-        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodes(string email)
-        {
-            var model = new GenerateRecoveryCodesModel();
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                model.StatusMessage = $"Unable to load user with email '{email}'.";
-                return model;
-            }
-            model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-            return model;
-        }
-
-        [Route("CheckRecoveryCodesStatus")]
-        [HttpPost]
-        public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
-                return model;
-            }
-
-            if (await _userManager.CountRecoveryCodesAsync(user) == 0)
-            {
-                model.NeededReset = true;
-                model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-            }
-
-            return model;
-        }
-
-        [Route("ResetAuthenticator")]
-        [HttpPost]
-        public async Task<ResetAuthenticatorModel> ResetAuthenticator(ResetAuthenticatorModel model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
-                return model;
-            }
-
-            await _userManager.SetTwoFactorEnabledAsync(user, false);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
-            
-            model.StatusMessage = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
             return model;
         }
 

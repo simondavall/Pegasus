@@ -19,6 +19,22 @@ namespace PegasusApi.Controllers
             _projectsData = projectsData;
         }
 
+        [Authorize(Roles = "Admin")]
+        [Route("AddProject")]
+        [HttpPost]
+        public async Task AddProject(ProjectModel project)
+        {
+            await _projectsData.AddProject(project);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [Route("DeleteProject/{id}")]
+        [HttpDelete]
+        public async Task DeleteProject(int id)
+        {
+            await _projectsData.DeleteProject(id);
+        }
+
         [Route("GetAllProjects")]
         [HttpGet]
         public async Task<List<ProjectModel>> GetAllProjects()
@@ -34,27 +50,11 @@ namespace PegasusApi.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [Route("AddProject")]
-        [HttpPost]
-        public async Task AddProject(ProjectModel project)
-        {
-            await _projectsData.AddProject(project);
-        }
-
-        [Authorize(Roles = "Admin")]
         [Route("UpdateProject")]
         [HttpPost]
         public async Task UpdateProject(ProjectModel project)
         {
             await _projectsData.UpdateProject(project);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [Route("DeleteProject/{id}")]
-        [HttpDelete]
-        public async Task DeleteProject(int id)
-        {
-            await _projectsData.DeleteProject(id);
         }
     }
 }
