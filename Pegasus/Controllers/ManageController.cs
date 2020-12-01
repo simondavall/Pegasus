@@ -87,114 +87,43 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        [Route(nameof(SetPassword))]
+        [Route(nameof(Disable2Fa))]
         [HttpGet]
-        public async Task<IActionResult> SetPassword()
+        public async Task<IActionResult> Disable2Fa()
         {
-            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
-            if (hasPasswordModel.UserNotFound)
+            var response = await _manageEndpoint.GetTwoFactorEnabledAsync(User.Identity.Name);
+            if (!response.Enabled)
             {
-                return NotFound($"Unable to load user with ID '{userId}'.");
-            }
-
-            if (hasPasswordModel.HasPassword)
-            {
-                return RedirectToAction(nameof(ChangePassword));
+                throw new InvalidOperationException($"Cannot disable 2FA for user with ID '{response.UserId}' as it's not currently enabled.");
             }
 
             return View();
         }
 
-        [Route(nameof(SetPassword))]
+        [Route(nameof(Disable2Fa))]
         [HttpPost]
-        public async Task<IActionResult> SetPassword(SetPasswordModel model)
+        public async Task<IActionResult> Disable2Fa(Disable2FaModel model)
         {
-            if (!ModelState.IsValid)
+            var setTwoFactorEnabled = new SetTwoFactorEnabledModel
             {
-                return View(model);
+                Email = User.Identity.Name
+            };
+            var disable2FaResult = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabled);
+
+            if (!disable2FaResult.Succeeded)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred disabling 2FA for user with ID '{disable2FaResult.UserId}'.");
             }
 
-            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
-            model.UserId = userId;
-            var addPasswordResult = await _manageEndpoint.AddPasswordAsync(model);
-
-            if (addPasswordResult.UserNotFound)
+            _logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", disable2FaResult.UserId);
+            var twoFactorAuthenticationModel = new TwoFactorAuthenticationModel
             {
-                return NotFound($"Unable to load user with ID '{userId}'.");
-            }
-
-            if (!addPasswordResult.Succeeded)
-            {
-                foreach (var error in addPasswordResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                return View(model);
-            }
-
-            await _signInManager.RefreshSignInAsync(model.UserId);
-
-            model = new SetPasswordModel {StatusMessage = "Your password has been set."};
-            return View(model);
+                StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app"
+            };
+            return RedirectToAction("TwoFactorAuthentication", "Manage", twoFactorAuthenticationModel);
         }
 
-        [Route(nameof(Index))]
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
-            var model = await _manageEndpoint.GetUserDetails(userId);
-            return View(model);
-        }
-
-        [Route(nameof(Index))]
-        [HttpPost]
-        public async Task<IActionResult> Index(UserDetailsModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                model.Username = User.Identity.Name;
-                return View(model);
-            }
-
-            model = await _manageEndpoint.SetUserDetails(model);
-            if (model.Errors.Count > 0)
-            {
-                var statusMessage = new StringBuilder("Details were not updated.");
-                foreach (var error in model.Errors)
-                {
-                    statusMessage.Append($" - {error}");
-                }
-                model.StatusMessage = statusMessage.ToString();
-                return View(model);
-            }
-
-            model.StatusMessage = "User details were updated.";
-            return View(model);
-        }
-
-        [Route(nameof(TwoFactorAuthentication))]
-        public async Task<IActionResult> TwoFactorAuthentication()
-        {
-            var model = await _manageEndpoint.TwoFactorAuthentication(User.Identity.Name);
-            return View(model);
-        }
-
-        [Route(nameof(TwoFactorAuthentication))]
-        [HttpPost]
-        public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
-        {
-            //TODO This is unlikely to work across the api
-            // signInManager probably has access to the current browser instance
-            //await _signInManager.ForgetTwoFactorClientAsync();
-            await _manageEndpoint.ForgetTwoFactorClientAsync(User.Identity.Name);
-            model.StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
-            model.IsMachineRemembered = false;
-            return View(model);
-        }
-
+        
         [Route(nameof(EnableAuthenticator))]
         [HttpGet]
         public async Task<IActionResult> EnableAuthenticator()
@@ -269,68 +198,6 @@ namespace Pegasus.Controllers
             return RedirectToAction("TwoFactorAuthentication");
         }
 
-        [Route(nameof(ResetAuthenticator))]
-        [HttpGet]
-        public IActionResult ResetAuthenticator()
-        {
-            return View();
-        }
-
-        [Route(nameof(ResetAuthenticator))]
-        [HttpPost]
-        // ReSharper disable once UnusedParameter.Global
-        public async Task<IActionResult> ResetAuthenticator(ResetAuthenticatorModel model)
-        {
-            model.Email = User.Identity.Name;
-            model = await _manageEndpoint.ResetAuthenticatorAsync(model);
-    
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", model.UserId);
-            var enableAuthenticatorModel = new EnableAuthenticatorModel
-            {
-                StatusMessage =
-                    "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key."
-            };
-
-
-            return RedirectToAction("EnableAuthenticator", "Manage", enableAuthenticatorModel);
-        }
-
-        [Route(nameof(Disable2Fa))]
-        [HttpGet]
-        public async Task<IActionResult> Disable2Fa()
-        {
-            var response = await _manageEndpoint.GetTwoFactorEnabledAsync(User.Identity.Name);
-            if (!response.Enabled)
-            {
-                throw new InvalidOperationException($"Cannot disable 2FA for user with ID '{response.UserId}' as it's not currently enabled.");
-            }
-
-            return View();
-        }
-
-        [Route(nameof(Disable2Fa))]
-        [HttpPost]
-        public async Task<IActionResult> Disable2Fa(Disable2FaModel model)
-        {
-            var setTwoFactorEnabled = new SetTwoFactorEnabledModel
-            {
-                Email = User.Identity.Name
-            };
-            var disable2FaResult = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabled);
-
-            if (!disable2FaResult.Succeeded)
-            {
-                throw new InvalidOperationException($"Unexpected error occurred disabling 2FA for user with ID '{disable2FaResult.UserId}'.");
-            }
-
-            _logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", disable2FaResult.UserId);
-            var twoFactorAuthenticationModel = new TwoFactorAuthenticationModel
-            {
-                StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app"
-            };
-            return RedirectToAction("TwoFactorAuthentication", "Manage", twoFactorAuthenticationModel);
-        }
-
         [Route(nameof(GenerateRecoveryCodes))]
         [HttpGet]
         public async Task<IActionResult> GenerateRecoveryCodes()
@@ -365,7 +232,121 @@ namespace Pegasus.Controllers
             showRecoveryCodes.StatusMessage = "You have generated new recovery codes.";
             return RedirectToAction("ShowRecoveryCodes", showRecoveryCodes);
         }
+        
+        [Route(nameof(Index))]
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            var model = await _manageEndpoint.GetUserDetails(userId);
+            return View(model);
+        }
+
+        [Route(nameof(Index))]
+        [HttpPost]
+        public async Task<IActionResult> Index(UserDetailsModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Username = User.Identity.Name;
+                return View(model);
+            }
+
+            model = await _manageEndpoint.SetUserDetails(model);
+            if (model.Errors.Count > 0)
+            {
+                var statusMessage = new StringBuilder("Details were not updated.");
+                foreach (var error in model.Errors)
+                {
+                    statusMessage.Append($" - {error}");
+                }
+                model.StatusMessage = statusMessage.ToString();
+                return View(model);
+            }
+
+            model.StatusMessage = "User details were updated.";
+            return View(model);
+        }
+
+        [Route(nameof(ResetAuthenticator))]
+        [HttpGet]
+        public IActionResult ResetAuthenticator()
+        {
+            return View();
+        }
+
+        [Route(nameof(ResetAuthenticator))]
+        [HttpPost]
+        // ReSharper disable once UnusedParameter.Global
+        public async Task<IActionResult> ResetAuthenticator(ResetAuthenticatorModel model)
+        {
+            model.Email = User.Identity.Name;
+            model = await _manageEndpoint.ResetAuthenticatorAsync(model);
     
+            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", model.UserId);
+            var enableAuthenticatorModel = new EnableAuthenticatorModel
+            {
+                StatusMessage =
+                    "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key."
+            };
+
+
+            return RedirectToAction("EnableAuthenticator", "Manage", enableAuthenticatorModel);
+        }
+                
+        [Route(nameof(SetPassword))]
+        [HttpGet]
+        public async Task<IActionResult> SetPassword()
+        {
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(new HasPasswordModel {UserId = userId});
+            if (hasPasswordModel.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (hasPasswordModel.HasPassword)
+            {
+                return RedirectToAction(nameof(ChangePassword));
+            }
+
+            return View();
+        }
+
+        [Route(nameof(SetPassword))]
+        [HttpPost]
+        public async Task<IActionResult> SetPassword(SetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+            model.UserId = userId;
+            var addPasswordResult = await _manageEndpoint.AddPasswordAsync(model);
+
+            if (addPasswordResult.UserNotFound)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            if (!addPasswordResult.Succeeded)
+            {
+                foreach (var error in addPasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            await _signInManager.RefreshSignInAsync(model.UserId);
+
+            model = new SetPasswordModel {StatusMessage = "Your password has been set."};
+            return View(model);
+        }
+
         [Route(nameof(ShowRecoveryCodes))]
         [HttpGet]
         public IActionResult ShowRecoveryCodes(ShowRecoveryCodesModel model)
@@ -375,6 +356,26 @@ namespace Pegasus.Controllers
                 return RedirectToAction("TwoFactorAuthentication");
             }
 
+            return View(model);
+        }
+
+        [Route(nameof(TwoFactorAuthentication))]
+        public async Task<IActionResult> TwoFactorAuthentication()
+        {
+            var model = await _manageEndpoint.TwoFactorAuthentication(User.Identity.Name);
+            return View(model);
+        }
+
+        [Route(nameof(TwoFactorAuthentication))]
+        [HttpPost]
+        public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
+        {
+            //TODO This is unlikely to work across the api
+            // signInManager probably has access to the current browser instance
+            //await _signInManager.ForgetTwoFactorClientAsync();
+            await _manageEndpoint.ForgetTwoFactorClientAsync(User.Identity.Name);
+            model.StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
+            model.IsMachineRemembered = false;
             return View(model);
         }
     }

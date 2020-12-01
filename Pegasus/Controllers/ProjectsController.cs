@@ -20,13 +20,6 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var projects = await _projectsEndpoint.GetAllProjects();
-            return View(projects);
-        }
-
-        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -46,6 +39,27 @@ namespace Pegasus.Controllers
             }
 
             return View(project);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var project = await _projectsEndpoint.GetProject((int) id);
+
+            if (project == null) return NotFound();
+
+            return View(project);
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _projectsEndpoint.DeleteProject(id);
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -86,24 +100,10 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Index()
         {
-            if (id == null) return NotFound();
-
-            var project = await _projectsEndpoint.GetProject((int) id);
-
-            if (project == null) return NotFound();
-
-            return View(project);
-        }
-
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _projectsEndpoint.DeleteProject(id);
-            return RedirectToAction("Index");
+            var projects = await _projectsEndpoint.GetAllProjects();
+            return View(projects);
         }
 
         private async Task<bool> ProjectExists(int id)
