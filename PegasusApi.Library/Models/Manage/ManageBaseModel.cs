@@ -5,7 +5,7 @@ namespace PegasusApi.Library.Models.Manage
 {
     public class ManageBaseModel
     {
-        public IEnumerable<IdentityError> Errors { get; set; }
+        public List<IdentityError> Errors { get; set; } = new List<IdentityError>();
         public string UserId { get; set; }
     }
 }
