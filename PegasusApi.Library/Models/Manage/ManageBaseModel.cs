@@ -1,7 +1,11 @@
-﻿namespace PegasusApi.Library.Models.Manage
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+
+namespace PegasusApi.Library.Models.Manage
 {
     public class ManageBaseModel
     {
-        public string StatusMessage { get; set; }
+        public List<IdentityError> Errors { get; set; } = new List<IdentityError>();
+        public string UserId { get; set; }
     }
 }

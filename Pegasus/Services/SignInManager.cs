@@ -19,12 +19,14 @@ namespace Pegasus.Services
 {
     public interface ISignInManager
     {
-        Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser);
-        Task<string> GetTwoFactorAuthenticationUserAsync();
-        Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode);
         Task DoSignInAsync(string userId, bool rememberClient);
         Task DoTwoFactorSignInAsync(string userId, bool rememberClient);
+        Task ForgetTwoFactorClientAsync();
+        Task<string> GetTwoFactorAuthenticationUserAsync();
+        Task<bool> IsTwoFactorClientRememberedAsync(string userId);
         Task RefreshSignInAsync(string userId);
+        Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser);
+        Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode);
     }
 
     public class SignInManager : ISignInManager
@@ -50,12 +52,64 @@ namespace Pegasus.Services
             get { return _httpContextAccessor.HttpContext; }
         }
 
-        private async Task RememberTwoFactorClientAsync(string userId)
+        public async Task DoSignInAsync(string userId, bool rememberClient)
         {
-            var principal = await StoreRememberClient(userId);
-            await HttpContext.SignInAsync(CookieConstants.TwoFactorRememberMeScheme,
-                principal,
-                new AuthenticationProperties { IsPersistent = true });
+            var authenticatedUser = await _authenticationEndpoint.Authenticate(userId);
+            await DoSignInAsync(authenticatedUser, rememberClient);
+        }
+
+        public async Task DoTwoFactorSignInAsync(string userId, bool rememberClient)
+        {
+            var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
+            await DoSignInAsync(authenticatedUser, rememberClient);
+        }
+
+        /// <summary>
+        /// Clears the "Remember this browser flag" from the current browser, as an asynchronous operation.
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public virtual Task ForgetTwoFactorClientAsync()
+        {
+            return HttpContext.SignOutAsync(CookieConstants.TwoFactorRememberMeScheme);
+        }
+
+        public async Task<string> GetTwoFactorAuthenticationUserAsync()
+        {
+            var info = await RetrieveTwoFactorInfoAsync();
+            return info == null ? null : info.UserId;
+        }
+
+        /// <summary>
+        /// Returns a flag indicating if the current client browser has been remembered by two factor authentication
+        /// for the user attempting to login, as an asynchronous operation.
+        /// </summary>
+        /// <param name="userId">The user attempting to login.</param>
+        /// <returns>
+        /// The task object representing the asynchronous operation containing true if the browser has been remembered
+        /// for the current user.
+        /// </returns>
+        public async Task<bool> IsTwoFactorClientRememberedAsync(string userId)
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieConstants.TwoFactorRememberMeScheme);
+            return (result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId);
+        }
+
+        /// <summary>
+        /// Regenerates the user's application cookie, whilst preserving the existing
+        /// AuthenticationProperties like rememberMe, as an asynchronous operation.
+        /// </summary>
+        /// <param name="userId">The user whose sign-in cookie should be refreshed.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task RefreshSignInAsync(string userId)
+        {
+            var auth = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var uses2Fa = auth?.Principal?.FindFirst("amr");
+            if (uses2Fa != null)
+            {
+                await DoTwoFactorSignInAsync(userId, false);
+            }
+
+            await DoSignInAsync(userId, false);
         }
 
         public async Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser)
@@ -84,12 +138,6 @@ namespace Pegasus.Services
             return signInResultModel;
         }
 
-        public async Task<string> GetTwoFactorAuthenticationUserAsync()
-        {
-            var info = await RetrieveTwoFactorInfoAsync();
-            return info == null ? null : info.UserId;
-        }
-
         public async Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
         {
             var twoFactorInfo = await RetrieveTwoFactorInfoAsync();
@@ -115,18 +163,6 @@ namespace Pegasus.Services
             return SignInResult.Failed;
         }
 
-        public async Task DoTwoFactorSignInAsync(string userId, bool rememberClient)
-        {
-            var authenticatedUser = await _authenticationEndpoint.Authenticate2Fa(userId);
-            await DoSignInAsync(authenticatedUser, rememberClient);
-        }
-
-        public async Task DoSignInAsync(string userId, bool rememberClient)
-        {
-            var authenticatedUser = await _authenticationEndpoint.Authenticate(userId);
-            await DoSignInAsync(authenticatedUser, rememberClient);
-        }
-
         private async Task DoSignInAsync(AuthenticatedUser authenticatedUser, bool rememberClient)
         {
             var accessTokenResult = _tokenAccessor.GetAccessTokenWithClaimsPrincipal(authenticatedUser);
@@ -141,34 +177,12 @@ namespace Pegasus.Services
             _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
         }
 
-        /// <summary>
-        /// Regenerates the user's application cookie, whilst preserving the existing
-        /// AuthenticationProperties like rememberMe, as an asynchronous operation.
-        /// </summary>
-        /// <param name="userId">The user whose sign-in cookie should be refreshed.</param>
-        /// <returns>The task object representing the asynchronous operation.</returns>
-        public virtual async Task RefreshSignInAsync(string userId)
+        private async Task RememberTwoFactorClientAsync(string userId)
         {
-            var auth = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            var amr = auth?.Principal?.FindFirst("amr");
-            if (amr != null)
-            {
-                
-                await DoTwoFactorSignInAsync(userId, false);
-            }
-
-            await DoSignInAsync(userId, false);
-        }
-
-        private static ClaimsPrincipal StoreTwoFactorInfo(string userId, string loginProvider)
-        {
-            var identity = new ClaimsIdentity(CookieConstants.TwoFactorUserIdScheme);
-            identity.AddClaim(new Claim(ClaimTypes.Name, userId));
-            if (loginProvider != null)
-            {
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, loginProvider));
-            }
-            return new ClaimsPrincipal(identity);
+            var principal = await StoreRememberClient(userId);
+            await HttpContext.SignInAsync(CookieConstants.TwoFactorRememberMeScheme,
+                principal,
+                new AuthenticationProperties { IsPersistent = true });
         }
 
         private async Task<TwoFactorAuthenticationInfo> RetrieveTwoFactorInfoAsync()
@@ -213,10 +227,15 @@ namespace Pegasus.Services
             return new ClaimsPrincipal(rememberBrowserIdentity);
         }
 
-        private async Task<bool> IsTwoFactorClientRememberedAsync(string userId)
+        private static ClaimsPrincipal StoreTwoFactorInfo(string userId, string loginProvider)
         {
-            var result = await HttpContext.AuthenticateAsync(CookieConstants.TwoFactorRememberMeScheme);
-            return (result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId);
+            var identity = new ClaimsIdentity(CookieConstants.TwoFactorUserIdScheme);
+            identity.AddClaim(new Claim(ClaimTypes.Name, userId));
+            if (loginProvider != null)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, loginProvider));
+            }
+            return new ClaimsPrincipal(identity);
         }
     }
 }
