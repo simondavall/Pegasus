@@ -19,17 +19,15 @@ namespace PegasusApi.Controllers
     public class ManageController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IUsersData _usersData;
         private readonly UrlEncoder _urlEncoder;
         private readonly IConfiguration _configuration;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        public ManageController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUsersData usersData, 
+        public ManageController(UserManager<IdentityUser> userManager, IUsersData usersData, 
             UrlEncoder urlEncoder, IConfiguration configuration)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _usersData = usersData;
             _urlEncoder = urlEncoder;
             _configuration = configuration;
@@ -229,7 +227,6 @@ namespace PegasusApi.Controllers
 
             model.HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
             model.Is2FaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-            model.IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user);
             model.RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
 
             return model;

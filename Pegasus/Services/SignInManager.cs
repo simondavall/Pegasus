@@ -23,6 +23,7 @@ namespace Pegasus.Services
         Task DoTwoFactorSignInAsync(string userId, bool rememberClient);
         Task ForgetTwoFactorClientAsync();
         Task<string> GetTwoFactorAuthenticationUserAsync();
+        Task<bool> IsTwoFactorClientRememberedAsync(string userId);
         Task RefreshSignInAsync(string userId);
         Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser);
         Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode);
@@ -76,6 +77,21 @@ namespace Pegasus.Services
         {
             var info = await RetrieveTwoFactorInfoAsync();
             return info == null ? null : info.UserId;
+        }
+
+        /// <summary>
+        /// Returns a flag indicating if the current client browser has been remembered by two factor authentication
+        /// for the user attempting to login, as an asynchronous operation.
+        /// </summary>
+        /// <param name="userId">The user attempting to login.</param>
+        /// <returns>
+        /// The task object representing the asynchronous operation containing true if the browser has been remembered
+        /// for the current user.
+        /// </returns>
+        public async Task<bool> IsTwoFactorClientRememberedAsync(string userId)
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieConstants.TwoFactorRememberMeScheme);
+            return (result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId);
         }
 
         /// <summary>
@@ -159,12 +175,6 @@ namespace Pegasus.Services
             await HttpContext.SignInAsync(accessTokenResult.ClaimsPrincipal, accessTokenResult.AuthenticationProperties);
 
             _apiHelper.AddTokenToHeaders(accessTokenResult.AccessToken);
-        }
-
-        private async Task<bool> IsTwoFactorClientRememberedAsync(string userId)
-        {
-            var result = await HttpContext.AuthenticateAsync(CookieConstants.TwoFactorRememberMeScheme);
-            return (result?.Principal?.FindFirstValue(ClaimTypes.Name) == userId);
         }
 
         private async Task RememberTwoFactorClientAsync(string userId)

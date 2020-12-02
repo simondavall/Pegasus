@@ -352,6 +352,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> TwoFactorAuthentication()
         {
             var model = await _manageEndpoint.TwoFactorAuthentication(UserId);
+            model.IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(UserId);
             return View(model);
         }
 
@@ -360,8 +361,8 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
         {
             await _signInManager.ForgetTwoFactorClientAsync();
+            model = await _manageEndpoint.TwoFactorAuthentication(UserId);
             model.StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
-            model.IsMachineRemembered = false;
             return View(model);
         }
 
