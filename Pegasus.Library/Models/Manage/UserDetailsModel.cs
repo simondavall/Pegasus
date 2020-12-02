@@ -1,14 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Pegasus.Library.Models.Manage
 {
     public class UserDetailsModel : ManageBaseModel
     {
-        public string UserId  { get; set; }
         public string Username { get; set; }
-        public IEnumerable<IdentityError> Errors { get; }
 
 
         [Display(Name = "Display Name")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -6,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.Extensions;
 using PegasusApi.Library.Models.Manage;
 
 namespace PegasusApi.Controllers
@@ -21,50 +22,19 @@ namespace PegasusApi.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IUsersData _usersData;
         private readonly UrlEncoder _urlEncoder;
-        private readonly ILogger<ManageController> _logger;
         private readonly IConfiguration _configuration;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         public ManageController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUsersData usersData, 
-            UrlEncoder urlEncoder, ILogger<ManageController> logger, IConfiguration configuration)
+            UrlEncoder urlEncoder, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _usersData = usersData;
             _urlEncoder = urlEncoder;
-            _logger = logger;
             _configuration = configuration;
         }
         
-        //private async Task<IdentityUser> GetUser<T>(T model) where T : ManageBaseModel
-        //{
-        //    var user = await _userManager.FindByIdAsync(model.UserId);
-        //    model.UserNotFound = user == null;
-        //    return user;
-        //}
-
-        //private async Task<(IdentityUser, T)> GetUser<T>(string userId) where T : ManageBaseModel, new()
-        //{
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    var model = new T
-        //    {
-        //        UserId = userId,
-        //        UserNotFound = user == null
-        //    };
-        //    return (user, model);
-        //}
-
-        //private async Task<(IdentityUser, T)> GetUserByEmail<T>(string email) where T : ManageBaseModel, new()
-        //{
-        //    var user = await _userManager.FindByEmailAsync(email);
-        //    var model = new T
-        //    {
-        //        UserId = user?.Id,
-        //        UserNotFound = user == null
-        //    };
-        //    return (user, model);
-        //}
-
         [Route("AddPassword")]
         [HttpPost]
         public async Task<SetPasswordModel> AddPassword(SetPasswordModel model)
@@ -72,7 +42,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.UserNotFound = true;
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
             var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
@@ -88,7 +58,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.UserNotFound = true;
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
@@ -101,53 +71,49 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
 
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {
-                model.NeededReset = true;
+                model.IsUpdated = true;
                 model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             }
 
             return model;
         }
 
-        [Route("GenerateNewRecoveryCodes/{email}")]
+        [Route("GenerateNewRecoveryCodes/{userId}")]
         [HttpGet]
-        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodes(string email)
+        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodes(string userId)
         {
             var model = new GenerateRecoveryCodesModel();
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{email}'.";
+                model.Errors = UserNotFoundError(userId);
                 return model;
             }
             model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             return model;
         }
 
-        [Route("GetTwoFactorEnabled/{email}")]
+        [Route("GetTwoFactorEnabled/{userId}")]
         [HttpGet]
-        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabled(string email)
+        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabled(string userId)
         {
-            var model = new GetTwoFactorEnabledModel
-            {
-                Email = email
-            };
-            var user = await _userManager.FindByEmailAsync(email);
+            var model = new GetTwoFactorEnabledModel();
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                model.Errors = UserNotFoundError(userId);
                 return model;
             }
-            model.UserId = user.Id;
-            model.Enabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            model.IsEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             return model;
         }
 
@@ -155,17 +121,14 @@ namespace PegasusApi.Controllers
         [HttpGet]
         public async Task<UserDetailsModel> GetUserDetails(string userId)
         {
-            var model = new UserDetailsModel
-            {
-                UserId = userId
-            };
+            var model = new UserDetailsModel();
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with userId '{model.UserId}'.";
+                model.Errors = UserNotFoundError(userId);
                 return model;
             }
-            model.UserId = user.Id;
+            model.UserId = userId;
             model.Username = user.UserName;
             model.PhoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
@@ -175,29 +138,30 @@ namespace PegasusApi.Controllers
             return model;
         }
 
-        [Route("HasPassword")]
-        [HttpPost]
-        public async Task<HasPasswordModel> HasPassword(HasPasswordModel model)
+        [Route("HasPassword/{userId}")]
+        [HttpGet]
+        public async Task<HasPasswordModel> HasPassword(string userId)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var model = new HasPasswordModel();
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.UserNotFound = true;
+                model.Errors = UserNotFoundError(userId);
                 return model;
             }
             model.HasPassword = await _userManager.HasPasswordAsync(user);
             return model;
         }
 
-        [Route("LoadSharedKeyAndQrCodeUri/{email}")]
+        [Route("LoadSharedKeyAndQrCodeUri/{userId}")]
         [HttpGet]
-        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUri(string email)
+        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUri(string userId)
         {
             var model = new AuthenticatorKeyModel();
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{email}'.";
+                model.Errors = UserNotFoundError(userId);
                 return model;
             }
 
@@ -208,18 +172,26 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<ResetAuthenticatorModel> ResetAuthenticator(ResetAuthenticatorModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
 
-            await _userManager.SetTwoFactorEnabledAsync(user, false);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
-            
-            model.StatusMessage = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
+            var set2FaResult =  await _userManager.SetTwoFactorEnabledAsync(user, false);
+            if (!set2FaResult.Succeeded)
+            {
+                model.Errors.AddRange(set2FaResult.Errors);
+                return model;
+            }
+
+            var resetResult = await _userManager.ResetAuthenticatorKeyAsync(user);
+            if (!resetResult.Succeeded)
+            {
+                model.Errors.AddRange(resetResult.Errors);
+            }
+
             return model;
         }
 
@@ -227,27 +199,16 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<SetTwoFactorEnabledModel> SetTwoFactorEnabled(SetTwoFactorEnabledModel model)
         {
-            try
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
-                    model.Succeeded = false;
-                    model.Enabled = false;
-                    return model;
-                }
-                model.UserId = user.Id;
-                await _userManager.SetTwoFactorEnabledAsync(user, true);
-                model.Succeeded = true;
-                model.Enabled = user.TwoFactorEnabled;
+                model.Errors = UserNotFoundError(model.UserId);
+                return model;
             }
-            catch (Exception e)
-            {
-                _logger.LogError($"Failed to enable Two Factor Authentication for user {model.Email}. Reason:{e.Message}");
-                model.Succeeded = false;
-                model.StatusMessage = $"Failed to enable Two Factor Authentication. Reason:{e.Message}";
-            }
+
+            var set2FaEnabledResult = await _userManager.SetTwoFactorEnabledAsync(user, model.SetEnabled);
+            model.Succeeded = set2FaEnabledResult.Succeeded;
+            model.Errors = set2FaEnabledResult.Errors;
 
             return model;
         }
@@ -259,7 +220,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.Errors.Add(Error($"Unable to load user with userId '{model.UserId}'."));
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
 
@@ -284,15 +245,15 @@ namespace PegasusApi.Controllers
         }
 
         [AllowAnonymous]
-        [Route("TwoFactorAuthentication/{email}")]
+        [Route("TwoFactorAuthentication/{userId}")]
         [HttpGet]
-        public async Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string email)
+        public async Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string userId)
         {
             var model = new TwoFactorAuthenticationModel();
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{email}'.";
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
 
@@ -308,13 +269,13 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<VerifyTwoFactorTokenModel> VerifyTwoFactorToken(VerifyTwoFactorTokenModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                model.StatusMessage = $"Unable to load user with email '{model.Email}'.";
+                model.Errors = UserNotFoundError(model.UserId);
                 return model;
             }
-            model.Is2FaTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, model.VerificationCode);
+            model.IsTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, model.VerificationCode);
             return model;
         }
 
@@ -363,9 +324,14 @@ namespace PegasusApi.Controllers
                 unformattedKey);
         }
 
-        private IdentityError Error(string message)
+        private static IdentityError Error(string message)
         {
             return new IdentityError() {Code = string.Empty, Description = message};
+        }
+
+        private static IEnumerable<IdentityError> UserNotFoundError(string userId)
+        {
+            return new[] {Error($"Unable to load user with userId '{userId}'.")};
         }
     }
 }

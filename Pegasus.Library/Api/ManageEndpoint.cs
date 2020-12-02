@@ -9,16 +9,15 @@ namespace Pegasus.Library.Api
         Task<SetPasswordModel> AddPasswordAsync(SetPasswordModel model);
         Task<ChangePasswordModel> ChangePasswordAsync(ChangePasswordModel model);
         Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model);
-        Task ForgetTwoFactorClientAsync(string email);
-        Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string email);
-        Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string email);
+        Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string userId);
+        Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string userId);
         Task<UserDetailsModel> GetUserDetails(string userId);
-        Task<HasPasswordModel> HasPasswordAsync(HasPasswordModel model);
-        Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUriAsync(string email);
+        Task<HasPasswordModel> HasPasswordAsync(string userId);
+        Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUriAsync(string userId);
         Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model);
         Task<SetTwoFactorEnabledModel> SetTwoFactorEnabledAsync(SetTwoFactorEnabledModel model);
         Task<UserDetailsModel> SetUserDetails(UserDetailsModel model);
-        Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string email);
+        Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string userId);
         Task<VerifyTwoFactorTokenModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorTokenModel model);
     }
 
@@ -47,20 +46,14 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model, "api/Account/Manage/CheckRecoveryCodesStatus");
         }
 
-        //TODO ForgetBrowser is not going to work across api
-        public async Task ForgetTwoFactorClientAsync(string email)
+        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string userId)
         {
-            await _apiHelper.PostAsync(email, "api/Account/Manage/ForgetTwoFactorClient");
+            return await _apiHelper.GetFromUri<GenerateRecoveryCodesModel>($"api/Account/Manage/GenerateNewRecoveryCodes/{userId}");
         }
 
-        public async Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string email)
+        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string userId)
         {
-            return await _apiHelper.GetFromUri<GenerateRecoveryCodesModel>($"api/Account/Manage/GenerateNewRecoveryCodes/{email}");
-        }
-
-        public async Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string email)
-        {
-            return await _apiHelper.GetFromUri<GetTwoFactorEnabledModel>($"api/Account/Manage/GetTwoFactorEnabled/{email}");
+            return await _apiHelper.GetFromUri<GetTwoFactorEnabledModel>($"api/Account/Manage/GetTwoFactorEnabled/{userId}");
         }
 
         public async Task<UserDetailsModel> GetUserDetails(string userId)
@@ -68,14 +61,14 @@ namespace Pegasus.Library.Api
             return await _apiHelper.GetFromUri<UserDetailsModel>($"api/Account/Manage/GetUserDetails/{userId}");
         }
 
-        public async Task<HasPasswordModel> HasPasswordAsync(HasPasswordModel model)
+        public async Task<HasPasswordModel> HasPasswordAsync(string userId)
         {
-            return await _apiHelper.PostAsync(model, "api/Account/Manage/HasPassword");
+            return await _apiHelper.GetFromUri<HasPasswordModel>($"api/Account/Manage/HasPassword/{userId}");
         }
 
-        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUriAsync(string email)
+        public async Task<AuthenticatorKeyModel> LoadSharedKeyAndQrCodeUriAsync(string userId)
         {
-            return await _apiHelper.GetFromUri<AuthenticatorKeyModel>($"api/Account/Manage/LoadSharedKeyAndQrCodeUri/{email}");
+            return await _apiHelper.GetFromUri<AuthenticatorKeyModel>($"api/Account/Manage/LoadSharedKeyAndQrCodeUri/{userId}");
         }
 
         public async Task<ResetAuthenticatorModel> ResetAuthenticatorAsync(ResetAuthenticatorModel model)
@@ -93,9 +86,9 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model, "api/Account/Manage/SetUserDetails");
         }
 
-        public async Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string email)
+        public async Task<TwoFactorAuthenticationModel> TwoFactorAuthentication(string userId)
         {
-            return await _apiHelper.GetFromUri<TwoFactorAuthenticationModel>($"api/Account/Manage/TwoFactorAuthentication/{email}");
+            return await _apiHelper.GetFromUri<TwoFactorAuthenticationModel>($"api/Account/Manage/TwoFactorAuthentication/{userId}");
         }
 
         public async Task<VerifyTwoFactorTokenModel> VerifyTwoFactorTokenAsync(VerifyTwoFactorTokenModel model)

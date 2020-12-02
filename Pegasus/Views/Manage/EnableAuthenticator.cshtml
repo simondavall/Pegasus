@@ -32,12 +32,12 @@
                 <div class="col-md-6">
                     <form id="send-code" method="post">
                         <div class="form-group">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <label asp-for="@Model.Code" class="col-form-label">Verification Code</label>
                             <input asp-for="@Model.Code" class="form-control" autocomplete="off" autofocus/>
                             <span asp-validation-for="@Model.Code" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-primary">Verify</button>
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     </form>
                 </div>
             </div>

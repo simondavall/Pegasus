@@ -2,8 +2,6 @@
 {
     public class GetTwoFactorEnabledModel : ManageBaseModel
     {
-        public string Email { get; set; }
-        public bool Enabled { get; set; }
-        public string UserId { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }
