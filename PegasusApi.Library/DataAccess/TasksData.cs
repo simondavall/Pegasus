@@ -56,7 +56,7 @@ namespace PegasusApi.Library.DataAccess
             var parameters = new
             {
                 task.Name, task.Description, task.ProjectId, task.TaskStatusId, 
-                task.TaskTypeId, task.TaskPriorityId, task.FixedInRelease, task.UserId
+                task.TaskTypeId, task.TaskPriorityId, task.FixedInRelease, task.UserId, task.ParentTaskId
             };
 
             await _dataAccess.SaveDataAsync<dynamic>("spTasks_Add", parameters, ConnectionStringName);

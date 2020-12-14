@@ -7,6 +7,7 @@
 	, @TaskPriorityId int
 	, @FixedInRelease nvarchar(20)
 	, @UserId nvarchar(450)
+	, @ParentTaskId int = NULL
 
 AS
 
@@ -29,9 +30,9 @@ BEGIN TRY
 
 -- Insert new project record
 	INSERT INTO [dbo].[ProjectTasks]
-           ([TaskRef], [Name], [Description], [ProjectId], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [UserId], [Created], [Modified])
+           ([TaskRef], [Name], [Description], [ProjectId], [ParentTaskId], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [UserId], [Created], [Modified])
      VALUES
-           (@TaskRef, @Name, @Description, @ProjectId, @TaskStatusId, @TaskTypeId, @TaskPriorityId, @FixedInRelease, @UserId, GETUTCDATE(), GETUTCDATE())
+           (@TaskRef, @Name, @Description, @ProjectId, @ParentTaskId, @TaskStatusId, @TaskTypeId, @TaskPriorityId, @FixedInRelease, @UserId, GETUTCDATE(), GETUTCDATE())
 
 	declare @TaskId int = @@IDENTITY
 
