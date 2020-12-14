@@ -9,6 +9,7 @@ using PegasusApi.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -22,20 +23,6 @@ namespace PegasusApi.Controllers
             _userManager = userManager;
         }
 
-
-        // Cannot be implemented until UserData and UserModel are created.
-        // And data.GetUserById(string userId) is created
-        //[Authorize(Roles = "Admin")]
-        //[HttpGet]
-        //[Route("Admin/GetById")]
-        //public UserModel GetById()
-        //{
-        //    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    UserData data = new UserData();
-        //    return data.GetUserById(userId).First();
-        //}
-
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
@@ -63,7 +50,6 @@ namespace PegasusApi.Controllers
             return output;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllRoles")]
         public Dictionary<string, string> GetAllRoles()
@@ -72,7 +58,6 @@ namespace PegasusApi.Controllers
             return roles;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("Admin/AddRole")]
         public async Task AddRole(UserRolePairModel pairing)
@@ -81,7 +66,6 @@ namespace PegasusApi.Controllers
             await _userManager.AddToRoleAsync(user, pairing.RoleName);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("Admin/RemoveRole")]
         public async Task RemoveRole(UserRolePairModel pairing)

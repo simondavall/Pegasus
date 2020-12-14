@@ -1,11 +1,15 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pegasus.Entities.Attributes;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 
 namespace Pegasus.Controllers
 {
+    [Authorize(Roles = "Admin")]
+    [Require2Fa]
     public class ProjectsController : Controller
     {
         private readonly IProjectsEndpoint _projectsEndpoint;
@@ -13,13 +17,6 @@ namespace Pegasus.Controllers
         public ProjectsController(IProjectsEndpoint projectsEndpoint)
         {
             _projectsEndpoint = projectsEndpoint;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var projects = await _projectsEndpoint.GetAllProjects();
-            return View(projects);
         }
 
         [HttpGet]
@@ -45,6 +42,27 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var project = await _projectsEndpoint.GetProject((int) id);
+
+            if (project == null) return NotFound();
+
+            return View(project);
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _projectsEndpoint.DeleteProject(id);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -54,7 +72,6 @@ namespace Pegasus.Controllers
             return View(project);
         }
 
-        // POST: Projects/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -82,27 +99,11 @@ namespace Pegasus.Controllers
             return View(project);
         }
 
-        // GET: Projects/Delete/
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Index()
         {
-            if (id == null) return NotFound();
-
-            var project = await _projectsEndpoint.GetProject((int) id);
-
-            if (project == null) return NotFound();
-
-            return View(project);
-        }
-
-        // POST: Projects/Delete/5
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _projectsEndpoint.DeleteProject(id);
-            return RedirectToAction("Index");
+            var projects = await _projectsEndpoint.GetAllProjects();
+            return View(projects);
         }
 
         private async Task<bool> ProjectExists(int id)

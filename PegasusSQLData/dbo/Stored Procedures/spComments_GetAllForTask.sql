@@ -1,8 +1,9 @@
 ﻿CREATE PROCEDURE [dbo].[spComments_GetAllForTask]
 	@TaskId int = 0
 AS
-	SELECT [Id], [Comment], [Created], [TaskId], [IsDeleted] 
-	FROM [dbo].[TaskComments]
+	SELECT c.[Id], [TaskId], [Comment], [IsDeleted], [UserId], [DisplayName], [Modified], [Created]
+	FROM [dbo].[TaskComments] c
+	LEFT OUTER JOIN [dbo].Users u ON u.Id = c.UserId
 	WHERE [TaskId] = @TaskId AND [IsDeleted] = 0
 	ORDER BY [Created]
 

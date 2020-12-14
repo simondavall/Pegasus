@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -21,25 +22,25 @@ namespace PegasusApi.Library.DataAccess
             return _configuration.GetConnectionString(name);
         }
 
-        public List<T> LoadData<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName)
+        public async Task<List<T>> LoadDataAsync<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName)
         {
             var connectionString = GetConnectionString(connectionStringName);
 
             using (IDbConnection connection = new SqlConnection(connectionString))
             {
-                var rows = connection.Query<T>(storedProcedure, parameters, null, true, null, CommandType.StoredProcedure).ToList();
+                var rows = await connection.QueryAsync<T>(storedProcedure, parameters, null, null, CommandType.StoredProcedure);
 
-                return rows;
+                return rows.ToList();
             }
         }
 
-        public void SaveData<TParam>(string storedProcedure, TParam parameters, string connectionStringName)
+        public async Task SaveDataAsync<TParam>(string storedProcedure, TParam parameters, string connectionStringName)
         {
             var connectionString = GetConnectionString(connectionStringName);
 
             using (IDbConnection connection = new SqlConnection(connectionString))
             {
-                connection.Execute(storedProcedure, parameters, null, null, CommandType.StoredProcedure);
+                await connection.ExecuteAsync(storedProcedure, parameters, null, null, CommandType.StoredProcedure);
             }
         }
     }

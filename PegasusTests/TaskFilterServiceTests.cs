@@ -6,7 +6,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Pegasus.Domain.Cache;
-using Pegasus.Domain.ProjectTask;
+using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace PegasusTests
 {
@@ -36,7 +37,7 @@ namespace PegasusTests
             var result = sut.GetTaskFilters();
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(5, result.Count());
         }
 
         [Test]
@@ -45,7 +46,7 @@ namespace PegasusTests
             var sut = new TaskFilterService(_cache, _configuration);
             var result = sut.GetTaskFilters();
 
-            var cachedEntry = _cache.Get<IEnumerable<TaskFilter>>(CacheKeys.TaskFilters);
+            var cachedEntry = _cache.Get<IEnumerable<TaskFilterModel>>(CacheKeys.TaskFilters);
 
             Assert.IsNotEmpty(cachedEntry);
             Assert.AreEqual(result, cachedEntry);

@@ -1,13 +1,19 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using PegasusApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using PegasusApi.Extensions;
 using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.JwtAuthentication.Extensions;
+using PegasusApi.Library.Models.Manage;
+using PegasusApi.Models;
+using PegasusApi.Services;
+
 
 namespace PegasusApi
 {
@@ -27,25 +33,25 @@ namespace PegasusApi
             services.AddTransient<IProjectsData, ProjectsData>();
             services.AddTransient<ITasksData, TasksData>();
             services.AddTransient<ICommentsData, CommentsData>();
+            services.AddTransient<IUsersData, UsersData>();
+            
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("PegasusAuth")));
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<EmailSenderOptions>(Configuration);
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddSwaggerGen(setup =>
-            {
-                setup.SwaggerDoc("v1", new OpenApiInfo()
-                {
-                    Title = "Pegasus Api",
-                    Version = "v1"
-                });
-            });
+            services.AddJwtAuthenticationForApi(Configuration);
+            services.AddPegasusSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

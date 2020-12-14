@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
-using PegasusApi.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
@@ -19,189 +19,91 @@ namespace PegasusApi.Controllers
             _taskData = taskData;
         }
 
-        [Route("GetTask/{taskId}")]
-        [HttpGet]
-        public TaskModel GetTask(int taskId)
+        [Route("AddTask")]
+        [HttpPost]
+        public async Task AddTask(TaskModel task)
         {
-            return _taskData.GetTask(taskId);
+            await _taskData.AddTask(task);
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [Route("AddTaskStatus")]
+        [HttpPost]
+        public async Task AddTaskStatus(TaskStatusModel taskStatus)
+        {
+            await _taskData.AddTaskStatus(taskStatus);
         }
 
-        [Route("GetTasks/{projectId}")]
-        [HttpGet]
-        public IEnumerable<TaskModel> GetTasks(int projectId)
+        [Authorize(Roles = "Admin")]
+        [Route("AddTaskType")]
+        [HttpPost]
+        public async Task AddTaskType(TaskTypeModel taskType)
         {
-            return _taskData.GetTasks(projectId);
+            await _taskData.AddTaskType(taskType);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [Route("AddTaskPriority")]
+        [HttpPost]
+        public async Task AddTaskPriority(TaskPriorityModel taskPriority)
+        {
+            await _taskData.AddTaskPriority(taskPriority);
         }
 
         [Route("GetAllTasks")]
         [HttpGet]
-        public IEnumerable<TaskModel> GetAllTasks()
+        public async Task<IEnumerable<TaskModel>> GetAllTasks()
         {
-            return _taskData.GetAllTasks();
-        }
-
-        [Route("AddTask")]
-        [HttpPost]
-        public void AddTask(TaskModel task)
-        {
-            _taskData.AddTask(task);
-        }
-
-        [Route("UpdateTask")]
-        [HttpPost]
-        public void UpdateTask(TaskModel task)
-        {
-            _taskData.UpdateTask(task);
+            return await _taskData.GetAllTasks();
         }
 
         [Route("GetAllTaskPriorities")]
         [HttpGet]
-        public IEnumerable<TaskPriorityModel> GetAllTaskPriorities()
+        public async Task<IEnumerable<TaskPriorityModel>> GetAllTaskPriorities()
         {
-            return _taskData.GetAllTaskPriorities();
+            return await _taskData.GetAllTaskPriorities();
         }
 
         [Route("GetAllTaskStatuses")]
         [HttpGet]
-        public IEnumerable<TaskStatusModel> GetAllTaskStatuses()
+        public async Task<IEnumerable<TaskStatusModel>> GetAllTaskStatuses()
         {
-            return _taskData.GetAllTaskStatuses();
+            return await _taskData.GetAllTaskStatuses();
         }
 
         [Route("GetAllTaskTypes")]
         [HttpGet]
-        public IEnumerable<TaskTypeModel> GetAllTaskTypes()
+        public async Task<IEnumerable<TaskTypeModel>> GetAllTaskTypes()
         {
-            return _taskData.GetAllTaskTypes();
+            return await _taskData.GetAllTaskTypes();
         }
 
-
-
-
-        #region Not yet implemented
-
-        [Obsolete]
-        [Route("GetNextTaskRef")]
-        [HttpGet]
-        public async Task<string> GetNextTaskRef(int projectId, string projectPrefix)
-        {
-            await Task.Delay(1);
-            return string.Empty;
-
-            //old code
-            //    var taskIndexer = _context.TaskIndexers.FirstOrDefault(ti => ti.ProjectId == projectId);
-            //    if (taskIndexer == null || string.IsNullOrWhiteSpace(projectPrefix))
-            //    {
-            //        return "###-##";
-            //    }
-            //    int nextIndex = taskIndexer.NextIndex++;
-            //    _context.TaskIndexers.Update(taskIndexer);
-            //    await _context.SaveChangesAsync();
-
-            //    return string.Format("{0}-{1}", projectPrefix, nextIndex);
-        }
-
-        [Obsolete]
-        [Route("AddTaskIndexer")]
-        [HttpPost]
-        public void AddTaskIndexer(ProjectTaskIndexerModel projectTaskIndexer)
-        {
-
-
-            //old code
-            //    _context.TaskIndexers.Add(projectTaskIndexer);
-            //    _context.SaveChanges();
-        }
-
-        [Obsolete]
-        [Route("AddTaskIndexerAsync")]
-        [HttpPost]
-        public async Task AddTaskIndexerAsync(ProjectTaskIndexerModel projectTaskIndexer)
-        {
-            await Task.Delay(1);
-
-            //old code
-            //    _context.TaskIndexers.Add(projectTaskIndexer);
-            //    await _context.SaveChangesAsync();
-        }
-
-        internal static async Task DeleteTasksAsync(int projectId)
-        {
-            // this is a private member used internally only
-            await Task.Delay(1);
-
-            //old code
-            //    //todo turn this into an async call with ToListAsync() i.e. change return type to IQueryable
-            //    var tasksToDelete = GetTasks(projectId).ToList();
-            //    foreach (var task in tasksToDelete)
-            //    {
-            //        _context.TaskComments.RemoveRange(GetComments(task.Id));
-            //        _context.StatusHistory.RemoveRange(await GetStatusHistory(task.Id).ToListAsync());
-            //    }
-            //    _context.ProjectTasks.RemoveRange(tasksToDelete);
-            //    await _context.SaveChangesAsync();;
-        }
-
-        [Obsolete]
-        [Route("AddTaskStatus")]
-        [HttpPost]
-        public void AddTaskStatus(TaskStatusModel taskStatus)
-        {
-
-            //old code
-            //    _context.Add(taskStatus);
-            //    _context.SaveChanges();
-        }
-
-        [Obsolete]
-        [Route("AddTaskType")]
-        [HttpPost]
-        public void AddTaskType(TaskTypeModel taskType)
-        {
-
-            //old code
-            //    _context.Add(taskType);
-            //    _context.SaveChanges();
-        }
-
-        [Obsolete]
-        [Route("AddTaskPriority")]
-        [HttpPost]
-        public void AddTaskPriority(TaskPriorityModel taskPriority)
-        {
-
-            //old code
-            //    _context.Add(taskPriority);
-            //    _context.SaveChanges();
-        }
-
-        //private void AddStatusHistory(ProjectTaskModel task)
-        //{
-
-        //    //old code
-        //    //    var taskStatusHistory = new TaskStatusHistory
-        //    //    {
-        //    //        TaskId = task.Id,
-        //    //        TaskStatusId = task.TaskStatusId,
-        //    //        Created = task.Modified
-        //    //    };
-        //    //    _context.StatusHistory.Add(taskStatusHistory);
-        //    //    _context.SaveChanges();
-        //}
-
-        [Obsolete]
         [Route("GetStatusHistory")]
         [HttpGet]
-        public IEnumerable<TaskStatusHistoryModel> GetStatusHistory(int taskId)
+        public async Task<IEnumerable<TaskStatusHistoryModel>> GetStatusHistory(int taskId)
         {
-            return new[] { new TaskStatusHistoryModel(), new TaskStatusHistoryModel() };
-
-            //old code
-            //    return _context.StatusHistory.Where(sh => sh.TaskId == taskId);
+            return await _taskData.GetStatusHistory(taskId);
         }
 
-        #endregion
+        [Route("GetTask/{taskId}")]
+        [HttpGet]
+        public async Task<TaskModel> GetTask(int taskId)
+        {
+            return await _taskData.GetTask(taskId);
+        }
 
+        [Route("GetTasks/{projectId}")]
+        [HttpGet]
+        public async Task<IEnumerable<TaskModel>> GetTasks(int projectId)
+        {
+            return await _taskData.GetTasks(projectId);
+        }
 
+        [Route("UpdateTask")]
+        [HttpPost]
+        public async Task UpdateTask(TaskModel task)
+        {
+            await _taskData.UpdateTask(task);
+        }
     }
 }

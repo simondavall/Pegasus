@@ -1,0 +1,23 @@
+﻿@model Pegasus.Library.Models.Manage.ResetAuthenticatorModel
+@{
+    ViewData["Title"] = "Reset authenticator key";
+}
+
+<partial name="_StatusMessage" for="@Model.StatusMessage" />
+<h4>@ViewData["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        <strong>If you reset your authenticator key your authenticator app will not work until you reconfigure it.</strong>
+    </p>
+    <p>
+        This process disables 2FA until you verify your authenticator app.
+        If you do not complete your authenticator app configuration you may lose access to your account.
+    </p>
+</div>
+<div>
+    <form id="reset-authenticator-form" method="post" class="form-group">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Reset authenticator key</button>
+    </form>
+</div>

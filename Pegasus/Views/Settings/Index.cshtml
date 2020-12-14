@@ -1,0 +1,60 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Extensions
+@using Pegasus.Extensions
+@using Pegasus.Services
+@inject ISettingsService Settings
+@inject IHttpContextAccessor HttpAccessor
+
+<div class="sidebar">
+    <div class="settings-sidebar">
+        @using (Html.BeginForm("SaveSettings", "Settings", FormMethod.Post))
+        {
+            var rq = HttpAccessor.HttpContext.Request;
+            var currentUrl = UriHelper.BuildRelative(rq.PathBase, rq.Path, rq.QueryString);
+
+            @Html.Hidden("returnUrl", currentUrl)
+
+            <div class="card card-default">
+                <div class="card-header settings-title-section">
+                    <a href="javascript:void(0)" class="settings-close"><i class="fa fa-times"></i></a>
+                    <h5 class="settings-title">Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="settings-section">
+                        <div class="settings-section-title">PAGINATION SETTINGS</div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@Settings.GetDisplayName(nameof(Settings.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <input type="hidden" value="false" name="PaginationEnabled" />
+                        </div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="PageSize">@Settings.GetDisplayName(nameof(Settings.PageSize))</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@Settings.PageSize">
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Setting-->
+                    <div class="settings-section">
+                        <div class="settings-section-title">DEVICE SETTINGS</div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="SettingsModel_ScreenSize">Screen Size</label>
+                            <input class="settings-input-text" type="number" id="SettingsModel_ScreenSize" name="SettingsModel.ScreenSize" value="0">
+                        </div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="SettingsModel_FullWidth">Full Width</label>
+                            <input type="checkbox" id="SettingsModel_FullWidth" name="SettingsModel.FullWidthn" value="true">
+                        </div>
+                        <div class="settings-item">
+                            <label class="settings-label settings-label-font" for="SettingsModel_SideBarRight">Sidebar Right</label>
+                            <input type="checkbox" id="SettingsModel_SideBarRight" name="SettingsModel.SideBarRight" value="true">
+                        </div>
+                    </div>
+
+                    <div class="settings-submit-button">
+                        <input type="submit" name="SaveSettings" value="Apply" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

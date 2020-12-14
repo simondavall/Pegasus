@@ -1,7 +1,7 @@
 @model Pegasus.Library.Models.ProjectModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "New Project";
 }
 
 <form asp-action="Create">
@@ -11,7 +11,7 @@
     <div class="form-group">
         <label asp-for="Name" class="col-md-2 col-form-label"></label>
         <div class="col-md-10">
-            <input asp-for="Name" class="form-control" />
+            <input asp-for="Name" class="form-control" autofocus/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <label asp-for="ProjectPrefix" class="col-md-2 col-form-label"></label>

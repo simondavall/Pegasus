@@ -3,17 +3,31 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>698253ae-a8e7-44df-b3aa-2b0f5bd69dce</UserSecretsId>
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
     <Authors>Simon Da Vall</Authors>
     <Company>Hereford Securities Ltd</Company>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\lib\davidshimjs-qrcodejs\index-svg.html" />
+    <Content Remove="wwwroot\lib\davidshimjs-qrcodejs\index.html" />
+    <Content Remove="wwwroot\lib\davidshimjs-qrcodejs\index.svg" />
+    <Content Remove="wwwroot\lib\davidshimjs-qrcodejs\jquery.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
+    <PackageReference Include="SendGrid" Version="9.21.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Pegasus.Library\Pegasus.Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Home\" />
   </ItemGroup>
 
 </Project>

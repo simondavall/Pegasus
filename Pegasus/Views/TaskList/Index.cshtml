@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Task List";
 }
-<form method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
+<form class="project-list-form" method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
     <div class="row task-list">
         <div class="col-sm-3">
             <partial name="../TaskList/_SelectionPanel" model="Model"/>

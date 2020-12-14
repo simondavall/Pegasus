@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
@@ -17,53 +19,25 @@ namespace PegasusApi.Controllers
             _commentsData = commentsData;
         }
 
-        [Route("GetComments/{taskId}")]
-        [HttpGet]
-        public IEnumerable<TaskCommentModel> GetComments(int taskId)
-        {
-             return _commentsData.GetComments(taskId);
-        }
-
         [Route("AddComment")]
         [HttpPost]
-        public void AddComment(TaskCommentModel taskComment)
+        public async Task AddComment(TaskCommentModel taskComment)
         {
-            _commentsData.AddComment(taskComment);
+            await _commentsData.AddComment(taskComment);
         }
 
+        [Route("GetComments/{taskId}")]
+        [HttpGet]
+        public async Task<IEnumerable<TaskCommentModel>> GetComments(int taskId)
+        {
+             return await _commentsData.GetComments(taskId);
+        }
 
         [Route("UpdateComments")]
         [HttpPost]
-        public void UpdateComments(IEnumerable<TaskCommentModel> taskComments)
+        public async Task UpdateComments(IEnumerable<TaskCommentModel> taskComments)
         {
-            _commentsData.UpdateComments(taskComments);
+            await _commentsData.UpdateComments(taskComments);
         }
-
-        #region Not Yet Implemented
-
-        [Obsolete]
-        [Route("GetComment")]
-        [HttpGet]
-        public TaskCommentModel GetComment(int id)
-        {
-            return new TaskCommentModel();
-
-            //old code
-            //    return _context.TaskComments.FirstOrDefault(c => c.Id == id);
-        }
-
-        [Obsolete]
-        [Route("UpdateComment")]
-        [HttpPost]
-        public void UpdateComment(TaskCommentModel taskComment)
-        {
-
-            //old code
-            //    _context.TaskComments.Update(taskComment);
-            //    _context.SaveChanges();
-        }
-
-        #endregion
-
     }
 }

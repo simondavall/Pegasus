@@ -1,0 +1,35 @@
+﻿@model Pegasus.Models.PaginationViewModel
+
+@if (Model.ShowPagination)
+{
+    <div id="pagination">
+        <table class="pagination">
+            <tbody>
+                <tr>
+                    <td>
+                        <a class="pagination-list-item @(Model.ShowPrevPage ? "":"not-active")" asp-action="@Model.Action" value="@Model.PrevPage">Previous</a>
+                    </td>
+                    @{
+                        for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            if (Model.CurrentPage == i)
+                            {
+                                <td>
+                                    <span class="pagination-list-item not-active">@i</span>
+                                </td>
+                            }
+                            else
+                            {
+                                <td><a class="pagination-list-item" asp-action="@Model.Action" value="@i">@i</a></td>
+                            }
+                        }
+                    }
+                    <td>
+                        <a class="pagination-list-item @(Model.ShowNextPage ? "":"not-active")" asp-action="@Model.Action" value="@Model.NextPage">Next</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+

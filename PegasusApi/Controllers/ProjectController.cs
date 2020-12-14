@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models;
 
 namespace PegasusApi.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProjectController : ControllerBase
@@ -16,39 +19,42 @@ namespace PegasusApi.Controllers
             _projectsData = projectsData;
         }
 
+        [Authorize(Roles = "Admin")]
+        [Route("AddProject")]
+        [HttpPost]
+        public async Task AddProject(ProjectModel project)
+        {
+            await _projectsData.AddProject(project);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [Route("DeleteProject/{id}")]
+        [HttpDelete]
+        public async Task DeleteProject(int id)
+        {
+            await _projectsData.DeleteProject(id);
+        }
+
         [Route("GetAllProjects")]
         [HttpGet]
-        public List<ProjectModel> GetAllProjects()
+        public async Task<List<ProjectModel>> GetAllProjects()
         {
-            return _projectsData.GetProjects();
+            return await _projectsData.GetProjects();
         }
 
         [Route("GetProject/{id}")]
         [HttpGet]
-        public ProjectModel GetProject(int id)
+        public async Task<ProjectModel> GetProject(int id)
         {
-            return _projectsData.GetProject(id);
+            return await _projectsData.GetProject(id);
         }
 
-        [Route("AddProject")]
-        [HttpPost]
-        public void AddProject(ProjectModel project)
-        {
-            _projectsData.AddProject(project);
-        }
-
+        [Authorize(Roles = "Admin")]
         [Route("UpdateProject")]
         [HttpPost]
-        public void UpdateProject(ProjectModel project)
+        public async Task UpdateProject(ProjectModel project)
         {
-            _projectsData.UpdateProject(project);
-        }
-
-        [Route("DeleteProject/{id}")]
-        [HttpDelete]
-        public void DeleteProject(int id)
-        {
-            _projectsData.DeleteProject(id);
+            await _projectsData.UpdateProject(project);
         }
     }
 }

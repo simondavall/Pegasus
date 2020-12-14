@@ -35,14 +35,15 @@ $(function () {
         $(taskFilterList[currentSettings.taskFilterId]).find("i").removeClass("hide");
     });
 
-    var updateList = function () {
+    var updateList = function (form) {
         var options = {
-            url: $("form").attr("action"),
-            type: $("form").attr("method"),
-            data: $("form").serialize()
+            url: $(form).attr("action"),
+            type: $(form).attr("method"),
+            data: $(form).serialize()
         };
+
         $.ajax(options).done(function (data) {
-            var $target = $($("form").attr("data-pgs-target"));
+            var $target = $($(form).attr("data-pgs-target"));
             $target.replaceWith(data);
         });
     }
@@ -52,11 +53,12 @@ $(function () {
         $(hiddenItem).val(selectedId);
         $(itemList).find("i").addClass("hide");
         $(item).find("i").removeClass("hide");
-        updateList();
+        updateList(".project-list-form");
         return selectedId;
     };
 
     $(".body-content").on("click", ".project-list-item", function () {
+        $("#page").val(1); // reset display back to page 1
         currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectListItems));
         // need to disable Create button if All projects selected
         setCreateTaskButton();
@@ -64,7 +66,13 @@ $(function () {
     });
 
     $(".body-content").on("click", ".task-filter", function () {
+        $("#page").val(1); // reset display back to page 1
         sidebarAction($(this), $("#taskFilterId"), $(taskFilterList));
+        return false;
+    });
+
+    $(".body-content").on("click", ".pagination-list-item", function () {
+        sidebarAction($(this), $("#page"), null);
         return false;
     });
 
@@ -86,7 +94,38 @@ $(function () {
     });
 
     $(".body-content").on('click', ".comment-delete-button", function () {
-        $(this).siblings("input").val(true);
-        updateList();
+        var editSection = $(this).parents(".comment-edit-section");
+        if (editSection.hasClass("task-comment-deleted")) {
+            $(this).siblings("input").val(false);
+            $(editSection).find(".comment-edit-button").removeClass("hide");
+            $(editSection).find(".task-comment-date").removeClass("task-comment-deleted");
+            $(editSection).removeClass("task-comment-deleted");
+        } else {
+
+            $(this).siblings("input").val(true);
+            $(editSection).find(".comment-edit-button").addClass("hide");
+            $(editSection).find(".task-comment-date").addClass("task-comment-deleted");
+            $(editSection).addClass("task-comment-deleted");
+        }
     });
+
+    var toggleSettingsSidebar = function () {
+        if ($(".settings-sidebar").hasClass("on")) {
+            $(".settings-sidebar").removeClass("on");
+        } else {
+            $(".settings-sidebar").addClass("on");
+        }
+        return false;
+    }
+
+    $(".navbar-content").on("click", ".settings-link", function () {
+        toggleSettingsSidebar();
+        return false;
+    });
+
+    $(".sidebar").on("click", ".settings-close", function() {
+        toggleSettingsSidebar();
+        return false;
+    });
+
 })

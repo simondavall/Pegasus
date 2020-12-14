@@ -1,27 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Pegasus.Domain.ProjectTask;
+﻿using Microsoft.AspNetCore.Authorization;
+using Pegasus.Entities.Attributes;
 using Pegasus.Library.Api;
-using Pegasus.Models;
+using Pegasus.Services;
 
 namespace Pegasus.Controllers
 {
+    [Authorize(Roles = "PegasusUser")]
+    [Require2Fa]
     public class HomeController : TaskListController
     {
-        public HomeController(IConfiguration configuration, ITaskFilterService taskFilterService, 
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint) 
-            : base(configuration, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint)
-        {
-
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            var model = new BaseViewModel { ProjectId = 0 };
-
-            return View(model);
-        }
+        public HomeController(ITaskFilterService taskFilterService, 
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService) 
+            : base(taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService)
+        { }
     }
 }

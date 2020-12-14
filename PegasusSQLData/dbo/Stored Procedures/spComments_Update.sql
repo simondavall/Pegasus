@@ -4,7 +4,7 @@
 	@IsDeleted bit = 0
 AS
 	UPDATE [dbo].[TaskComments]
-	SET [Comment] = @Comment ,[IsDeleted] = @IsDeleted
+	SET [Comment] = @Comment ,[IsDeleted] = @IsDeleted, [Modified] = GETUTCDATE()
 	WHERE Id = @Id
 
 RETURN 0

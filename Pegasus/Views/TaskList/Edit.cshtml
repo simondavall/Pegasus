@@ -1,10 +1,10 @@
 @model Pegasus.Models.TaskList.TaskViewModel
 
 @{
-    ViewData["Title"] = "Task";
+    ViewData["Title"] = "Edit Task";
 }
 
-<form asp-action="Edit" data-pgs-ajax="true" data-pgs-target="#editTaskContent">
+<form class="project-task-form" asp-action="Edit" data-pgs-ajax="true" data-pgs-target="#editTaskContent">
     <div class="edit-task">
         <partial name="_EditTaskContent" model="Model"/>
     </div>
