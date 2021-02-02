@@ -39,14 +39,15 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? id)
         {
             var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
                 ProjectId = projectId,
-                TaskRef = $"{project.ProjectPrefix}-<tbc>"
+                TaskRef = $"{project.ProjectPrefix}-<tbc>",
+                ParentTaskId = id
             };
             var model = await TaskViewModel.Create(new TaskViewModelArgs
             {
@@ -65,7 +66,7 @@ namespace Pegasus.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
+            [Bind("Description,Name,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask)
         {
             projectTask.Created = projectTask.Modified = DateTime.Now;

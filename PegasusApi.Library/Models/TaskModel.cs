@@ -13,6 +13,7 @@ namespace PegasusApi.Library.Models
         public int TaskPriorityId { get; set; }
         public string FixedInRelease { get; set; }
         public int ProjectId { get; set; }
+        public int? ParentTaskId { get; set; }
         public string UserId { get; set; }
         public DateTime Modified { get; set; }
         public DateTime Created { get; set; }

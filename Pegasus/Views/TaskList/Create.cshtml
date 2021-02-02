@@ -10,6 +10,7 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="ProjectTask.ProjectId" />
     <input type="hidden" asp-for="ProjectTask.Id" />
+    <input type="hidden" asp-for="ProjectTask.ParentTaskId"/>
     <input type="hidden" asp-for="ProjectTask.Created" />
     <input type="hidden" asp-for="ExistingTaskStatus" value="@Model.ExistingTaskStatus" />
     <div class="row">

@@ -8,6 +8,7 @@
     [TaskPriorityId] INT            NOT NULL,
     [FixedInRelease] NVARCHAR (20)  NULL,
     [ProjectId]      INT            NOT NULL,
+    [ParentTaskId]   INT            NULL,
     [UserId]         NVARCHAR(450)  NULL,
     [Modified]       DATETIME2 (7)  NOT NULL,
     [Created]        DATETIME2 (7)  NOT NULL

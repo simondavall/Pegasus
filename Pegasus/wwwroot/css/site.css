@@ -219,6 +219,10 @@ html {
 .navbar-content, .btn-default, .recovery-code {
 }
 
+.project-task-list {
+    min-height: 400px;
+}
+
 a.settings-close {
     text-decoration: none;
     position: relative;
@@ -369,10 +373,6 @@ a.settings-close i {
 
 .task-in-progress a {
     color: #337ab7;
-}
-
-.task-list {
-    min-height: 400px;
 }
 
 .task-list i {
