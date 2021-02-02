@@ -1,9 +1,9 @@
 ﻿CREATE PROCEDURE [dbo].[spTasks_GetAllForProject]
 	@projectId int = 0
 AS
-	SELECT [Id], [TaskRef], [Name], [Description], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [ProjectId], [UserId], [Modified], [Created]
+	SELECT *
 	FROM ProjectTasks
-	WHERE ProjectId = @projectId
+	WHERE ProjectId = @projectId AND ParentTaskId is null
 	ORDER BY Modified DESC
 
 RETURN 0
