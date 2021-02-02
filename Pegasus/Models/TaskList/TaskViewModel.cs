@@ -18,6 +18,8 @@ namespace Pegasus.Models.TaskList
         [DataType(DataType.MultilineText)]
         public string NewComment { get; set; }
 
+        public IEnumerable<TaskModel> SubTasks { get; set; }
+        
         public int ExistingTaskStatus { get; set; }
 
         public static async Task<TaskViewModel> Create(TaskViewModelArgs args)
@@ -32,7 +34,8 @@ namespace Pegasus.Models.TaskList
                 ProjectTask = args.ProjectTask,
                 Project = args.Project ?? await args.ProjectsEndpoint.GetProject(args.ProjectTask.ProjectId),
                 ExistingTaskStatus = args.ExistingStatusId != 0 ? args.ExistingStatusId : args.ProjectTask.TaskStatusId,
-                NewComment = args.NewComment
+                NewComment = args.NewComment,
+                SubTasks = await args.TasksEndpoint.GetSubTasks(args.ProjectTask.Id)
             };
 
             return model;

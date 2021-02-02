@@ -57,6 +57,13 @@ namespace PegasusApi.Controllers
             return await _taskData.GetAllTasks();
         }
 
+        [Route("GetSubTasks/{taskId}")]
+        [HttpGet]
+        public async Task<IEnumerable<TaskModel>> GetSubTasks(int taskId)
+        {
+            return await _taskData.GetSubTasks(taskId);
+        }
+        
         [Route("GetAllTaskPriorities")]
         [HttpGet]
         public async Task<IEnumerable<TaskPriorityModel>> GetAllTaskPriorities()

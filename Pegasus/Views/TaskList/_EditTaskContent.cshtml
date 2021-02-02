@@ -1,3 +1,5 @@
+@using Pegasus.Entities.Enumerations
+@using Pegasus.Extensions
 @model Pegasus.Models.TaskList.TaskViewModel
 
 <div id="editTaskContent" class="row">
@@ -27,11 +29,7 @@
                 <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
             </div>
         </div>
-        
-        <!--TODO  Add partial here to list sub tasks and maybe parent task here too-->
-        <div>
-            <a id="createSubTaskButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create" asp-route-id="@Model.ProjectTask.Id">Create Sub Task</a>
-        </div>
+
         <partial name="_CommentList" model="Model.Comments.ToList()" />
         <div class="form-group">
             <label asp-for="@Model.NewComment" class="col-md-4 col-form-label"></label>
@@ -40,9 +38,21 @@
                 <span asp-validation-for="@Model.NewComment" class="text-danger"></span>
             </div>
         </div>
+        
+        @if(Model.SubTasks.Any())
+    {
+        <div class="form-group">
+            <label class="col-md-2 col-form-label">Sub Tasks</label>
+            <div style="margin-left: 30px">
+                <partial name="_TaskList" model="Model.SubTasks" />
+            </div>
+        </div>
+    }
+        
         <div class="form-group">
             <div class="col-md-10">
                 <input id="editTaskButton" type="submit" value="Update" class="btn btn-primary" />
+                <a id="createSubTaskButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create" asp-route-id="@Model.ProjectTask.Id">Add Sub Task</a>
             </div>
         </div>
     </div>

@@ -27,6 +27,12 @@ namespace PegasusApi.Library.DataAccess
             return output;
         }
 
+        public async Task<List<TaskModel>> GetSubTasks(int taskId)
+        {
+            var output = await _dataAccess.LoadDataAsync<TaskModel, dynamic>("spTasks_GetSubTasks", new { taskId }, ConnectionStringName);
+            return output;
+        }
+        
         public async Task<List<TaskModel>> GetAllTasks()
         {
             var output = await _dataAccess.LoadDataAsync<TaskModel, dynamic>("spTasks_GetAll", new { }, ConnectionStringName);
