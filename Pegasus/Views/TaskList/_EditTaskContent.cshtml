@@ -8,7 +8,11 @@
     <input type="hidden" asp-for="ProjectTask.Id" />
     <input type="hidden" asp-for="ProjectTask.Created" />
     <input type="hidden" asp-for="ExistingTaskStatus" value="@Model.ExistingTaskStatus" />
+    <input type="hidden" asp-for="ProjectTask.ParentTaskId"/>
     <div class="col-sm-9">
+        <div class="banner-message">
+            <span>@Model.BannerMessage</span>
+        </div>
         @if (Model.ParentTask != null)
         {
             
@@ -63,7 +67,10 @@
         <div class="form-group">
             <div class="col-md-10">
                 <input id="editTaskButton" type="submit" value="Update" class="btn btn-primary"/>
-                <a id="createSubTaskButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create" asp-route-id="@Model.ProjectTask.Id">Add Sub Task</a>
+                @if (!Model.ProjectTask.IsClosed())
+                {
+                    <a id="createSubTaskButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create" asp-route-id="@Model.ProjectTask.Id">Add Sub Task</a>
+                }
             </div>
         </div>
     </div>

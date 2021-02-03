@@ -22,6 +22,16 @@ namespace PegasusApi.Library.DataAccess
             return _configuration.GetConnectionString(name);
         }
 
+        public async Task<T> ExecuteScalarAsync<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName)
+        {
+            var connectionString = GetConnectionString(connectionStringName);
+
+            using (IDbConnection connection = new SqlConnection(connectionString))
+            {
+                return await connection.ExecuteScalarAsync<T>(storedProcedure, parameters, null, null, CommandType.StoredProcedure);
+            }
+        }
+
         public async Task<List<T>> LoadDataAsync<T, TParam>(string storedProcedure, TParam parameters, string connectionStringName)
         {
             var connectionString = GetConnectionString(connectionStringName);
