@@ -104,6 +104,13 @@ html {
     overflow-y: scroll;
 }
 
+.banner-message {
+    background-color: #ffc869;
+    text-align: center;
+    line-height: 2.0rem;
+    margin-bottom: 10px;
+}
+
 .btn-group-xs > .btn, .btn-xs {
     padding: 1px 5px;
     font-size: 12px;

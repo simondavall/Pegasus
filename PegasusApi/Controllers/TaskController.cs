@@ -21,9 +21,9 @@ namespace PegasusApi.Controllers
 
         [Route("AddTask")]
         [HttpPost]
-        public async Task AddTask(TaskModel task)
+        public async Task<int> AddTask(TaskModel task)
         {
-            await _taskData.AddTask(task);
+            return await _taskData.AddTask(task);
         }
         
         [Authorize(Roles = "Admin")]

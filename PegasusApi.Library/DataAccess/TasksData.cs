@@ -57,7 +57,7 @@ namespace PegasusApi.Library.DataAccess
             return output;
         }
 
-        public async Task AddTask(TaskModel task)
+        public async Task<int> AddTask(TaskModel task)
         {
             var parameters = new
             {
@@ -65,7 +65,7 @@ namespace PegasusApi.Library.DataAccess
                 task.TaskTypeId, task.TaskPriorityId, task.FixedInRelease, task.UserId, task.ParentTaskId
             };
 
-            await _dataAccess.SaveDataAsync<dynamic>("spTasks_Add", parameters, ConnectionStringName);
+            return await _dataAccess.ExecuteScalarAsync<int, dynamic>("spTasks_Add", parameters, ConnectionStringName);
         }
 
         public async Task UpdateTask(TaskModel task)

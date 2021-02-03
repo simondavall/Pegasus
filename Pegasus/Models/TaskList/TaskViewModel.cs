@@ -8,6 +8,7 @@ namespace Pegasus.Models.TaskList
 {
     public class TaskViewModel : BaseViewModel
     {
+        public string BannerMessage { get; set; }
         public IEnumerable<TaskCommentModel> Comments { get; set; }
         public int ExistingTaskStatus { get; set; }
         [Display(Name="Add Comment")]
@@ -25,6 +26,7 @@ namespace Pegasus.Models.TaskList
         {
             var model = new TaskViewModel
             {
+                BannerMessage = args.BannerMessage,
                 Comments = args.Comments ?? await args.CommentsEndpoint.GetComments(args.ProjectTask.Id),
                 ExistingTaskStatus = args.ExistingStatusId != 0 ? args.ExistingStatusId : args.ProjectTask.TaskStatusId,
                 NewComment = args.NewComment,

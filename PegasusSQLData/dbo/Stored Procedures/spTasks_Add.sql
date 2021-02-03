@@ -12,6 +12,7 @@
 AS
 
 declare @TaskRef nvarchar(20)
+declare @TaskId int = 0
 
 BEGIN TRANSACTION;
 
@@ -34,7 +35,7 @@ BEGIN TRY
      VALUES
            (@TaskRef, @Name, @Description, @ProjectId, @ParentTaskId, @TaskStatusId, @TaskTypeId, @TaskPriorityId, @FixedInRelease, @UserId, GETUTCDATE(), GETUTCDATE())
 
-	declare @TaskId int = @@IDENTITY
+	SET @TaskId = @@IDENTITY
 
 -- Insert new entry into status history
 	INSERT INTO [dbo].[StatusHistory]
@@ -46,10 +47,11 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION
-		
+	SET @TaskId = 0
 END CATCH
 
 IF @@TRANCOUNT > 0
 	COMMIT TRANSACTION
 
-RETURN 0
+
+SELECT @TaskId
