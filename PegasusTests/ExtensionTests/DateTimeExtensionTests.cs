@@ -65,11 +65,11 @@ namespace PegasusTests.ExtensionTests
         }
 
         [Test]
-        public void TimeLapsed_For28days_Returns28days()
+        public void TimeLapsed_For27days_Returns28days()
         {
-            var sut = DateTime.Now.AddMonths(-0).AddDays(-28).AddHours(-10).AddMinutes(-0);
+            var sut = DateTime.Now.AddMonths(-0).AddDays(-27).AddHours(-10).AddMinutes(-0);
 
-            Assert.AreEqual("28 days ago", sut.LapsedTime());
+            Assert.AreEqual("27 days ago", sut.LapsedTime());
         }
 
         [Test]
