@@ -1,82 +1,155 @@
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NUnit.Framework;
+using PegasusApi.Controllers;
+using PegasusApi.Data;
+using PegasusApi.Library.JwtAuthentication;
+using PegasusApi.Models;
+using PegasusApi.Services;
+using TokenOptions = PegasusApi.Library.JwtAuthentication.Models.TokenOptions;
 
 namespace PegasusApi.Tests
 {
-
-    //TODO Need to implement this test for new JwtBearer code.
-    // The original tests took too long to run. See if things can be improved.
+    //TODO Need to implement this test for new JwtBearer version (3.1.18).
 
     public class TokenControllerTests
     {
+        private IApplicationUserManager<IdentityUser> _userManager;
+        private IApplicationDbContext _applicationDbContext;
+        private static readonly string _username = "test.user@email.com";
+        private static readonly string _password = "SecretPassword";
+        private readonly string _issuer = "https://fakelocalhost:5001";
+        private readonly string _audience = "https://fakelocalhost:5002";
+        private readonly string _signingKey = "MySecretKeyIsSecretSoDoNotTell";
+        private readonly string _tokenExpiryInMinute = "720";
+        private static readonly string _userId = "12345";
+        
+        // bad data
+        private static readonly string _badUserId = "BadValueId";
+        private static readonly string _badUsername = "bad.user@email.com";
+        private static readonly string _badPassword = "BadPassword";
+        
+        private IdentityUser _user;
+        private IJwtTokenGenerator _tokenGenerator;
 
-        [Test]
-        public void DefaultTest()
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
-            Assert.Pass("Placeholder test");
+            var tokenOptions = new TokenOptions(_issuer, _audience, _signingKey, _tokenExpiryInMinute);
+            _tokenGenerator = new JwtTokenGenerator(tokenOptions);
+
+            _user = new IdentityUser { Id = _userId, UserName = _username, PasswordHash = _password };
+
+            _userManager = MockUserManager(_user).Object;
+            _applicationDbContext = MockApplicationDbContext().Object;
         }
 
-        //    private DbContextOptions<ApplicationDbContext> _options;
-        //    private UserManager<IdentityUser> _userManager;
-        //    private string _username = "test.user@email.com";
-        //    private string _password = "SecretPassword";
-        //    private IConfiguration _configuration;
+        [Test]
+        public void CreateToken_CorrectCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_username, _password, "password").Result;
 
-        //    [OneTimeSetUp]
-        //    public void OneTimeSetup()
-        //    {
-        //        var jsonConfig = "{ \"Token\": { \"Issuer\": \"https://localhost:5001\", \"Audience\": \"https://localhost:5002\", \"SigningKey\": \"MySecretKeyIsSecretSoDoNotTell\" }}";
-        //        var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonConfig));
+            Assert.IsInstanceOf<ObjectResult>(sut);
 
-        //        _configuration = new ConfigurationBuilder()
-        //            .AddJsonStream(stream)
-        //            .Build();
+            dynamic tokenObject = ((ObjectResult)sut).Value;
+            Assert.IsInstanceOf<TokenModel>(tokenObject);
+            Assert.AreEqual(_username, tokenObject.Username);
+        }
+        
+        [Test]
+        public void CreateToken_BadUsername_ReturnsBadRequest()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_badUsername, _password, "password").Result;
 
-        //        var user1 = new IdentityUser { Id = "12345", UserName = _username, PasswordHash = _password };
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
+        
+        [Test]
+        public void CreateToken_BadPassword_ReturnsBadRequest()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_username, _badPassword, "password").Result;
 
-        //        _options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        //            .UseInMemoryDatabase(databaseName: "PegasusAuth")
-        //            .Options;
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
 
-        //        using (var context = new ApplicationDbContext(_options))
-        //        {
-        //            context.Users.Add(user1);
-        //            context.SaveChanges();
-        //        }
+        [Test]
+        public void CreateToken_BadCredentials_ReturnsBadRequest()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_badUsername, _badPassword, "password").Result;
 
-        //        _userManager = MockUserManager(new List<IdentityUser> { user1 }).Object;
-        //    }
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
 
-        //[Test]
-        //public void TokenControllerTest()
-        //{
-        //    using (var context = new ApplicationDbContext(_options))
-        //    {
-        //        var tokenController = new TokenController(context, _userManager, _configuration);
+        [Test]
+        public void RefreshToken_CorrectCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(_userId).Result;
 
-        //        var sut = tokenController.Create(_username, _password, "password").Result;
+            Assert.IsInstanceOf<ObjectResult>(sut);
 
-        //        Assert.IsInstanceOf<ObjectResult>(sut);
+            dynamic tokenObject = ((ObjectResult)sut).Value;
+            Assert.IsInstanceOf<TokenModel>(tokenObject);
+            Assert.AreEqual(_username, tokenObject.Username);
+        }
+        
+        [Test]
+        public void RefreshToken_BadCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(_badUserId).Result;
 
-        //        dynamic tokenObject = ((ObjectResult) sut).Value;
-        //        Assert.IsInstanceOf<TokenModel>(tokenObject);
-        //        Assert.AreEqual(_username, tokenObject.Username);
-        //    }
-        //}
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
+        
+        [Test]
+        public void Create2FaToken_CorrectCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(_userId).Result;
 
-        //private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> users) where TUser : class
-        //{
-        //    var store = new Mock<IUserStore<TUser>>();
-        //    var mgr = new Mock<UserManager<TUser>>(store.Object, null, null, null, null, null, null, null, null);
-        //    mgr.Object.UserValidators.Add(new UserValidator<TUser>());
-        //    mgr.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
+            Assert.IsInstanceOf<ObjectResult>(sut);
 
-        //    mgr.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-        //    mgr.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => users.Add(x));
-        //    mgr.Setup(x => x.UpdateAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-        //    mgr.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(users[0]);
-        //    mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(true);
+            dynamic tokenObject = ((ObjectResult)sut).Value;
+            Assert.IsInstanceOf<TokenModel>(tokenObject);
+            Assert.AreEqual(_username, tokenObject.Username);
+        }
 
-        //    return mgr;
-        //}
+        [Test]
+        public void Create2FaToken_BadCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.Create2FaToken(_badUserId).Result;
+
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
+        
+        private static Mock<IApplicationUserManager<TUser>> MockUserManager<TUser>(TUser user) where TUser : class
+        {
+            var mgr = new Mock<IApplicationUserManager<TUser>>();
+            // set up for success
+            mgr.Setup(x => x.FindByEmailAsync(It.Is<string>(y => y == _username))).ReturnsAsync(user);
+            mgr.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == _userId))).ReturnsAsync(user);
+            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.Is<string>(y => y == _password))).ReturnsAsync(true);
+            // set up for fail
+            mgr.Setup(x => x.FindByEmailAsync(It.Is<string>(y => y == _badUsername))).ReturnsAsync((TUser) null);
+            mgr.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == _badUserId))).ReturnsAsync((TUser) null);
+            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.Is<string>(y => y == _badPassword))).ReturnsAsync(false);
+
+            return mgr;
+        }
+
+        private static Mock<IApplicationDbContext> MockApplicationDbContext()
+        {
+            var context = new Mock<IApplicationDbContext>();
+            context.Setup(x => x.GetRolesForUser(It.IsAny<IdentityUser>())).Returns(new List<string>());
+            return context;
+        }
     }
 }

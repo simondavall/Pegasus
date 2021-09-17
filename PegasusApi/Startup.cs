@@ -44,6 +44,9 @@ namespace PegasusApi
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+            services.AddTransient<IApplicationUserManager<IdentityUser>, ApplicationUserManager<IdentityUser>>();
+            
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<EmailSenderOptions>(Configuration);
 
