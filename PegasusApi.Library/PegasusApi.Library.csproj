@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>2.2.0</Version>
     <Authors>Simon Da Vall</Authors>
     <Company>Hereford Securities Ltd</Company>
   </PropertyGroup>
