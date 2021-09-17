@@ -60,7 +60,7 @@ namespace PegasusApi.Tests
         }
         
         [Test]
-        public void CreateToken_BadCredentials_ReturnsBadRequest()
+        public void CreateToken_BadUsername_ReturnsBadRequest()
         {
             var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
             var sut = tokenController.CreateToken(_badUsername, _password, "password").Result;
@@ -68,6 +68,24 @@ namespace PegasusApi.Tests
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }
         
+        [Test]
+        public void CreateToken_BadPassword_ReturnsBadRequest()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_username, _badPassword, "password").Result;
+
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
+
+        [Test]
+        public void CreateToken_BadCredentials_ReturnsBadRequest()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(_badUsername, _badPassword, "password").Result;
+
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
+
         [Test]
         public void RefreshToken_CorrectCredentials_CreatesToken()
         {
@@ -103,6 +121,14 @@ namespace PegasusApi.Tests
             Assert.AreEqual(_username, tokenObject.Username);
         }
 
+        [Test]
+        public void Create2FaToken_BadCredentials_CreatesToken()
+        {
+            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
+            var sut = tokenController.Create2FaToken(_badUserId).Result;
+
+            Assert.IsInstanceOf<BadRequestResult>(sut);
+        }
         
         private static Mock<IApplicationUserManager<TUser>> MockUserManager<TUser>(TUser user) where TUser : class
         {

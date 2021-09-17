@@ -31,10 +31,9 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateToken(string username, string password, string grantType)
         {
-            var user = await IsValidUsernameAndPassword(username, password);
-            if (user == null)
+            var user = await _userManager.FindByEmailAsync(username);
+            if (user == null || ! await _userManager.CheckPasswordAsync(user, password))
             {
-                //TODO Look into whether I should be returning a message with the bad request response
                 return BadRequest();
             }
 
@@ -69,15 +68,7 @@ namespace PegasusApi.Controllers
             var claims = new List<Claim> {new Claim("amr", "mfa")};
             return new ObjectResult(GenerateToken(user, claims));
         }
-
-        //TODO Change this back to returning a boolean, and change signature to (user, password))
-        //do the find user in the calling code so that this just checks for valid password.
-        private async Task<IdentityUser> IsValidUsernameAndPassword(string username, string password)
-        {
-            var user = await _userManager.FindByEmailAsync(username);
-            var result = await _userManager.CheckPasswordAsync(user, password);
-            return result ? user : null;
-        }
+        
 
         private dynamic GenerateToken(IdentityUser user, ICollection<Claim> claims = null)
         {
