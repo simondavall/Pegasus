@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using PegasusApi.Library.DataAccess;
+using PegasusApi.Library.Models.Manage;
 
-namespace PegasusApi.Library.Models.Manage
+namespace PegasusApi.Library.DataAccess
 {
     public class UsersData : IUsersData
     {
