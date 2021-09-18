@@ -117,8 +117,8 @@ namespace PegasusApi.Controllers
             model.Username = user.UserName;
             model.PhoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            var customData = await _usersData.GetUser(userId);
-            model.DisplayName = customData?.DisplayName;
+            var userModel = await _usersData.GetUser(userId);
+            model.DisplayName = userModel?.DisplayName;
 
             return model;
         }

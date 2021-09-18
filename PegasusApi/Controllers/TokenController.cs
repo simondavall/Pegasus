@@ -16,10 +16,10 @@ namespace PegasusApi.Controllers
     public class TokenController : Controller
     {
         private readonly IApplicationDbContext _context;
-        private readonly IApplicationUserManager<IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-        public TokenController(IApplicationDbContext context, IApplicationUserManager<IdentityUser> userManager, IJwtTokenGenerator jwtTokenGenerator)
+        public TokenController(IApplicationDbContext context, UserManager<IdentityUser> userManager, IJwtTokenGenerator jwtTokenGenerator)
         {
             _context = context;
             _userManager = userManager;
