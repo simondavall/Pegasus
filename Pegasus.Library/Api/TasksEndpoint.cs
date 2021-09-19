@@ -6,11 +6,12 @@ namespace Pegasus.Library.Api
 {
     public interface ITasksEndpoint
     {
-        Task AddTask(TaskModel taskModel);
+        Task<int> AddTask(TaskModel taskModel);
         Task<List<TaskModel>> GetAllTasks();
         Task<List<TaskPriorityModel>> GetAllTaskPriorities();
         Task<List<TaskStatusModel>> GetAllTaskStatuses();
         Task<List<TaskTypeModel>> GetAllTaskTypes();
+        Task<List<TaskModel>> GetSubTasks(int taskId);
         Task<TaskModel> GetTask(int taskId);
         Task<List<TaskModel>> GetTasks(int projectId);
         Task UpdateTask(TaskModel taskModel);
@@ -25,9 +26,9 @@ namespace Pegasus.Library.Api
             _apiHelper = apiHelper;
         }
 
-        public async Task AddTask(TaskModel taskModel)
+        public async Task<int> AddTask(TaskModel taskModel)
         {
-            await _apiHelper.PostAsync(taskModel, "api/Task/AddTask");
+            return await _apiHelper.PostAsync<TaskModel, int>(taskModel, "api/Task/AddTask");
         }
 
         public async Task<List<TaskModel>> GetAllTasks()
@@ -50,6 +51,11 @@ namespace Pegasus.Library.Api
             return await _apiHelper.GetListFromUri<TaskTypeModel>("api/Task/GetAllTaskTypes");
         }
 
+        public async Task<List<TaskModel>> GetSubTasks(int taskId)
+        {
+            return await _apiHelper.GetListFromUri<TaskModel>($"api/Task/GetSubTasks/{taskId}");
+        }
+        
         public async Task<TaskModel> GetTask(int taskId)
         {
             return await _apiHelper.GetFromUri<TaskModel>($"api/Task/GetTask/{taskId}");

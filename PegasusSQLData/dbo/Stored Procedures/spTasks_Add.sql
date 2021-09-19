@@ -7,10 +7,12 @@
 	, @TaskPriorityId int
 	, @FixedInRelease nvarchar(20)
 	, @UserId nvarchar(450)
+	, @ParentTaskId int = NULL
 
 AS
 
 declare @TaskRef nvarchar(20)
+declare @TaskId int = 0
 
 BEGIN TRANSACTION;
 
@@ -29,11 +31,11 @@ BEGIN TRY
 
 -- Insert new project record
 	INSERT INTO [dbo].[ProjectTasks]
-           ([TaskRef], [Name], [Description], [ProjectId], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [UserId], [Created], [Modified])
+           ([TaskRef], [Name], [Description], [ProjectId], [ParentTaskId], [TaskStatusId], [TaskTypeId], [TaskPriorityId], [FixedInRelease], [UserId], [Created], [Modified])
      VALUES
-           (@TaskRef, @Name, @Description, @ProjectId, @TaskStatusId, @TaskTypeId, @TaskPriorityId, @FixedInRelease, @UserId, GETUTCDATE(), GETUTCDATE())
+           (@TaskRef, @Name, @Description, @ProjectId, @ParentTaskId, @TaskStatusId, @TaskTypeId, @TaskPriorityId, @FixedInRelease, @UserId, GETUTCDATE(), GETUTCDATE())
 
-	declare @TaskId int = @@IDENTITY
+	SET @TaskId = @@IDENTITY
 
 -- Insert new entry into status history
 	INSERT INTO [dbo].[StatusHistory]
@@ -45,10 +47,11 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION
-		
+	SET @TaskId = 0
 END CATCH
 
 IF @@TRANCOUNT > 0
 	COMMIT TRANSACTION
 
-RETURN 0
+
+SELECT @TaskId

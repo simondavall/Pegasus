@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pegasus.Entities.Attributes;
+using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -39,14 +41,15 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? id)
         {
             var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
                 ProjectId = projectId,
-                TaskRef = $"{project.ProjectPrefix}-<tbc>"
+                TaskRef = $"{project.ProjectPrefix}-<tbc>",
+                ParentTaskId = id
             };
             var model = await TaskViewModel.Create(new TaskViewModelArgs
             {
@@ -65,15 +68,15 @@ namespace Pegasus.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Description,Name,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
+            [Bind("Description,Name,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask)
         {
             projectTask.Created = projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
                 projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                await _tasksEndpoint.AddTask(projectTask);
-                return RedirectToAction("Index");
+                var taskId = await _tasksEndpoint.AddTask(projectTask);
+                return RedirectToAction("Edit", new { id = taskId});
             }
 
             var model = await TaskViewModel.Create(new TaskViewModelArgs
@@ -91,6 +94,11 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var projectTask = await _tasksEndpoint.GetTask(id);
+            if (projectTask == null)
+            {
+                //todo set a banner message, project task not found
+                return RedirectToAction("Index");
+            }
             _settingsService.ProjectId = projectTask.ProjectId;
             _settingsService.SaveSettings();
 
@@ -111,26 +119,10 @@ namespace Pegasus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             [Bind(
-                "Id,Description,Name,Created,ProjectId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
+                "Id,Description,Name,Created,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask,
             int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskCommentModel> comments)
         {
-            if (ModelState.IsValid)
-            {
-                var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                projectTask.UserId = userId;
-                await _tasksEndpoint.UpdateTask(projectTask);
-                await _commentsEndpoint.UpdateComments(comments);
-                if (!string.IsNullOrWhiteSpace(newComment))
-                    await _commentsEndpoint.AddComment(new TaskCommentModel
-                        {TaskId = projectTask.Id, Comment = newComment, UserId = userId});
-
-                if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)
-                    return RedirectToAction("Index");
-
-                return RedirectToAction("Edit", projectTask.Id);
-            }
-
             var taskViewModelArgs = new TaskViewModelArgs
             {
                 ProjectsEndpoint = _projectsEndpoint,
@@ -141,6 +133,43 @@ namespace Pegasus.Controllers
                 Comments = comments,
                 NewComment = newComment
             };
+            
+            if (ModelState.IsValid)
+            {
+                if ((projectTask.IsClosed()) && await HasIncompleteSubTasks(projectTask.Id))
+                {
+                    // pass error message back to user client
+                    taskViewModelArgs.BannerMessage =
+                        "Update Failed: Cannot complete a task that still has open sub tasks.";
+                }
+                else
+                {
+                    var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    projectTask.UserId = userId;
+                    await _tasksEndpoint.UpdateTask(projectTask);
+                    await _commentsEndpoint.UpdateComments(comments);
+                    if (!string.IsNullOrWhiteSpace(newComment))
+                        await _commentsEndpoint.AddComment(new TaskCommentModel
+                            {TaskId = projectTask.Id, Comment = newComment, UserId = userId});
+
+                    if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)
+                    {
+                        if (projectTask.HasParentTask())
+                        {
+                            // return to the parent task
+                            return RedirectToAction("Edit", new { id = projectTask.ParentTaskId});
+                        }
+                        else
+                        {
+                            // return to the main index page
+                            return RedirectToAction("Index");
+                        }
+                    }
+                    
+                    return RedirectToAction("Edit", projectTask.Id);
+                }
+            }
+
             var model = await TaskViewModel.Create(taskViewModelArgs);
 
             return View(model);
@@ -179,6 +208,12 @@ namespace Pegasus.Controllers
             return View("../TaskList/Index", model);
         }
 
+        private async Task<bool> HasIncompleteSubTasks(int taskId)
+        {
+            var subTasks = await _tasksEndpoint.GetSubTasks(taskId);
+            return subTasks.Any(subTask => !subTask.IsClosed());
+        }
+        
         private int GetPage()
         {
             const int defaultPageNo = 1;

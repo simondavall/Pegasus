@@ -9,10 +9,11 @@ namespace PegasusApi.Library.DataAccess
         Task<TaskModel> GetTask(int id);
         Task<List<TaskModel>> GetTasks(int projectId);
         Task<List<TaskModel>> GetAllTasks();
+        Task<List<TaskModel>> GetSubTasks(int taskId);
         Task<List<TaskPriorityModel>> GetAllTaskPriorities();
         Task<List<TaskStatusModel>> GetAllTaskStatuses();
         Task<List<TaskTypeModel>> GetAllTaskTypes();
-        Task AddTask(TaskModel task);
+        Task<int> AddTask(TaskModel task);
         Task UpdateTask(TaskModel task);
         Task AddTaskStatus(TaskStatusModel taskStatus);
         Task AddTaskType(TaskTypeModel taskType);

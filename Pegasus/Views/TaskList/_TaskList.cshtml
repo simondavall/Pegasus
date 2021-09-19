@@ -1,0 +1,47 @@
+﻿@using Pegasus.Extensions
+@model IEnumerable<Pegasus.Library.Models.TaskModel>
+
+<div class="table-font-sm task-list">
+    <div class="table-responsive">
+
+        <table class="table table-striped table-hover table-narrow-lined">
+            <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="table-row-condensed">
+                            <span class="@task.TaskProfile().TaskRefStyle">
+                                <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="fa-fw">
+                        @if (!string.IsNullOrWhiteSpace(task.PriorityIconClass()))
+                        {
+                            <span><i class="fa fa-bolt @task.PriorityIconClass()"></i></span>
+                        }
+                    </td>
+                    <td>
+                        <div class="table-row-condensed">
+                            <span class="@task.TaskProfile().TaskTextStyle">
+                                <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile().TaskIcon)@task.Name</a>
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-row-condensed">
+                            <div class="@task.TaskProfile().TaskTimeStyle">
+                                <span>
+                                    @task.ModifiedLocal.LapsedTime()
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+    </div>
+</div>

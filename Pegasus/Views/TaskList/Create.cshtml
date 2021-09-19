@@ -10,6 +10,7 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="ProjectTask.ProjectId" />
     <input type="hidden" asp-for="ProjectTask.Id" />
+    <input type="hidden" asp-for="ProjectTask.ParentTaskId"/>
     <input type="hidden" asp-for="ProjectTask.Created" />
     <input type="hidden" asp-for="ExistingTaskStatus" value="@Model.ExistingTaskStatus" />
     <div class="row">
@@ -41,35 +42,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="form-group">
-                <label asp-for="ProjectTask.TaskPriorityId" class="col-md-8 col-form-label"></label>
-                <div class="col-md-8">
-                    @Html.DropDownListFor(m => m.ProjectTask.TaskPriorityId, Model.TaskPriorities, new { @class = "form-control" })
-                    <span asp-validation-for="ProjectTask.TaskPriorityId" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProjectTask.TaskTypeId" class="col-md-8 col-form-label"></label>
-                <div class="col-md-8">
-                    @Html.DropDownListFor(m => m.ProjectTask.TaskTypeId, Model.TaskTypes, new { @class = "form-control" })
-                    <span asp-validation-for="ProjectTask.TaskTypeId" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProjectTask.TaskStatusId" class="col-md-8 col-form-label"></label>
-                <div class="col-md-8">
-                    @Html.DropDownListFor(m => m.ProjectTask.TaskStatusId, Model.TaskStatuses, new { @class = "form-control" })
-                    <span asp-validation-for="ProjectTask.TaskStatusId" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProjectTask.FixedInRelease" class="col-md-8 col-form-label"></label>
-                <div class="col-md-8">
-                    <input asp-for="ProjectTask.FixedInRelease" class="form-control" />
-                    <span asp-validation-for="ProjectTask.FixedInRelease" class="text-danger"></span>
-                </div>
-            </div>
-
+            <partial name="_TaskProperties" model="Model.TaskProperties"/>
         </div>
     </div>
 </form>

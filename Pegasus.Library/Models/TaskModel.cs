@@ -20,9 +20,18 @@ namespace Pegasus.Library.Models
         [DisplayName("Fixed In Release")]
         public string FixedInRelease { get; set; }
         public int ProjectId { get; set; }
+        public int? ParentTaskId { get; set; }
         public string UserId { get; set; }
         public DateTime Modified { get; set; }
+        public DateTime ModifiedLocal
+        {
+            get => Modified.ToLocalTime();
+        }
         public DateTime Created { get; set; }
+        public DateTime CreatedLocal
+        {
+            get => Created.ToLocalTime();
+        }
     }
 
 }

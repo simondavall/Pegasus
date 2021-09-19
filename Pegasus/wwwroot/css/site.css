@@ -104,6 +104,13 @@ html {
     overflow-y: scroll;
 }
 
+.banner-message {
+    background-color: #ffc869;
+    text-align: center;
+    line-height: 2.0rem;
+    margin-bottom: 10px;
+}
+
 .btn-group-xs > .btn, .btn-xs {
     padding: 1px 5px;
     font-size: 12px;
@@ -217,6 +224,10 @@ html {
 /* ReSharper disable once DeclarationIsEmpty */
 .project-list-item, .project-list-form, .task-filter, .taskfilter-list, .project-task-form,
 .navbar-content, .btn-default, .recovery-code {
+}
+
+.project-task-list {
+    min-height: 400px;
 }
 
 a.settings-close {
@@ -371,15 +382,16 @@ a.settings-close i {
     color: #337ab7;
 }
 
-.task-list {
-    min-height: 400px;
-}
-
 .task-list i {
     padding-right: 6px;
 }
 
 .task-time {
     text-align: right;
+}
+
+.task-title {
+    border: 0px;
+    font-size: 1.4rem;
 }
 

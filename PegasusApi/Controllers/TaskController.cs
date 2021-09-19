@@ -21,9 +21,9 @@ namespace PegasusApi.Controllers
 
         [Route("AddTask")]
         [HttpPost]
-        public async Task AddTask(TaskModel task)
+        public async Task<int> AddTask(TaskModel task)
         {
-            await _taskData.AddTask(task);
+            return await _taskData.AddTask(task);
         }
         
         [Authorize(Roles = "Admin")]
@@ -57,6 +57,13 @@ namespace PegasusApi.Controllers
             return await _taskData.GetAllTasks();
         }
 
+        [Route("GetSubTasks/{taskId}")]
+        [HttpGet]
+        public async Task<IEnumerable<TaskModel>> GetSubTasks(int taskId)
+        {
+            return await _taskData.GetSubTasks(taskId);
+        }
+        
         [Route("GetAllTaskPriorities")]
         [HttpGet]
         public async Task<IEnumerable<TaskPriorityModel>> GetAllTaskPriorities()

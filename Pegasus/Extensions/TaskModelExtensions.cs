@@ -26,6 +26,11 @@ namespace Pegasus.Extensions
             return string.Empty;
         }
 
+        public static bool HasParentTask(this TaskModel model)
+        {
+            return model.ParentTaskId != null;
+        }
+        
         public static ITaskProfile TaskProfile(this TaskModel model)
         {
             return TaskProfileResolver.GetTaskProfile((TaskStatusEnum)model.TaskStatusId);

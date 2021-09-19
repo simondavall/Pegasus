@@ -32,11 +32,7 @@ namespace Pegasus
             services.AddSingleton<IApiHelper, ApiHelper>();
             services.AddScoped<ISettingsService, SettingsService>();
 
-
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
-
-            services.AddTransient<IEmailSender, EmailSender>();
-            services.Configure<EmailSenderOptions>(Configuration);
 
             services.AddScoped<ISignInManager, SignInManager>();
 
