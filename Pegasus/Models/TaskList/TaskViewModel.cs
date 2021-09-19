@@ -18,12 +18,18 @@ namespace Pegasus.Models.TaskList
         public ProjectModel Project { get; set; }
         public TaskModel ProjectTask { get; set; }
         public IEnumerable<TaskModel> SubTasks { get; set; }
-        public IEnumerable<SelectListItem> TaskPriorities { get; set; }
-        public IEnumerable<SelectListItem> TaskStatuses { get; set; }
-        public IEnumerable<SelectListItem> TaskTypes { get; set; }
+        public TaskPropertiesViewModel TaskProperties { get; set; }
 
         public static async Task<TaskViewModel> Create(TaskViewModelArgs args)
         {
+            var taskProperties = new TaskPropertiesViewModel()
+            {
+                ProjectTask = args.ProjectTask,
+                TaskPriorities = new SelectList(await args.TasksEndpoint.GetAllTaskPriorities(), "Id", "Name", 1),
+                TaskStatuses = new SelectList(await args.TasksEndpoint.GetAllTaskStatuses(), "Id", "Name", 1),
+                TaskTypes = new SelectList(await args.TasksEndpoint.GetAllTaskTypes(), "Id", "Name", 1)
+            };
+
             var model = new TaskViewModel
             {
                 BannerMessage = args.BannerMessage,
@@ -35,9 +41,7 @@ namespace Pegasus.Models.TaskList
                 ProjectId = args.ProjectTask.ProjectId,
                 ProjectTask = args.ProjectTask,
                 SubTasks = await args.TasksEndpoint.GetSubTasks(args.ProjectTask.Id),
-                TaskPriorities = new SelectList(await args.TasksEndpoint.GetAllTaskPriorities(), "Id", "Name", 1),
-                TaskStatuses = new SelectList(await args.TasksEndpoint.GetAllTaskStatuses(), "Id", "Name", 1),
-                TaskTypes = new SelectList(await args.TasksEndpoint.GetAllTaskTypes(), "Id", "Name", 1)
+                TaskProperties = taskProperties
             };
 
             return model;
