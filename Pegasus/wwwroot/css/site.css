@@ -390,3 +390,8 @@ a.settings-close i {
     text-align: right;
 }
 
+.task-title {
+    border: 0px;
+    font-size: 1.4rem;
+}
+
