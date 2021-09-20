@@ -358,6 +358,7 @@ namespace Pegasus.Controllers
 
         [Route(nameof(TwoFactorAuthentication))]
         [HttpPost]
+        // ReSharper disable once RedundantAssignment
         public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
         {
             await _signInManager.ForgetTwoFactorClientAsync();

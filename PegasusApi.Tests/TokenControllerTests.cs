@@ -35,21 +35,21 @@ namespace PegasusApi.Tests
         [Test]
         public void CreateToken_CorrectCredentials_CreatesToken()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.CreateToken(_username, _password, "password").Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(Username, Password, "password").Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
 
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
-            Assert.AreEqual(_username, tokenObject.Username);
+            Assert.AreEqual(Username, tokenObject.Username);
         }
         
         [Test]
         public void CreateToken_BadUsername_ReturnsBadRequest()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.CreateToken(_badUsername, _password, "password").Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(BadUsername, Password, "password").Result;
 
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }
@@ -57,8 +57,8 @@ namespace PegasusApi.Tests
         [Test]
         public void CreateToken_BadPassword_ReturnsBadRequest()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.CreateToken(_username, _badPassword, "password").Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(Username, BadPassword, "password").Result;
 
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }
@@ -66,8 +66,8 @@ namespace PegasusApi.Tests
         [Test]
         public void CreateToken_BadCredentials_ReturnsBadRequest()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.CreateToken(_badUsername, _badPassword, "password").Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.CreateToken(BadUsername, BadPassword, "password").Result;
 
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }
@@ -75,21 +75,21 @@ namespace PegasusApi.Tests
         [Test]
         public void RefreshToken_CorrectCredentials_CreatesToken()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.RefreshToken(_userId).Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(UserId).Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
 
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
-            Assert.AreEqual(_username, tokenObject.Username);
+            Assert.AreEqual(Username, tokenObject.Username);
         }
         
         [Test]
         public void RefreshToken_BadCredentials_CreatesToken()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.RefreshToken(_badUserId).Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(BadUserId).Result;
 
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }
@@ -97,21 +97,21 @@ namespace PegasusApi.Tests
         [Test]
         public void Create2FaToken_CorrectCredentials_CreatesToken()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.RefreshToken(_userId).Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.RefreshToken(UserId).Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
 
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
-            Assert.AreEqual(_username, tokenObject.Username);
+            Assert.AreEqual(Username, tokenObject.Username);
         }
 
         [Test]
         public void Create2FaToken_BadCredentials_CreatesToken()
         {
-            var tokenController = new TokenController(_applicationDbContext, _userManager, _tokenGenerator);
-            var sut = tokenController.Create2FaToken(_badUserId).Result;
+            var tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator);
+            var sut = tokenController.Create2FaToken(BadUserId).Result;
 
             Assert.IsInstanceOf<BadRequestResult>(sut);
         }

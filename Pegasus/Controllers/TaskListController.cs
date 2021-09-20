@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pegasus.Entities.Attributes;
-using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -121,7 +120,7 @@ namespace Pegasus.Controllers
             [Bind(
                 "Id,Description,Name,Created,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask,
-            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IEnumerable<TaskCommentModel> comments)
+            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IList<TaskCommentModel> comments)
         {
             var taskViewModelArgs = new TaskViewModelArgs
             {

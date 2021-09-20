@@ -2,14 +2,14 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @using Pegasus.Extensions
 @using Pegasus.Services
-@inject ISettingsService Settings
-@inject IHttpContextAccessor HttpAccessor
+@inject ISettingsService _settings
+@inject IHttpContextAccessor _httpAccessor
 
 <div class="sidebar">
     <div class="settings-sidebar">
         @using (Html.BeginForm("SaveSettings", "Settings", FormMethod.Post))
         {
-            var rq = HttpAccessor.HttpContext.Request;
+            var rq = _httpAccessor.HttpContext.Request;
             var currentUrl = UriHelper.BuildRelative(rq.PathBase, rq.Path, rq.QueryString);
 
             @Html.Hidden("returnUrl", currentUrl)
@@ -23,13 +23,13 @@
                     <div class="settings-section">
                         <div class="settings-section-title">PAGINATION SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PaginationEnabled">@Settings.GetDisplayName(nameof(Settings.PaginationEnabled))</label>
-                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@_settings.GetDisplayName(nameof(_settings.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(_settings.PaginationEnabled ? "checked=\"checked\"" : "") />
                             <input type="hidden" value="false" name="PaginationEnabled" />
                         </div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PageSize">@Settings.GetDisplayName(nameof(Settings.PageSize))</label>
-                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@Settings.PageSize">
+                            <label class="settings-label settings-label-font" for="PageSize">@_settings.GetDisplayName(nameof(_settings.PageSize))</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@_settings.PageSize">
                         </div>
                     </div>
 
