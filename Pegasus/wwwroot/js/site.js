@@ -1,6 +1,9 @@
 ﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
+// ReSharper disable UseOfImplicitGlobalInFunctionScope
+// ReSharper disable PossiblyUnassignedProperty
+
 // Write your JavaScript code.
 $(function () {
     var currentSettings = {
@@ -76,7 +79,7 @@ $(function () {
         return false;
     });
 
-    $(".body-content").on('click', ".comment-edit-button", function () {
+    $(".body-content").on("click", ".comment-edit-button", function () {
         $(this).addClass("hide").siblings(".comment-cancel-button").removeClass("hide");
         var editSection = $(this).parents(".comment-edit-section");
         $(editSection).find(".task-comment").addClass("hide");
@@ -85,7 +88,7 @@ $(function () {
             $(this).css("height", "auto").css("height", this.scrollHeight + this.offsetHeight);
         });
     });
-    $(".body-content").on('click', ".comment-cancel-button", function () {
+    $(".body-content").on("click", ".comment-cancel-button", function () {
         $(this).addClass("hide").siblings(".comment-edit-button").removeClass("hide");
         var editSection = $(this).parents(".comment-edit-section");
         var taskComment = $(editSection).find(".task-comment");
@@ -93,7 +96,7 @@ $(function () {
             .find("textarea").val($(taskComment).find("p").html());
     });
 
-    $(".body-content").on('click', ".comment-delete-button", function () {
+    $(".body-content").on("click", ".comment-delete-button", function () {
         var editSection = $(this).parents(".comment-edit-section");
         if (editSection.hasClass("task-comment-deleted")) {
             $(this).siblings("input").val(false);

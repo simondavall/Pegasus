@@ -391,7 +391,7 @@ a.settings-close i {
 }
 
 .task-title {
-    border: 0px;
+    border: 0;
     font-size: 1.4rem;
 }
 
