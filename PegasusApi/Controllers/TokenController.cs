@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using PegasusApi.Data;
 using PegasusApi.Library.JwtAuthentication;
 using PegasusApi.Models;
-using PegasusApi.Services;
 
 
 namespace PegasusApi.Controllers

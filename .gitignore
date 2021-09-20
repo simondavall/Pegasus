@@ -1,5 +1,6 @@
 
 #/.vs
+#/.idea
 #obj
 #bin
 
@@ -358,3 +359,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Pegasus/.config/dotnet-tools.json
+/.idea
