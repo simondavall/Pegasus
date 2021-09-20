@@ -92,36 +92,40 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Remove("Authorization");
         }
 
-        private void InitializeClient(HttpMessageHandler httpMessageHandler)
+        private void InitializeClient()
         {
-            if (httpMessageHandler == null)
+            var apiRoot = _configuration["apiRoot"];
+            var httpClientHandler = new HttpClientHandler
             {
-                var apiRoot = _configuration["apiRoot"];
-                var httpClientHandler = new HttpClientHandler
-                {
-                    // This bypasses the SSL certificate check. Prevents the invalid license error message
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
-                };
+                // This bypasses the SSL certificate check. Prevents the invalid license error message
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
 
-                ApiClient = new HttpClient(httpClientHandler)
-                {
-                    BaseAddress = new Uri(apiRoot)
-                };
-            }
-            else
+            ApiClient = new HttpClient(httpClientHandler)
             {
-                ApiClient = new HttpClient(httpMessageHandler)
-                {
-                    BaseAddress = new Uri( "http://BaseUrl")
-                };
-            }
-            
+                BaseAddress = new Uri(apiRoot)
+            };
 
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var token = _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             AddTokenToHeaders(token.Result);
+        }
+
+        private void InitializeClient(HttpMessageHandler httpMessageHandler)
+        {
+            if (httpMessageHandler == null)
+            {
+                InitializeClient();
+            }
+            else
+            {
+                ApiClient = new HttpClient(httpMessageHandler)
+                {
+                    BaseAddress = new Uri( "http://FakeUrl")
+                };
+            }
         }
     }
 }
