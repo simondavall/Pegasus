@@ -1,64 +1,117 @@
-﻿//using System.Security.Claims;
-//using Microsoft.AspNetCore.Authentication;
-//using Microsoft.AspNetCore.Http;
-//using Moq;
+﻿using System.Net;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Threading;
+using System.Threading.Tasks;
+using Moq;
+using Moq.Protected;
 using NUnit.Framework;
+using Pegasus.Library.Api;
+using Pegasus.Library.JwtAuthentication.Models;
+using Pegasus.Library.Models.Account;
 
 namespace PegasusTests
 {
     public class AuthenticationTests
     {
         [Test]
-        public void CallingAuthenticate()
+        public void Authenticate_WithGoodCredentials_ReturnsAccessToken()
         {
-            Assert.Pass("Need to implement Authentication Testing");
+            var authenticatedUser = new AuthenticatedUser()
+            {
+                Username = "valid_username",
+                UserId = "valid_user_id",
+                AccessToken = "valid_access_token"
+            };
 
-            // Have a look at implementing this https://github.com/richardszalay/mockhttp in order to mock HttpClient.
+            var response = new HttpResponseMessage();
+            response.StatusCode = HttpStatusCode.OK;
+            response.Content = new ObjectContent<AuthenticatedUser>(authenticatedUser, new JsonMediaTypeFormatter());
+            
+            var apiHelper = CreateApiHelper(response);
+            var authenticationEndpoint = new AuthenticationEndpoint(apiHelper);
+            
+            var sut = authenticationEndpoint.Authenticate((UserCredentials)null).Result;
 
-            //var myJsonConfig = "{\"apiRoot\": \"https://pegasus2api.local\" }";
-            //var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
+            Assert.IsNotNull(sut);
+            Assert.AreEqual(authenticatedUser.Username, sut.Username);
+            Assert.IsTrue(sut.Authenticated, "Returned user is not authenticated.");
+            Assert.IsNotNull(sut.AccessToken, "Access token was not returned.");
+        }
+        
+        [Test]
+        public void Authenticate_WithBadCredentials_ReturnsNullAccessToken()
+        {
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
+            var apiHelper = CreateApiHelper(response);
+            var authenticationEndpoint = new AuthenticationEndpoint(apiHelper);
 
-            //var configuration = new ConfigurationBuilder()
-            //   .AddJsonStream(stream)
-            //   .Build();
+            var sut = authenticationEndpoint.Authenticate((UserCredentials)null).Result;
 
-            ////TODO Urgent!! Change this to use a mock authentication rather than real credentials
-            //var apiHelper = new ApiHelper(configuration);
-            //var credentials = new UserCredentials {Username = "simon.davall@gmail.com", Password = "H3r3ford!!"};
-            //var sut = apiHelper.Authenticate(credentials).Result;
+            Assert.IsNotNull(sut);
+            Assert.IsFalse(sut.Authenticated, "Returned user is authenticated.");
+            Assert.IsNull(sut.AccessToken, "Access token was returned.");
+            Assert.AreEqual("Bad Request", sut.FailedReason );
+        }
+        
+        [Test]
+        public void Authenticate_WithGoodUserId_ReturnsAccessToken()
+        {
+            var authenticatedUser = new AuthenticatedUser()
+            {
+                Username = "valid_username",
+                UserId = "valid_user_id",
+                AccessToken = "valid_access_token"
+            };
 
-            //Assert.IsNotNull(sut);
-            //Assert.AreEqual(credentials.Username, sut.Username);
+            var response = new HttpResponseMessage();
+            response.StatusCode = HttpStatusCode.OK;
+            response.Content = new ObjectContent<AuthenticatedUser>(authenticatedUser, new JsonMediaTypeFormatter());
+            
+            var apiHelper = CreateApiHelper(response);
+            var authenticationEndpoint = new AuthenticationEndpoint(apiHelper);
+            
+            var sut = authenticationEndpoint.Authenticate(authenticatedUser.UserId).Result;
+
+            Assert.IsNotNull(sut);
+            Assert.AreEqual(authenticatedUser.Username, sut.Username);
+            Assert.IsTrue(sut.Authenticated, "Returned user is not authenticated.");
+            Assert.IsNotNull(sut.AccessToken, "Access token was not returned.");
+        }
+        
+        [Test]
+        public void AuthenticateWith2fa_WithGoodUserId_ReturnsAccessToken()
+        {
+            var authenticatedUser = new AuthenticatedUser()
+            {
+                Username = "valid_username",
+                UserId = "valid_user_id",
+                AccessToken = "valid_access_token"
+            };
+
+            var response = new HttpResponseMessage();
+            response.StatusCode = HttpStatusCode.OK;
+            response.Content = new ObjectContent<AuthenticatedUser>(authenticatedUser, new JsonMediaTypeFormatter());
+            
+            var apiHelper = CreateApiHelper(response);
+            var authenticationEndpoint = new AuthenticationEndpoint(apiHelper);
+            
+            var sut = authenticationEndpoint.Authenticate2Fa(authenticatedUser.UserId).Result;
+
+            Assert.IsNotNull(sut);
+            Assert.AreEqual(authenticatedUser.Username, sut.Username);
+            Assert.IsTrue(sut.Authenticated, "Returned user is not authenticated.");
+            Assert.IsNotNull(sut.AccessToken, "Access token was not returned.");
         }
 
-
-        ///// <summary>
-        ///// Need this to mock the GetTokenAsync function which returns the access token.
-        ///// </summary>
-        ///// <param name="httpContextAccessorMock"></param>
-        ///// <param name="tokenName"></param>
-        ///// <param name="tokenValue"></param>
-        ///// <param name="scheme"></param>
-        //private void MockHttpContextGetToken(
-        //    Mock<IHttpContextAccessor> httpContextAccessorMock,
-        //    string tokenName, string tokenValue, string scheme = null)
-        //{
-        //    var authenticationServiceMock = new Mock<IAuthenticationService>();
-        //    httpContextAccessorMock
-        //        .Setup(x => x.HttpContext.RequestServices.GetService(typeof(IAuthenticationService)))
-        //        .Returns(authenticationServiceMock.Object);
-
-        //    var authResult = AuthenticateResult.Success(
-        //        new AuthenticationTicket(new ClaimsPrincipal(), scheme));
-
-        //    authResult.Properties.StoreTokens(new[]
-        //    {
-        //        new AuthenticationToken { Name = tokenName, Value = tokenValue }
-        //    });
-
-        //    authenticationServiceMock
-        //        .Setup(x => x.AuthenticateAsync(httpContextAccessorMock.Object.HttpContext, scheme))
-        //        .ReturnsAsync(authResult);
-        //}
+        private ApiHelper CreateApiHelper(HttpResponseMessage response)
+        {
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var apiHelper = new ApiHelper(null, null, mockHttpMessageHandler.Object);
+            return apiHelper;
+        }
     }
 }
