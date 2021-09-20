@@ -26,11 +26,11 @@ namespace Pegasus.Library.Api
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, HttpMessageHandler messageHandler = null)
         {
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
-            InitializeClient();
+            InitializeClient(messageHandler);
         }
 
         public HttpClient ApiClient { get; private set; }
@@ -92,19 +92,30 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Remove("Authorization");
         }
 
-        private void InitializeClient()
+        private void InitializeClient(HttpMessageHandler httpMessageHandler)
         {
-            var apiRoot = _configuration["apiRoot"];
-            var httpClientHandler = new HttpClientHandler
+            if (httpMessageHandler == null)
             {
-                // This bypasses the SSL certificate check. Prevents the invalid license error message
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
-            };
+                var apiRoot = _configuration["apiRoot"];
+                var httpClientHandler = new HttpClientHandler
+                {
+                    // This bypasses the SSL certificate check. Prevents the invalid license error message
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                };
 
-            ApiClient = new HttpClient(httpClientHandler)
+                ApiClient = new HttpClient(httpClientHandler)
+                {
+                    BaseAddress = new Uri(apiRoot)
+                };
+            }
+            else
             {
-                BaseAddress = new Uri(apiRoot)
-            };
+                ApiClient = new HttpClient(httpMessageHandler)
+                {
+                    BaseAddress = new Uri( "http://BaseUrl")
+                };
+            }
+            
 
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
