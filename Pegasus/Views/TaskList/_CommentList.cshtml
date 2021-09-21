@@ -2,30 +2,37 @@
 @model IList<Pegasus.Library.Models.TaskCommentModel>
 
 <div id="taskCommentList" class="form-group">
-            @for (var i = 0; i < Model.Count; i++)
-            {
-                <div class="comment-edit-section col-md-8">
-                    <input type="hidden" asp-for="@Model[i].Id" />
-                    <input type="hidden" asp-for="@Model[i].TaskId" />
-                    <input type="hidden" asp-for="@Model[i].Created"/>
-                    <input type="hidden" asp-for="@Model[i].DisplayName"/>
-                    <div class="comment-edit-buttons pull-right btn-group-xs">
-                        <a class="btn btn-xs comment-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit comment"></i></a>
-                        <a class="btn btn-xs comment-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
-                        <input type="hidden" asp-for="@Model[i].IsDeleted"/>
-                        <a class="btn btn-xs comment-delete-button"><i class="fa fa-trash" data-toggle="tooltip" title="Delete comment"></i></a>
-                    </div>
-                    <div class="task-comment-date">
-                        <span>@Model[i].Created.ToString("dd MMM yy, HH:mm")</span>
-                        <span>by @Model[i].DisplayName</span>
-                    </div>
-                    <div class="task-comment">
-                        <p>@Html.Raw(Model[i].Comment.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
-                    </div>
-                    <div class="comment-task-edit hide">
-                        <textarea data-autoresize rows="1" asp-for="@Model[i].Comment" class="comment-task-text form-control form-no-max-control"></textarea>
-                        <span asp-validation-for="@Model[i].Comment" class="text-danger"></span>
-                    </div>
+    @if (@Model.Count > 0)
+    {
+        <div class="col-md-2 col-form-label">
+            <span>Comments</span>
+        </div>
+
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <div class="comment-edit-section col-md-8">
+                <input type="hidden" asp-for="@Model[i].Id"/>
+                <input type="hidden" asp-for="@Model[i].TaskId"/>
+                <input type="hidden" asp-for="@Model[i].Created"/>
+                <input type="hidden" asp-for="@Model[i].DisplayName"/>
+                <div class="comment-edit-buttons pull-right btn-group-xs">
+                    <a class="btn btn-xs comment-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit comment"></i></a>
+                    <a class="btn btn-xs comment-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
+                    <input type="hidden" asp-for="@Model[i].IsDeleted"/>
+                    <a class="btn btn-xs comment-delete-button"><i class="fa fa-trash" data-toggle="tooltip" title="Delete comment"></i></a>
                 </div>
-            }
+                <div class="task-comment-date">
+                    <span>@Model[i].Created.ToString("dd MMM yy, HH:mm")</span>
+                    <span>by @Model[i].DisplayName</span>
+                </div>
+                <div class="task-comment">
+                    <p>@Html.Raw(Model[i].Comment.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
+                </div>
+                <div class="comment-task-edit hide">
+                    <textarea data-autoresize rows="1" asp-for="@Model[i].Comment" class="comment-task-text form-control form-no-max-control"></textarea>
+                    <span asp-validation-for="@Model[i].Comment" class="text-danger"></span>
+                </div>
+            </div>
+        }
+    }
 </div>

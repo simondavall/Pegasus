@@ -349,8 +349,21 @@ a.settings-close i {
     background-color: rgba(0,0,0,.03);
 }
 
+.task-description {
+    font-size: 0.9rem;
+    padding-left: 12px;
+}
+
+/* ReSharper disable once DeclarationIsEmpty */
+.task-description-cancel-button,
+.task-description-edit
+.task-description-edit-button,
+.task-description-section
+.task-description-text {
+}
+
 .task-comment {
-    font-size: 11px;
+    font-size: 0.8rem;
     padding-left: 12px;
 }
 

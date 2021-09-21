@@ -61,6 +61,14 @@ namespace PegasusTests.ExtensionTests
             Assert.AreEqual("Lorem ipsum dolor sit amet, consectetur <a href=\"https://localhost:5002/TaskList/Edit/14027\">localhost:5002/TaskList/Edit/14027</a> adipiscing elit. Nunc consectetur elementum interdum.", sut);
         }
 
+        [Test]
+        public void Linkify_StringIsNull_ReturnsNull()
+        {
+            string originalText = null;
+            var sut = originalText.Linkify();
+
+            Assert.IsNull(sut);
+        }
 
     }
 }

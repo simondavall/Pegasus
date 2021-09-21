@@ -112,6 +112,24 @@ $(function () {
         }
     });
 
+    $(".body-content").on("click", ".task-description-edit-button", function () {
+        $(this).addClass("hide").siblings(".task-description-cancel-button").removeClass("hide");
+        var editSection = $(this).parents(".task-description-section");
+        $(editSection).find(".task-description").addClass("hide");
+        $(editSection).find(".task-description-edit").removeClass("hide");
+        //$(".task-description-text").each(function () {
+        //    $(this).css("height", "auto").css("height", this.scrollHeight + this.offsetHeight);
+        //});
+    });
+
+    $(".body-content").on("click", ".task-description-cancel-button", function () {
+        $(this).addClass("hide").siblings(".task-description-edit-button").removeClass("hide");
+        var editSection = $(this).parents(".task-description-section");
+        var taskComment = $(editSection).find(".task-description");
+        $(taskComment).removeClass("hide").siblings(".task-description-edit").addClass("hide")
+            //.find("textarea").val($(taskComment).find("p").html());
+    });
+
     var toggleSettingsSidebar = function () {
         if ($(".settings-sidebar").hasClass("on")) {
             $(".settings-sidebar").removeClass("on");
