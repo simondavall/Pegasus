@@ -35,6 +35,7 @@
             </div>
         </div>
         <div class="form-group task-description-section">
+            <input id="rollbackDescription" type="hidden" value="@Model.ProjectTask?.Description"/>
             <label asp-for="ProjectTask.Description" class="col-md-2 col-form-label"></label>
             <span class="comment-edit-buttons btn-group-xs">
                 <a class="btn btn-xs task-description-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit description"></i></a>
