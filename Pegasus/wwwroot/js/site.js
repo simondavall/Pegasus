@@ -92,8 +92,9 @@ $(function () {
         $(this).addClass("hide").siblings(".comment-edit-button").removeClass("hide");
         var editSection = $(this).parents(".comment-edit-section");
         var taskComment = $(editSection).find(".task-comment");
+        var taskRollback = $(editSection).find("#rollbackComment");
         $(taskComment).removeClass("hide").siblings(".comment-task-edit").addClass("hide")
-            .find("textarea").val($(taskComment).find("p").html());
+            .find("textarea").val($(taskRollback).val());
     });
 
     $(".body-content").on("click", ".comment-delete-button", function () {
@@ -110,6 +111,25 @@ $(function () {
             $(editSection).find(".task-comment-date").addClass("task-comment-deleted");
             $(editSection).addClass("task-comment-deleted");
         }
+    });
+
+    $(".body-content").on("click", ".task-description-edit-button", function () {
+        $(this).addClass("hide").siblings(".task-description-cancel-button").removeClass("hide");
+        var editSection = $(this).parents(".task-description-section");
+        $(editSection).find(".task-description").addClass("hide");
+        $(editSection).find(".task-description-edit").removeClass("hide");
+        $(".task-description-text").each(function () {
+            $(this).css("height", "auto").css("height", this.scrollHeight + this.offsetHeight);
+        });
+    });
+
+    $(".body-content").on("click", ".task-description-cancel-button", function () {
+        $(this).addClass("hide").siblings(".task-description-edit-button").removeClass("hide");
+        var editSection = $(this).parents(".task-description-section");
+        var taskDescription = $(editSection).find(".task-description");
+        var rollbackDescription = $(editSection).find("#rollbackDescription");
+        $(taskDescription).removeClass("hide").siblings(".task-description-edit").addClass("hide")
+            .find("textarea").val($(rollbackDescription).val());
     });
 
     var toggleSettingsSidebar = function () {
@@ -130,5 +150,4 @@ $(function () {
         toggleSettingsSidebar();
         return false;
     });
-
 })

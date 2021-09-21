@@ -34,15 +34,29 @@
                 <span asp-validation-for="ProjectTask.Name" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group task-description-section">
+            <input id="rollbackDescription" type="hidden" value="@Model.ProjectTask?.Description"/>
             <label asp-for="ProjectTask.Description" class="col-md-2 col-form-label"></label>
+            <span class="comment-edit-buttons btn-group-xs">
+                <a class="btn btn-xs task-description-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit description"></i></a>
+                <a class="btn btn-xs task-description-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
+            </span>
             <div class="col-md-12">
-                <textarea rows="5" asp-for="ProjectTask.Description" class="form-control form-no-max-control"></textarea>
-                <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
+                <div class="task-description">
+                    @if (Model.ProjectTask?.Description != null)
+                    {
+                        <p>@Html.Raw(Model.ProjectTask.Description.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
+                    }
+                </div>
+                <div class="task-description-edit hide">
+                    <textarea rows="5" asp-for="ProjectTask.Description" class="task-description-text form-control form-no-max-control"></textarea>
+                    <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
+                </div>
             </div>
         </div>
+        
+        <partial name="_CommentList" model="Model.Comments.OrderByDescending(x => x.Created).ToList()"/>
 
-        <partial name="_CommentList" model="Model.Comments.ToList()" />
         <div class="form-group">
             <label asp-for="@Model.NewComment" class="col-md-4 col-form-label"></label>
             <div class="col-md-8">

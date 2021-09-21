@@ -4,19 +4,21 @@ namespace Pegasus.Extensions
 {
     public static class DateTimeExtensions
     {
-        public static string ToTaskDate(this DateTime value)
+        public static string FormattedDate(this DateTime value, string format = null)
         {
-            if (DateTime.Today == value.Date)
+            if (string.IsNullOrEmpty(format))
             {
-                return value.ToString("t");
+                return value.ToLocalTime().ToString("dd MMM yy, HH:mm");
             }
-            return value.ToString("MMM dd");
+            else
+            {
+                return value.ToLocalTime().ToString(format);
+            }
         }
-
         public static string LapsedTime(this DateTime value)
         {
             var timeNow = DateTime.Now.ToUniversalTime();
-            var lapsedTime = timeNow - value.ToUniversalTime();
+            var lapsedTime = timeNow - value.ToLocalTime().ToUniversalTime();
 
             if (lapsedTime < timeNow - timeNow.AddMinutes(-1))
             {
@@ -41,6 +43,16 @@ namespace Pegasus.Extensions
 
             return FormatLapsedTime(lapsedTime.ApproxYears(), "yr");
         }
+
+        public static string ToTaskDate(this DateTime value)
+        {
+            if (DateTime.Today == value.Date.ToLocalTime())
+            {
+                return value.ToString("t");
+            }
+            return value.ToString("MMM dd");
+        }
+
 
         private static string FormatLapsedTime(int lapsedTime, string timeUnit)
         {
