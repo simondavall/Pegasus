@@ -130,17 +130,4 @@ $(function () {
         toggleSettingsSidebar();
         return false;
     });
-
-    var itemsToLinkify = $(".linkify");
-    $(function () {
-        var html = linkify(itemsToLinkify.val());
-        itemsToLinkify.val(html);
-    });
-
-    function linkify(text) {
-        var urlRegex =/([^>|!\("'\)])(\b(https?|ftp|file):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))(?!<\/\s?a>)/ig;
-        return text.replace(urlRegex, function(url, grp1, grp2, grp3, grp4) {
-            return '<a href="' + grp2 + '">' + grp4 + "</a>";
-        });
-    }
 })

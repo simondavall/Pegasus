@@ -1,4 +1,5 @@
-﻿@model IList<Pegasus.Library.Models.TaskCommentModel>
+﻿@using Pegasus.Extensions
+@model IList<Pegasus.Library.Models.TaskCommentModel>
 
 <div id="taskCommentList" class="form-group">
             @for (var i = 0; i < Model.Count; i++)
@@ -19,7 +20,7 @@
                         <span>by @Model[i].DisplayName</span>
                     </div>
                     <div class="task-comment">
-                        <p>@Html.Raw(Model[i].Comment.Replace(Environment.NewLine, "<br/>"))</p>
+                        <p>@Html.Raw(Model[i].Comment.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
                     </div>
                     <div class="comment-task-edit hide">
                         <textarea data-autoresize rows="1" asp-for="@Model[i].Comment" class="comment-task-text form-control form-no-max-control"></textarea>
