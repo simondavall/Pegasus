@@ -92,8 +92,9 @@ $(function () {
         $(this).addClass("hide").siblings(".comment-edit-button").removeClass("hide");
         var editSection = $(this).parents(".comment-edit-section");
         var taskComment = $(editSection).find(".task-comment");
+        var taskRollback = $(editSection).find("#rollbackComment");
         $(taskComment).removeClass("hide").siblings(".comment-task-edit").addClass("hide")
-            .find("textarea").val($(taskComment).find("p").html());
+            .find("textarea").val($(taskRollback).val());
     });
 
     $(".body-content").on("click", ".comment-delete-button", function () {

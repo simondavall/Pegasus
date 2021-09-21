@@ -54,7 +54,7 @@
             </div>
         </div>
         
-        <partial name="_CommentList" model="Model.Comments.ToList()"/>
+        <partial name="_CommentList" model="Model.Comments.OrderByDescending(x => x.Created).ToList()"/>
 
         <div class="form-group">
             <label asp-for="@Model.NewComment" class="col-md-4 col-form-label"></label>
