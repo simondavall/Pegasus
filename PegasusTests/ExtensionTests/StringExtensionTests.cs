@@ -65,6 +65,7 @@ namespace PegasusTests.ExtensionTests
         public void Linkify_StringIsNull_ReturnsNull()
         {
             string originalText = null;
+            // ReSharper disable once ExpressionIsAlwaysNull
             var sut = originalText.Linkify();
 
             Assert.IsNull(sut);
