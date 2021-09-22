@@ -30,7 +30,7 @@ namespace Pegasus.Library.Api
 
         public async Task DeleteProject(int id)
         {
-            using (var response = await _apiHelper.ApiClient.DeleteAsync($"api/Project/DeleteProject/{id}"))
+            using (var response = await _apiHelper.ApiClient.PostAsync($"api/Project/DeleteProject/{id}", null))
             {
                 if (!response.IsSuccessStatusCode)
                 {
