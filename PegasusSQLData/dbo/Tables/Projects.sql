@@ -4,5 +4,6 @@
     [Name]          NVARCHAR(50) NULL, 
     [ProjectPrefix] NVARCHAR(20) NULL, 
     [IsPinned] BIT NOT NULL DEFAULT 0, 
-    [IsActive] BIT NOT NULL DEFAULT 1
+    [IsActive] BIT NOT NULL DEFAULT 1, 
+    [IsDeleted] BIT NOT NULL DEFAULT 0
 )
