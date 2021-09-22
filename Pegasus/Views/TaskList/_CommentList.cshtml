@@ -1,11 +1,12 @@
 ﻿@using Pegasus.Services
 @using Pegasus.Extensions
+@using Pegasus.Entities.Enumerations
 @model IEnumerable<Pegasus.Library.Models.TaskCommentModel>
 @inject ISettingsService _settings
 
 <div id="taskCommentList" class="form-group">
     @{
-        var comments = _settings.CommentSortOrder == 0 ? Model.ToList() : Model.OrderByDescending(x => x.Created).ToList();
+        var comments = _settings.CommentSortOrder == (int)CommentSortOrderEnum.DateAscending ? Model.ToList() : Model.OrderByDescending(x => x.Created).ToList();
     }
     
     @if (comments.Count > 0)
