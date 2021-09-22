@@ -3,7 +3,7 @@
 AS
 	SET NOCOUNT ON
 
-	SELECT [Id], [Name], [ProjectPrefix]
+	SELECT [Id], [Name], [ProjectPrefix], [IsPinned], [IsActive]
 	FROM [dbo].[Projects]
 	WHERE [Id] = @id
 RETURN 0
