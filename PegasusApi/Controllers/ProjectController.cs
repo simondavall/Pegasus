@@ -29,7 +29,7 @@ namespace PegasusApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [Route("DeleteProject/{id}")]
-        [HttpDelete]
+        [HttpPost]
         public async Task DeleteProject(int id)
         {
             await _projectsData.DeleteProject(id);
