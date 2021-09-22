@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Extensions
+@using Pegasus.Entities.Enumerations
 @using Pegasus.Extensions
 @using Pegasus.Services
 @inject ISettingsService _settings
@@ -35,10 +36,11 @@
 
                     <!-- Placeholder Setting-->
                     <div class="settings-section">
-                        <div class="settings-section-title">DEVICE SETTINGS</div>
+                        <div class="settings-section-title">PAGE SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="SettingsModel_ScreenSize">Screen Size</label>
-                            <input class="settings-input-text" type="number" id="SettingsModel_ScreenSize" name="SettingsModel.ScreenSize" value="0">
+                            <label class="settings-label settings-label-font" for="CommentSortOrder">@_settings.GetDisplayName(nameof(_settings.CommentSortOrder))</label>
+                            <select asp-for="@_settings.CommentSortOrder" id="CommentSortOrder" name="CommentSortOrder" asp-items="@Html.GetEnumSelectList<CommentSortOrderEnum>()">
+                            </select>
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_FullWidth">Full Width</label>

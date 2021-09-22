@@ -4,6 +4,8 @@ namespace Pegasus.Services.Models
 {
     public class SettingsModel
     {
+        [DisplayName("Comment Order")] 
+        public int CommentSortOrder { get; set; }
         public int CookieExpiryDays { get; set; }
         [DisplayName("Page Size")]
         public int PageSize { get; set; }

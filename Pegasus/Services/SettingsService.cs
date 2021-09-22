@@ -30,6 +30,23 @@ namespace Pegasus.Services
             InitializeSettings();
         }
 
+        public T GetSetting<T>(string settingName)
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            var property = GetProperty<T>(settingName);
+            var currentValue = property.GetValue(this);
+
+            var qsValue = request.Query[settingName].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(qsValue))
+            {
+                currentValue = Convert.ChangeType(qsValue, property.PropertyType);
+                property.SetValue(this, currentValue);
+                SaveSettings();
+            }
+
+            return (T)currentValue;
+        }
+
         public void SaveSettings()
         {
             var propertyValues = new Dictionary<string, object>();
@@ -40,7 +57,7 @@ namespace Pegasus.Services
                 propertyValues.Add(property.Name, value);
             }
 
-            var cookieData =  JsonSerializer.Serialize(propertyValues);
+            var cookieData = JsonSerializer.Serialize(propertyValues);
             _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, CookieExpiryDays);
         }
 
@@ -66,23 +83,6 @@ namespace Pegasus.Services
                     property.SetValue(this, convertedValue);
                 }
             }
-        }
-
-        public T GetSetting<T>(string settingName)
-        {
-            var request = _httpContextAccessor.HttpContext.Request; 
-            var property = GetProperty<T>(settingName);
-            var currentValue = property.GetValue(this);
-
-            var qsValue = request.Query[settingName].FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(qsValue))
-            {
-                currentValue = Convert.ChangeType(qsValue, property.PropertyType);
-                property.SetValue(this, currentValue);
-                SaveSettings();
-            }
-
-            return (T)currentValue;
         }
 
         private PropertyInfo GetProperty<T>(string settingName)

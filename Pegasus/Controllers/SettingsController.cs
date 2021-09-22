@@ -20,8 +20,9 @@ namespace Pegasus.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveSettings([Bind("PageSize,PaginationEnabled")] SettingsService settings, string returnUrl)
+        public IActionResult SaveSettings([Bind("PageSize,PaginationEnabled,CommentSortOrder")] SettingsService settings, string returnUrl)
         {
+            _settings.CommentSortOrder = settings.CommentSortOrder;
             _settings.PageSize = settings.PageSize;
             _settings.PaginationEnabled = settings.PaginationEnabled;
             _settings.SaveSettings();
