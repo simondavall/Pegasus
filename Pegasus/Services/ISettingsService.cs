@@ -2,6 +2,7 @@
 {
     public interface ISettingsService
     {
+        public int CommentSortOrder { get; set; }
         public int CookieExpiryDays { get; set; }
         int PageSize { get; set; }
         bool PaginationEnabled { get; set; }
