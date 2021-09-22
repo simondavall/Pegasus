@@ -150,4 +150,9 @@ $(function () {
         toggleSettingsSidebar();
         return false;
     });
+    
+    // set height of project task title
+    $(function () {
+        $(".task-title").css("height", "auto").css("height", $(".task-title")[0].scrollHeight.toString() + "px");
+    });
 })
