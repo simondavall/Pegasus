@@ -211,6 +211,10 @@ html {
     color: lightgrey;
 }
 
+.project-flex {
+    flex-direction: column;
+}
+
 .project-list {
     font-size: 0.90rem;
     font-weight: 100;
