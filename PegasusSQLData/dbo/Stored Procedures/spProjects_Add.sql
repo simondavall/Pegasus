@@ -1,13 +1,17 @@
 ﻿CREATE PROCEDURE [dbo].[spProjects_Add]
 	@Name nvarchar(50)
 	, @ProjectPrefix nvarchar(20)
+    , @IsPinned bit = 0
+    , @IsActive bit = 1
 AS
 -- Insert new project record
 	INSERT INTO [dbo].[Projects]
            ([Name]
-           ,[ProjectPrefix])
+           ,[ProjectPrefix]
+           ,[IsPinned]
+           ,[IsActive])
      VALUES
-           (@Name, @ProjectPrefix);
+           (@Name, @ProjectPrefix, @IsPinned, @IsActive);
 
 declare @ProjectId int = @@IDENTITY;
 

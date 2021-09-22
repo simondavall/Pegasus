@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +77,7 @@ namespace Pegasus.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ProjectPrefix")] ProjectModel project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ProjectPrefix,IsPinned,IsActive")] ProjectModel project)
         {
             if (id != project.Id) return NotFound();
 
@@ -103,7 +104,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Index()
         {
             var projects = await _projectsEndpoint.GetAllProjects();
-            return View(projects);
+            return View(projects.OrderBy(x => x.Name));
         }
 
         private async Task<bool> ProjectExists(int id)
