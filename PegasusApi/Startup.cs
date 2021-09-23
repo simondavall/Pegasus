@@ -12,6 +12,7 @@ using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.JwtAuthentication.Extensions;
 using PegasusApi.Models;
 using PegasusApi.Services;
+using Serilog;
 
 
 namespace PegasusApi
@@ -76,6 +77,8 @@ namespace PegasusApi
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSerilogRequestLogging();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
