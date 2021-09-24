@@ -77,6 +77,8 @@ namespace PegasusApi
             app.UseAuthentication();
             app.UseAuthorization();
 
+            //app.UseSerilogRequestLogging();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
