@@ -384,6 +384,7 @@ namespace Pegasus.Controllers
             if (model.Errors == null || !model.Errors.Any()) return false;
             foreach (var error in model.Errors)
             {
+                _logger.LogError("Error processing userId {UserId}: {Error}", model.UserId, error);
                 ModelState.AddModelError(string.Empty, error.Description);
             }
 
