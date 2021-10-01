@@ -5,6 +5,7 @@
         public bool AnalyticsCookieEnabled { get; set; }
         public int CommentSortOrder { get; set; }
         public int CookieExpiryDays { get; set; }
+        public bool CookiePolicyAccepted { get; set; }
         public bool MarketingCookieEnabled { get; set; }
         int PageSize { get; set; }
         bool PaginationEnabled { get; set; }

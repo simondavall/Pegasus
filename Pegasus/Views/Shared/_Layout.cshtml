@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@using Pegasus.Services
+@using Pegasus.Services.Models
+@inject ISettingsService _settingsService
+@{
+    var cookiePolicyModel = new CookiePolicyModel()
+    {
+        AnalyticsCookieEnabled = _settingsService.AnalyticsCookieEnabled,
+        MarketingCookieEnabled = _settingsService.MarketingCookieEnabled,
+        CookiePolicyAccepted = _settingsService.CookiePolicyAccepted
+    };
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -49,6 +60,7 @@
         </nav>
     </header>
     <partial name="../Settings/Index"/>
+    <partial name="_CookiePolicy" model="@cookiePolicyModel"/>
     <div class="container body-content">
         @RenderBody()
         <hr/>

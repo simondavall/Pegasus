@@ -137,6 +137,97 @@ html {
     }
 }
 
+#cp-modalCookiePolicy {
+    margin-top: 10px;
+    margin: 0;
+    max-width: none;
+    display: block;
+    flex-direction: initial;
+    width: 100%;
+    box-sizing: content-box;
+    font-size: 16px;
+    color: black;
+}
+
+    #cp-modalCookiePolicy .privacy-notice-link {
+        color: black;
+        text-decoration: underline;
+    }
+
+    #cp-modalCookiePolicy .privacy-notice-link:hover {
+        text-decoration: none;
+
+    }
+
+    #cp-modalCookiePolicy button {
+        max-width: 394px;
+        padding: 12px 30px;
+        line-height: 1;
+        word-break: break-word;
+        word-wrap: break-word;
+        white-space: normal;
+        font-weight: bold;
+        height: auto;
+    }
+
+#cp-accept-recommended-btn-handler {
+    margin-right: 10px;
+    margin-bottom: 25px;
+    outline-offset: -1px;
+    float: right !important;
+    font-weight: normal !important;
+    letter-spacing: 0.1rem !important;
+    text-transform: uppercase !important;
+    border: 1px solid transparent !important;
+    border-radius: 2px !important;
+    vertical-align: middle !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: transparent !important;
+    font-family: "Neue Helvetica VFDP Cond",helvetica,sans-serif !important;
+    font-size: 14px !important;
+    padding: 10px 30px !important;
+    min-width: 200px !important;
+}
+
+#cp-category-title {
+    float: left;
+    padding-bottom: 10px;
+    font-size: 1em;
+    width: 100%;
+    font-weight: bold;
+    font-size: 2rem;
+    color: #2a2a2a;
+    letter-spacing: .03em;
+    line-height: 1;
+    font-weight: 500;
+    font-family: "Neue Helvetica VFDP Cond", helvetica, sans-serif;
+    text-transform: uppercase;
+    text-rendering: optimizeLegibility;
+    margin: 20px 0 10px !important;
+}
+
+
+
+#cp-desc {
+    clear: both;
+    width: 100%;
+    font-size: .812em;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+#cp-title {
+    float: left;
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 100%;
+    font-weight: bold;
+    color: dimgray;
+}
+
 /* ReSharper disable once DeclarationIsEmpty */
 .comment-cancel-button,
 .comment-delete-button,

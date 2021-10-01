@@ -171,4 +171,65 @@ $(function () {
     $(function () {
         $(".task-title").css("height", "auto").css("height", $(".task-title")[0].scrollHeight.toString() + "px");
     });
+
+    $(window).on("load", function() {
+        $("#cp-modalCookiePolicy").modal("show");
+    });
+
+    $(function() {
+        var allowAllCookiesButton = $("#cp-accept-recommended-btn-handler").click(onAllowAllButtonClick);
+
+        function onAllowAllButtonClick() {
+
+            var url = "CookiePolicy/SaveSelected";
+            var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
+            alert(antiForgeryToken);
+            event.preventDefault();
+            var data = {
+                __RequestVerificationToken: antiForgeryToken,
+                CookiePolicyAccepted: true,
+                MarketingCookieEnabled: true,
+                AnalyticsCookieEnabled: true
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                success : function() {
+                    alert("Success");
+                    location.href = document.referrer;
+                }
+            });
+        }
+    });
+
+    $(function() {
+
+        var allowAllCookiesButton = $("#cp-selection-btn-handler").click(onSelectionButtonClick);
+
+        function onSelectionButtonClick() {
+
+            var url = "CookiePolicy/SaveSelected";
+            var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
+            alert(antiForgeryToken);
+            event.preventDefault();
+            //todo change the hard coded settings in this function
+            var data = {
+                __RequestVerificationToken: antiForgeryToken,
+                CookiePolicyAccepted: true,
+                MarketingCookieEnabled: false,
+                AnalyticsCookieEnabled: true
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                success : function() {
+                    location.href = document.referrer;
+                }
+            });
+        }
+    });
 })

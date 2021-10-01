@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using PegasusApi.Controllers;
 using PegasusApi.Library.DataAccess;
@@ -9,8 +11,6 @@ namespace PegasusApi.Tests
     public class ManageControllerTests : BaseControllerTest
     {
         private IUsersData _usersData;
-        //private UrlEncoder _urlEncoder;
-        //private IConfiguration _configuration;
         private static UserModel _userModel;
 
         [OneTimeSetUp]
@@ -31,7 +31,7 @@ namespace PegasusApi.Tests
         [Test]
         public void GetUserDetails_ValidUserId_ReturnsDetails()
         {
-            var manageController = new ManageController(UserManager, _usersData, null, null);
+            var manageController = new ManageController(UserManager, _usersData, null, null, null);
             var sut = manageController.GetUserDetails(UserId).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
@@ -44,7 +44,9 @@ namespace PegasusApi.Tests
         [Test]
         public void GetUserDetails_InvalidUserId_EmptyInstanceWithOneErrorCount()
         {
-            var manageController = new ManageController(UserManager, _usersData, null, null);
+            var mockLogger = MockLogger<ManageController>();
+
+            var manageController = new ManageController(UserManager, _usersData, null, null, mockLogger);
             var sut = manageController.GetUserDetails(BadUserId).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
@@ -67,7 +69,7 @@ namespace PegasusApi.Tests
                 PhoneNumber = PhoneNumber
             };
 
-            var manageController = new ManageController(UserManager, _usersData, null, null);
+            var manageController = new ManageController(UserManager, _usersData, null, null, null);
             var sut = manageController.SetUserDetails(userDetailsModel).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
@@ -88,8 +90,9 @@ namespace PegasusApi.Tests
                 Username = Username,
                 PhoneNumber = BadPhoneNumber
             };
+            var mockLogger = MockLogger<ManageController>();
 
-            var manageController = new ManageController(UserManager, _usersData, null, null);
+            var manageController = new ManageController(UserManager, _usersData, null, null, mockLogger);
             var sut = manageController.SetUserDetails(userDetailsModel).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
@@ -112,6 +115,26 @@ namespace PegasusApi.Tests
             usersData.Setup(x => x.GetUser(BadUserId)).ReturnsAsync((UserModel) null);
 
             return usersData;
+        }
+
+        private static ILogger<T> MockLogger<T>()
+        {
+            var mockLogger = new Mock<ILogger<T>>();
+            mockLogger.Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+            //loggerMock.Verify(
+            //    x => x.Log(
+            //        It.IsAny<LogLevel>(),
+            //        It.IsAny<EventId>(),
+            //        It.Is<It.IsAnyType>((v, t) => true),
+            //        It.IsAny<Exception>(),
+            //        It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+
+            return mockLogger.Object;
         }
     }
 }
