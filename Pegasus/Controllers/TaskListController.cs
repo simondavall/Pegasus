@@ -120,7 +120,7 @@ namespace Pegasus.Controllers
             [Bind(
                 "Id,Description,Name,Created,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask,
-            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IList<TaskCommentModel> comments)
+            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IList<TaskCommentModel> comments, string addSubTask)
         {
             var taskViewModelArgs = new TaskViewModelArgs
             {
@@ -150,6 +150,11 @@ namespace Pegasus.Controllers
                     if (!string.IsNullOrWhiteSpace(newComment))
                         await _commentsEndpoint.AddComment(new TaskCommentModel
                             {TaskId = projectTask.Id, Comment = newComment, UserId = userId});
+
+                    if (!string.IsNullOrWhiteSpace(addSubTask))
+                    {
+                        return RedirectToAction("Create", new { id = addSubTask});
+                    }
 
                     if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)
                     {

@@ -60,6 +60,12 @@ $(function () {
         return selectedId;
     };
 
+    $(".body-content").on("click", "#addSubTaskButton", function () {
+        $("#addSubTask").val($("#ProjectTask_Id").val());
+        $("#editTaskButton").click();
+        return false;
+    });
+
     $(".body-content").on("click", ".project-list-item", function () {
         $("#page").val(1); // reset display back to page 1
         currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectListItems));
@@ -130,6 +136,16 @@ $(function () {
         var rollbackDescription = $(editSection).find("#rollbackDescription");
         $(taskDescription).removeClass("hide").siblings(".task-description-edit").addClass("hide")
             .find("textarea").val($(rollbackDescription).val());
+    });
+
+    $(".body-content").on("change", "#ProjectTask_TaskStatusId", function () {
+        var completedStatus = "3"; // index value of Completed in TaskStatus enum
+        if ($(this).val() === completedStatus) {
+            $("#addSubTaskButton").addClass("hide");
+        } else {
+            $("#addSubTaskButton").removeClass("hide");
+        }
+		return false;
     });
 
     var toggleSettingsSidebar = function () {
