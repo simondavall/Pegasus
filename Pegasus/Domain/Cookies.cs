@@ -13,17 +13,17 @@ namespace Pegasus.Domain
             _cookieExpiryDays = settings.CookieExpiryDays;
         }
 
-        public void WriteCookie(HttpResponse response, string setting, string settingValue)
+        public void WriteCookie(HttpResponse response, string cookieName, string cookieData)
         {
-            WriteCookie(response, setting, settingValue, _cookieExpiryDays);
+            WriteCookie(response, cookieName, cookieData, _cookieExpiryDays);
         }
 
-        public void WriteCookie(HttpResponse response, string setting, string settingValue, int expiryDays)
+        public void WriteCookie(HttpResponse response, string cookieName, string cookieData, int expiryDays)
         {
             if (expiryDays == 0)
                 expiryDays = _cookieExpiryDays;
             var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
-            response.Cookies.Append(setting, settingValue, options);
+            response.Cookies.Append(cookieName, cookieData, options);
         }
     }
 }

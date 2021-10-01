@@ -10,8 +10,8 @@ namespace Pegasus.Controllers
     public class HomeController : TaskListController
     {
         public HomeController(ITaskFilterService taskFilterService, 
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService) 
-            : base(taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService)
+            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService, IMarketingService marketingService, IAnalyticsService analyticsService) 
+            : base(taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService, marketingService, analyticsService)
         { }
     }
 }
