@@ -176,60 +176,44 @@ $(function () {
         $("#cp-modalCookiePolicy").modal("show");
     });
 
+    var saveSelectedCookies = function (data) {
+        var url = "CookiePolicy/SaveSelected";
+        var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
+        data.__RequestVerificationToken = antiForgeryToken;
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success : function() {
+                location.href = document.referrer;
+            }
+        });
+        return false;
+    }
+
     $(function() {
-        var allowAllCookiesButton = $("#cp-accept-recommended-btn-handler").click(onAllowAllButtonClick);
-
-        function onAllowAllButtonClick() {
-
-            var url = "CookiePolicy/SaveSelected";
-            var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
-            alert(antiForgeryToken);
-            event.preventDefault();
+        $("#cp-accept-recommended-btn-handler").on("click", function() {
             var data = {
-                __RequestVerificationToken: antiForgeryToken,
                 CookiePolicyAccepted: true,
                 MarketingCookieEnabled: true,
                 AnalyticsCookieEnabled: true
             }
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: data,
-                success : function() {
-                    alert("Success");
-                    location.href = document.referrer;
-                }
-            });
-        }
+            saveSelectedCookies(data);
+        });
+        return false;
     });
 
     $(function() {
-
-        var allowAllCookiesButton = $("#cp-selection-btn-handler").click(onSelectionButtonClick);
-
-        function onSelectionButtonClick() {
-
-            var url = "CookiePolicy/SaveSelected";
-            var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
-            alert(antiForgeryToken);
-            event.preventDefault();
+        $("#cp-selection-btn-handler").on("click", function() {
             //todo change the hard coded settings in this function
             var data = {
-                __RequestVerificationToken: antiForgeryToken,
                 CookiePolicyAccepted: true,
                 MarketingCookieEnabled: false,
                 AnalyticsCookieEnabled: true
             }
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: data,
-                success : function() {
-                    location.href = document.referrer;
-                }
-            });
-        }
+            saveSelectedCookies(data);
+        });
+        return false;
     });
 })

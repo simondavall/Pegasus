@@ -17,29 +17,9 @@ namespace Pegasus.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AllowAllCookies()
-        {
-            _settingsService.CookiePolicyAccepted = true;
-            _settingsService.MarketingCookieEnabled = true;
-            _settingsService.AnalyticsCookieEnabled = true;
-            _settingsService.SaveSettings();
-
-            var model = new CookiePolicyModel
-            {
-                MarketingCookieEnabled = true,
-                AnalyticsCookieEnabled = true,
-                CookiePolicyAccepted = true
-            };
-
-            return PartialView("_CookiePolicy", model);
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult SaveSelected(CookiePolicyModel model)
         {
-            _settingsService.CookiePolicyAccepted = false;
+            _settingsService.CookiePolicyAccepted = true;
             _settingsService.MarketingCookieEnabled = model.MarketingCookieEnabled;
             _settingsService.AnalyticsCookieEnabled = model.AnalyticsCookieEnabled;
             _settingsService.SaveSettings();
