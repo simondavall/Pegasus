@@ -6,10 +6,12 @@ namespace Pegasus.Domain
 {
     public class Cookies
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int _cookieExpiryDays;
 
-        public Cookies(ISettingsService settings)
+        public Cookies(IHttpContextAccessor httpContextAccessor, ISettingsService settings)
         {
+            _httpContextAccessor = httpContextAccessor;
             _cookieExpiryDays = settings.CookieExpiryDays;
         }
 
@@ -24,6 +26,12 @@ namespace Pegasus.Domain
                 expiryDays = _cookieExpiryDays;
             var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
             response.Cookies.Append(cookieName, cookieData, options);
+        }
+
+        public void DeleteCookie(HttpResponse response, string cookieName)
+        {
+            if (_httpContextAccessor.HttpContext.Request.Cookies.ContainsKey(cookieName))
+                response.Cookies.Delete(cookieName);
         }
     }
 }
