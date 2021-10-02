@@ -177,7 +177,7 @@ $(function () {
     });
 
     var saveSelectedCookies = function (data) {
-        var url = "CookiePolicy/SaveSelected";
+        var url = "/CookiePolicy/SaveSelected";
         var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
         data.__RequestVerificationToken = antiForgeryToken;
         event.preventDefault();
@@ -186,7 +186,7 @@ $(function () {
             url: url,
             data: data,
             success : function() {
-                location.href = document.referrer;
+                location.href = document.location.href;
             }
         });
         return false;
