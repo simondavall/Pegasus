@@ -2,7 +2,7 @@
 
 namespace Pegasus.Services.Models
 {
-    public class SettingsModel
+    public class SettingsModel : CookiePolicyModel
     {
         [DisplayName("Comment Order")] 
         public int CommentSortOrder { get; set; }

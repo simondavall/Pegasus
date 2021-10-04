@@ -29,7 +29,8 @@ namespace Pegasus.Controllers
 
         public TaskListController(ITaskFilterService taskFilterService,
             IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint,
-            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService)
+            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService,
+            IMarketingService marketingService, IAnalyticsService analyticsService)
         {
             _taskFilterService = taskFilterService;
             _projectsEndpoint = projectsEndpoint;
@@ -37,6 +38,10 @@ namespace Pegasus.Controllers
             _commentsEndpoint = commentsEndpoint;
             _settingsService = settingsService;
             _pageSize = settingsService.PageSize;
+
+            // this is here to simulate stored data, for cookie policy interaction.
+            marketingService.SaveMarketingData("Some Marketing Data");
+            analyticsService.SaveAnalyticsData("Some Analytics Data");
         }
 
         [HttpGet]

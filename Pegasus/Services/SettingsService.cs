@@ -26,7 +26,7 @@ namespace Pegasus.Services
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
-            _cookies = new Cookies(this);
+            _cookies = new Cookies(httpContextAccessor, this);
             InitializeSettings();
         }
 
@@ -45,6 +45,24 @@ namespace Pegasus.Services
             }
 
             return (T)currentValue;
+        }
+
+        public void SaveSetting(string settingName, string value)
+        {
+            var propertyValues = new Dictionary<string, object>();
+            var properties = typeof(SettingsService).GetProperties();
+            foreach (var property in properties)
+            {
+                var propertyValue = property.GetValue(this, null);
+                if (property.Name == settingName)
+                {
+                    propertyValue = value;
+                }
+                propertyValues.Add(property.Name, propertyValue);
+            }
+
+            var cookieData = JsonSerializer.Serialize(propertyValues);
+            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, CookieExpiryDays);
         }
 
         public void SaveSettings()

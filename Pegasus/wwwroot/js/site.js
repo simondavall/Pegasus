@@ -171,4 +171,6 @@ $(function () {
     $(function () {
         $(".task-title").css("height", "auto").css("height", $(".task-title")[0].scrollHeight.toString() + "px");
     });
+
+
 })

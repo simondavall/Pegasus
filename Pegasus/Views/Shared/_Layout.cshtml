@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@using Pegasus.Services
+@using Pegasus.Services.Models
+@inject ISettingsService _settingsService
+@{
+    var cookiePolicyModel = new CookiePolicyModel()
+    {
+        AnalyticsCookieEnabled = _settingsService.AnalyticsCookieEnabled,
+        MarketingCookieEnabled = _settingsService.MarketingCookieEnabled,
+        CookiePolicyAccepted = _settingsService.CookiePolicyAccepted
+    };
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -9,6 +20,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css"/>
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/cookiepolicy.css" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -49,6 +61,7 @@
         </nav>
     </header>
     <partial name="../Settings/Index"/>
+    <partial name="_CookiePolicy" model="@cookiePolicyModel"/>
     <div class="container body-content">
         @RenderBody()
         <hr/>
@@ -61,6 +74,7 @@
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/cookiepolicy.js" asp-append-version="true"></script>
     </environment>
     <environment names="Staging,Production">
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"
