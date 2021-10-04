@@ -30,6 +30,26 @@
     height: auto;
 }
 
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-track {
+    margin-right: 20px
+}
+
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar {
+    width: 11px
+}
+
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #d8d8d8
+}
+
+#cp-modalCookiePolicy .ot-pc-scrollbar {
+    scrollbar-arrow-color: #d8d8d8;
+    scrollbar-darkshadow-color: #d8d8d8;
+    scrollbar-face-color: #d8d8d8;
+    scrollbar-shadow-color: #d8d8d8
+}
+
 .cp-button {
     margin-right: 10px;
     margin-bottom: 25px;
@@ -208,14 +228,14 @@
     bottom: 0;
     background-color: #f2f1f1;
     border: 1px solid #ddd;
-    transition: all .2s ease-in 0s;
-    -moz-transition: all .2s ease-in 0s;
-    -o-transition: all .2s ease-in 0s;
-    -webkit-transition: all .2s ease-in 0s;
+    -moz-transition: all .2s ease-in 0;
+    -o-transition: all .2s ease-in 0;
+    -webkit-transition: all .2s ease-in 0;
+    transition: all .2s ease-in 0;
     border-radius: 20px
 }
 
-    #cp-modalCookiePolicy .cp-switch-nob:before {
+#cp-modalCookiePolicy .cp-switch-nob:before {
         position: absolute;
         content: "";
         height: 21px;
@@ -268,7 +288,7 @@
         height: 18px;
         width: 18px;
         border: 1px solid #3860be;
-        left: 0px;
+        left: 0;
         top: auto
     }
 
@@ -277,10 +297,10 @@
         width: 9px;
         border-left: 3px solid;
         border-bottom: 3px solid;
-        transform: rotate(-45deg);
         -o-transform: rotate(-45deg);
         -ms-transform: rotate(-45deg);
         -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg);
         left: 4px;
         top: 5px
     }
