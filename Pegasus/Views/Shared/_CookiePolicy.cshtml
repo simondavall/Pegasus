@@ -1,6 +1,6 @@
 ﻿@model Pegasus.Services.Models.CookiePolicyModel
 
-@if (Model.CookiePolicyAccepted)
+@if (!Model.CookiePolicyAccepted)
 {
 <div class="modal fade cp-modal" id="cp-modalCookiePolicy" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
@@ -27,12 +27,12 @@
                         <div class="card">
                             <button class="btn btn-link btn-block accordion-button text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                             </button>
-                            <div class="card-header cp-accordian-header" id="headingOne">
+                            <div class="card-header cp-accordion-header" id="headingOne">
                                 <div class="cp-plus-minus">
                                     <span></span>
                                     <span></span>
                                 </div>
-                                <h4 class="mb-0 cp-accordian-title">
+                                <h4 class="mb-0 cp-accordion-title">
                                     Required Cookies
                                 </h4>
                                 <div class="cp-always-active">
@@ -49,12 +49,12 @@
                         <div class="card">
                             <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             </button>
-                            <div class="card-header cp-accordian-header" id="headingTwo">
+                            <div class="card-header cp-accordion-header" id="headingTwo">
                                 <div class="cp-plus-minus">
                                     <span></span>
                                     <span></span>
                                 </div>
-                                <h4 class="mb-0 cp-accordian-title">
+                                <h4 class="mb-0 cp-accordion-title">
                                     Performance &amp; Analytics Cookies
                                 </h4>
                                 <div class="cp-toggle">
@@ -74,12 +74,12 @@
                         <div class="card">
                             <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                             </button>
-                            <div class="card-header cp-accordian-header" id="headingThree">
+                            <div class="card-header cp-accordion-header" id="headingThree">
                                 <div class="cp-plus-minus">
                                     <span></span>
                                     <span></span>
                                 </div>
-                                <h4 class="mb-0 cp-accordian-title">
+                                <h4 class="mb-0 cp-accordion-title">
                                     Marketing Cookies
                                 </h4>
                                 <div class="cp-toggle">

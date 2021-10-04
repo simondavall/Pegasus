@@ -1,4 +1,4 @@
-﻿.cp-modal {
+﻿#cp-modalCookiePolicy .cp-modal {
     margin-top: 10px;
     margin: 0;
     max-width: none;
@@ -10,16 +10,16 @@
     color: black;
 }
 
-    .cp-modal .privacy-notice-link {
+    #cp-modalCookiePolicy .cp-modal .privacy-notice-link {
         color: black;
         text-decoration: underline;
     }
 
-        .cp-modal .privacy-notice-link:hover {
-            text-decoration: none;
-        }
+    #cp-modalCookiePolicy .cp-modal .privacy-notice-link:hover {
+        text-decoration: none;
+    }
 
-.cp-modal-button {
+#cp-modalCookiePolicy .cp-modal-button {
     max-width: 394px;
     padding: 12px 30px;
     line-height: 1;
@@ -30,27 +30,7 @@
     height: auto;
 }
 
-#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-track {
-    margin-right: 20px
-}
-
-#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar {
-    width: 11px
-}
-
-#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: #d8d8d8
-}
-
-#cp-modalCookiePolicy .ot-pc-scrollbar {
-    scrollbar-arrow-color: #d8d8d8;
-    scrollbar-darkshadow-color: #d8d8d8;
-    scrollbar-face-color: #d8d8d8;
-    scrollbar-shadow-color: #d8d8d8
-}
-
-.cp-button {
+#cp-modalCookiePolicy .cp-button {
     margin-right: 10px;
     margin-bottom: 25px;
     outline-offset: -1px;
@@ -70,16 +50,13 @@
     min-width: 200px !important;
 }
 
-.card button {
+#cp-modalCookiePolicy .card button {
     color: #2e3644;
-    margin: 0;
     display: inline-block;
-    height: auto;
     word-wrap: break-word;
     min-height: inherit;
     font-weight: 600;
     font-size: 0.9rem;
-    max-width: 90%;
     padding: 12px 30px;
     position: absolute;
     cursor: pointer;
@@ -93,7 +70,7 @@
     border: none;
 }
 
-.cp-accordian-header {
+#cp-modalCookiePolicy .cp-accordion-header {
     padding-top: 11.5px;
     padding-bottom: 11.5px;
     padding-left: 20px;
@@ -103,7 +80,7 @@
     min-height: 25px;
 }
 
-.cp-accordian-title {
+#cp-modalCookiePolicy .cp-accordion-title {
     color: #2e3644;
     margin: 0;
     display: inline-block;
@@ -118,7 +95,7 @@
     vertical-align: middle;
 }
 
-.cp-always-active {
+#cp-modalCookiePolicy .cp-always-active {
     font-weight: bold;
     float: right;
     clear: none;
@@ -132,7 +109,7 @@
     right: 20px;
 }
 
-.cp-desc {
+#cp-modalCookiePolicy .cp-desc {
     clear: both;
     width: 100%;
     font-size: .812em;
@@ -140,7 +117,7 @@
     margin-bottom: 25px;
 }
 
-.cp-plus-minus {
+#cp-modalCookiePolicy .cp-plus-minus {
     width: 20px;
     height: 20px;
     font-size: 1em;
@@ -150,38 +127,38 @@
     top: 3px;
 }
 
-    .cp-plus-minus span {
+#cp-modalCookiePolicy .cp-plus-minus span {
         position: absolute;
         background: #27455c;
         border-radius: 1px
     }
 
-        .cp-plus-minus span:first-of-type {
-            top: 25%;
-            bottom: 25%;
-            width: 10%;
-            left: 45%
-        }
+    #cp-modalCookiePolicy .cp-plus-minus span:first-of-type {
+        top: 25%;
+        bottom: 25%;
+        width: 10%;
+        left: 45%
+    }
 
-        .cp-plus-minus span:last-of-type {
-            left: 25%;
-            right: 25%;
-            height: 10%;
-            top: 45%
-        }
+    #cp-modalCookiePolicy .cp-plus-minus span:last-of-type {
+        left: 25%;
+        right: 25%;
+        height: 10%;
+        top: 45%
+    }
 
-#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordian-header .ot-arw,
-#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordian-header .cp-plus-minus span:first-of-type,
-#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordian-header .cp-plus-minus span:last-of-type {
+#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordion-header .ot-arw,
+#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordion-header .cp-plus-minus span:first-of-type,
+#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordion-header .cp-plus-minus span:last-of-type {
     transform: rotate(90deg)
 }
 
-#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordian-header .cp-plus-minus span:last-of-type {
+#cp-modalCookiePolicy button[aria-expanded=true] ~ .cp-accordion-header .cp-plus-minus span:last-of-type {
     left: 50%;
     right: 50%
 }
 
-.cp-title {
+#cp-modalCookiePolicy .cp-title {
     float: left;
     font-size: 1em;
     line-height: 1.5;
@@ -318,6 +295,27 @@
     height: 0
 }
 
-#cp-modalCookiePolicy input[type=checkbox]:focus + .cp-accordian-header {
+#cp-modalCookiePolicy input[type=checkbox]:focus + .cp-accordion-header {
     outline: #000 1px solid
+}
+
+
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-track {
+    margin-right: 20px
+}
+
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar {
+    width: 11px
+}
+
+#cp-modalCookiePolicy .cp-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #d8d8d8
+}
+
+#cp-modalCookiePolicy .ot-pc-scrollbar {
+    scrollbar-arrow-color: #d8d8d8;
+    scrollbar-darkshadow-color: #d8d8d8;
+    scrollbar-face-color: #d8d8d8;
+    scrollbar-shadow-color: #d8d8d8
 }
