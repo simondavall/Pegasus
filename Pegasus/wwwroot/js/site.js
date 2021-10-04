@@ -172,48 +172,5 @@ $(function () {
         $(".task-title").css("height", "auto").css("height", $(".task-title")[0].scrollHeight.toString() + "px");
     });
 
-    $(window).on("load", function() {
-        $("#cp-modalCookiePolicy").modal("show");
-    });
 
-    var saveSelectedCookies = function (data) {
-        var url = "/CookiePolicy/SaveSelected";
-        var antiForgeryToken = $("#cp-modalCookiePolicy input[name='__RequestVerificationToken']").val();
-        data.__RequestVerificationToken = antiForgeryToken;
-        event.preventDefault();
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: data,
-            success : function() {
-                location.href = document.location.href;
-            }
-        });
-        return false;
-    }
-
-    $(function() {
-        $("#cp-accept-recommended-btn-handler").on("click", function() {
-            var data = {
-                CookiePolicyAccepted: true,
-                MarketingCookieEnabled: true,
-                AnalyticsCookieEnabled: true
-            }
-            saveSelectedCookies(data);
-        });
-        return false;
-    });
-
-    $(function() {
-        $("#cp-selection-btn-handler").on("click", function() {
-            //todo change the hard coded settings in this function
-            var data = {
-                CookiePolicyAccepted: true,
-                MarketingCookieEnabled: false,
-                AnalyticsCookieEnabled: true
-            }
-            saveSelectedCookies(data);
-        });
-        return false;
-    });
 })
