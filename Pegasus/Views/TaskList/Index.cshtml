@@ -4,11 +4,12 @@
 }
 <form class="project-list-form" method="get" action="@Url.Action("Index")" data-pgs-ajax="true" data-pgs-target="#projectTaskList">
     <div class="row project-task-list">
-        <div class="col-sm-3">
-            <partial name="../TaskList/_SelectionPanel" model="Model"/>
+        <div class="col-md-9">
+            <partial name="../TaskList/_SelectionPanelNew" model="Model"/>
+            <partial name="../TaskList/_ProjectTaskList" model="Model"/>
         </div>
-        <div class="col-sm-9">
-            <partial name="../TaskList/_ProjectTaskList" model="Model" />
+        <div class="col-md-3">
+            <partial name="../TaskList/_ProjectSummary" model="Model.ProjectSummaryViewModel"/>
         </div>
     </div>
 </form>

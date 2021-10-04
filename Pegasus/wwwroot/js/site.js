@@ -51,6 +51,12 @@ $(function () {
         });
     }
 
+    var sidebarAction2 = function (selectedId, hiddenItem, itemList) {
+        $(hiddenItem).val(selectedId);
+        updateList(".project-list-form");
+        return selectedId;
+    };
+
     var sidebarAction = function (item, hiddenItem, itemList) {
         var selectedId = $(item).attr("value");
         $(hiddenItem).val(selectedId);
@@ -63,6 +69,20 @@ $(function () {
     $(".body-content").on("click", "#addSubTaskButton", function () {
         $("#addSubTask").val($("#ProjectTask_Id").val());
         $("#editTaskButton").click();
+        return false;
+    });
+
+    $(".body-content").on("change", "#selection-panel-project-list", function () {
+        $("#page").val(1); // reset display back to page 1
+        currentSettings.projectId = sidebarAction2($(this).val(), $("#projectId"), $(projectListItems));
+        // need to disable Create button if All projects selected
+        setCreateTaskButton();
+        return false;
+    });
+
+    $(".body-content").on("change", "#selection-panel-task-filter-list", function () {
+        $("#page").val(1); // reset display back to page 1
+        sidebarAction2($(this).val(), $("#taskFilterId"), $(taskFilterList));
         return false;
     });
 

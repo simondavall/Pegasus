@@ -1,0 +1,30 @@
+﻿@using Pegasus.Extensions
+@model Pegasus.Models.TaskList.ProjectSummaryViewModel
+
+<div>
+    <div>
+        <span class="project-summary-item-label">Project Name:</span><span class="project-summary-item">@Model.ProjectName</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Date Created:</span><span class="project-summary-item">@Model.ProjectCreated.FormattedDate()</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Last Action:</span><span class="project-summary-item">@Model.ProjectLastAction.FormattedDate() (@Model.ProjectLastAction.LapsedTime())</span>
+    </div>
+    <hr />
+    <div>
+        <span class="project-summary-item-label">TOTAL Tasks:</span><span class="project-summary-item">@Model.TotalIssues</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Open Tasks:</span><span class="project-summary-item">@Model.OpenIssues</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Closed Tasks:</span><span class="project-summary-item">@Model.ClosedIssues</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Backlog Tasks:</span><span class="project-summary-item">@Model.BacklogIssues</span>
+    </div>
+    <div>
+        <span class="project-summary-item-label">Current Version:</span><span class="project-summary-item">@Model.CurrentVersion</span>
+    </div>
+</div>

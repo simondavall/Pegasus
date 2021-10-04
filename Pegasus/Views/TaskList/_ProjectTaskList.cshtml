@@ -1,9 +1,7 @@
 @model Pegasus.Models.TaskList.IndexViewModel
 
 <div id="projectTaskList" class="card no-border">
-    <div class="card-header no-background no-border">
-        <h5>Project: @Model.Project.Name</h5>
-    </div>
+
     <div class="card-body">
         <partial name="../TaskList/_TaskList" model="Model.ProjectTasks" />
     </div>

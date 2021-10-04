@@ -5,7 +5,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities.Attributes;
+using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -202,14 +204,20 @@ namespace Pegasus.Controllers
                 ? await _tasksEndpoint.GetTasks(project.Id)
                 : await _tasksEndpoint.GetAllTasks();
 
+            var projects = await _projectsEndpoint.GetAllProjects();
+            var taskFilters = _taskFilterService.GetTaskFilters(); 
+
             var model = new IndexViewModel(projectTasks, taskFilterId, (SettingsModel) _settingsService)
             {
                 ProjectId = project.Id,
                 Page = page,
                 PageSize = _pageSize,
-                Projects = await _projectsEndpoint.GetAllProjects(),
-                TaskFilters = _taskFilterService.GetTaskFilters(),
-                Project = project
+                Projects = projects,
+                TaskFilters = taskFilters,
+                TaskFilterListItems = GetTaskFilterListItems(taskFilters, taskFilterId),
+                ProjectListItems = GetProjectListItems(projects, projectId),
+                Project = project,
+                ProjectSummaryViewModel = GetProjectSummaryViewModel(project, projectTasks)
             };
 
             if (Request != null && Request.IsAjaxRequest()) return PartialView("../TaskList/_ProjectTaskList", model);
@@ -228,6 +236,50 @@ namespace Pegasus.Controllers
             const int defaultPageNo = 1;
             var qsPage = Request.Query["page"];
             return int.TryParse(qsPage, out var pageNo) ? pageNo : defaultPageNo;
+        }
+
+        private IEnumerable<SelectListItem> GetProjectListItems(IEnumerable<ProjectModel> projects, int selectedProjectId)
+        {
+            var projectListItems = new List<SelectListItem>();
+            foreach (var project in projects)
+            {
+                var selectListItem = new SelectListItem()
+                    { Text = project.Name, Value = project.Id.ToString(), Selected = project.Id == selectedProjectId };
+                projectListItems.Add(selectListItem);
+            }
+
+            return projectListItems;
+        }
+        private IEnumerable<SelectListItem> GetTaskFilterListItems(IEnumerable<TaskFilterModel> taskFilters, int selectedTaskFilterId)
+        {
+            var taskFilterListItems = new List<SelectListItem>();
+            foreach (var taskFilter in taskFilters)
+            {
+                var selectListItem = new SelectListItem()
+                    { Text = taskFilter.Name, Value = taskFilter.Value.ToString(), Selected = taskFilter.Value == selectedTaskFilterId };
+                taskFilterListItems.Add(selectListItem);
+            }
+
+            return taskFilterListItems;
+        }
+
+        private ProjectSummaryViewModel GetProjectSummaryViewModel(ProjectModel currentProject, IList<TaskModel> projectTasks)
+        {
+            var projectSummary = new ProjectSummaryViewModel();
+            projectSummary.ProjectName = currentProject.Name;
+            if (projectTasks.Any())
+            {
+                projectSummary.ProjectCreated =  projectTasks.OrderBy(x => x.Created).First().Created;
+                projectSummary.ProjectLastAction =  projectTasks.OrderBy(x => x.Modified).Last().Modified;
+                projectSummary.TotalIssues = projectTasks.Count;
+                projectSummary.ClosedIssues = projectTasks.Count(x => x.IsClosed());
+                projectSummary.OpenIssues = projectTasks.Filtered((int)TaskFilters.Open).Count();
+                projectSummary.BacklogIssues = projectTasks.Filtered((int)TaskFilters.Backlog).Count();
+                projectSummary.CurrentVersion = projectTasks.OrderBy(x => x.FixedInRelease).Last().FixedInRelease;
+            }
+
+            return projectSummary;
+
         }
     }
 }

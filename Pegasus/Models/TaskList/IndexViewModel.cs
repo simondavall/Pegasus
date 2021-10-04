@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities.Sorters.ProjectTask;
 using Pegasus.Extensions;
 using Pegasus.Library.Models;
@@ -29,6 +30,11 @@ namespace Pegasus.Models.TaskList
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = DefaultPageSize;
         public bool PaginationEnabled { get; set; }
+
+        public IEnumerable<SelectListItem> ProjectListItems { get; set; }
+        public IEnumerable<SelectListItem> TaskFilterListItems { get; set; }
+
+        public ProjectSummaryViewModel ProjectSummaryViewModel { get; set; }
 
         public IEnumerable<TaskFilterModel> TaskFilters { get; set; }
 

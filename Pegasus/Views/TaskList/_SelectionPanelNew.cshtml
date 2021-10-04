@@ -1,0 +1,19 @@
+﻿@model Pegasus.Models.TaskList.IndexViewModel
+
+<panel class="selection-panel">
+    <input id="page" type="hidden" asp-for="Page"/>
+    <input id="projectId" type="hidden" asp-for="ProjectId"/>
+    <input id="taskFilterId" type="hidden" asp-for="TaskFilterId"/>
+    
+    <div class="col-sm-4 selection-panel-droplist">
+        <span class="selection-panel-label">Projects</span>
+        <select id="selection-panel-project-list" name="selection-panel-project-list" asp-for="ProjectId" asp-items="@Model.ProjectListItems">
+            <option class="project-list-item" value="0">All Projects</option>
+        </select>
+    </div>
+    <div class="col-sm-4 selection-panel-droplist">
+        <span class="selection-panel-label" label-for="selection-panel-task-filter-list">Task Filters:</span>
+        <select id="selection-panel-task-filter-list" name="selection-panel-task-filter-list"  asp-for="TaskFilterId" asp-items="@Model.TaskFilterListItems"></select>
+    </div>
+
+</panel>

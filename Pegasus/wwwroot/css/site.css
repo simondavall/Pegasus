@@ -234,6 +234,39 @@ html {
     min-height: 400px;
 }
 
+.project-summary-item {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.project-summary-item-label {
+    padding-right: 5px;
+}
+
+.selection-panel h5 {
+    display: inline;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 1.15rem;
+}
+
+
+.selection-panel-droplist {
+    display: inline;
+}
+
+    .selection-panel-droplist select {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size: 1.1rem;
+    }
+
+.selection-panel-label {
+    display: inline;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 1.15rem;
+    padding-right: 5px;
+}
+
 a.settings-close {
     text-decoration: none;
     position: relative;
