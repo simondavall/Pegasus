@@ -65,7 +65,7 @@ namespace Pegasus
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=TaskList}/{action=Index}/{id?}");
             });
         }
     }
