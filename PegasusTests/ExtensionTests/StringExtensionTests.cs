@@ -116,5 +116,22 @@ namespace PegasusTests.ExtensionTests
             Assert.IsNull(sut);
         }
 
+        [Test]
+        public void Linkify_OneUrlMatchAtStart_ReturnsTextWithHyperlink()
+        {
+            var originalText = "https://example.com Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc consectetur elementum interdum.";
+            var sut = originalText.Linkify();
+
+            Assert.AreEqual("<a href=\"https://example.com\">example.com</a> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc consectetur elementum interdum.", sut);
+        }
+
+        [Test]
+        public void Linkify_OneUrl_ReturnsUrlAsHyperlink()
+        {
+            var originalText = "https://example.com";
+            var sut = originalText.Linkify();
+
+            Assert.AreEqual("<a href=\"https://example.com\">example.com</a>", sut);
+        }
     }
 }

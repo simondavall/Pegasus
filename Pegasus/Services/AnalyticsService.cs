@@ -26,7 +26,7 @@ namespace Pegasus.Services
 
         public void SaveAnalyticsData(string data)
         {
-            if (_settingsService.AnalyticsCookieEnabled)
+            if (_settingsService.Settings.AnalyticsCookieEnabled)
             {
                 _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.Analytics, data);
                 return;

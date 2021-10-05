@@ -26,7 +26,7 @@ namespace Pegasus.Services
 
         public void SaveMarketingData(string data)
         {
-            if (_settingsService.MarketingCookieEnabled)
+            if (_settingsService.Settings.MarketingCookieEnabled)
             {
                 _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.Marketing, data);
                 return;

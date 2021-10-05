@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pegasus.Services;
+using Pegasus.Services.Models;
 
 namespace Pegasus.Controllers
 {
@@ -20,11 +21,11 @@ namespace Pegasus.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveSettings([Bind("PageSize,PaginationEnabled,CommentSortOrder")] SettingsService settings, string returnUrl)
+        public IActionResult SaveSettings([Bind("PageSize,PaginationEnabled,CommentSortOrder")] SettingsModel settings, string returnUrl)
         {
-            _settings.CommentSortOrder = settings.CommentSortOrder;
-            _settings.PageSize = settings.PageSize;
-            _settings.PaginationEnabled = settings.PaginationEnabled;
+            _settings.Settings.CommentSortOrder = settings.CommentSortOrder;
+            _settings.Settings.PageSize = settings.PageSize;
+            _settings.Settings.PaginationEnabled = settings.PaginationEnabled;
             _settings.SaveSettings();
 
             return Redirect(returnUrl);
