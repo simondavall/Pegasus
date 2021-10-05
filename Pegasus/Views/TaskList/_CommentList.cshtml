@@ -1,47 +1,41 @@
-﻿@using Pegasus.Services
-@using Pegasus.Extensions
-@using Pegasus.Entities.Enumerations
-@model IEnumerable<Pegasus.Library.Models.TaskCommentModel>
-@inject ISettingsService _settings
+﻿@using Pegasus.Extensions
+@model Pegasus.Models.TaskList.CommentsViewModel
 
 <div id="taskCommentList" class="form-group">
-    @{
-        var comments = _settings.CommentSortOrder == (int)CommentSortOrderEnum.DateAscending ? Model.ToList() : Model.OrderByDescending(x => x.Created).ToList();
-    }
-    
-    @if (comments.Count > 0)
+
+    @if (@Model.Comments.Any())
     {
         <div class="col-md-2 col-form-label">
             <span>Comments</span>
         </div>
 
-        @for (var i = 0; i < comments.Count; i++)
+        @foreach(var comment in @Model.Comments)
         {
             <div class="comment-edit-section col-md-8">
-                <input type="hidden" asp-for="@comments[i].Id"/>
-                <input type="hidden" asp-for="@comments[i].TaskId"/>
-                <input type="hidden" asp-for="@comments[i].Created"/>
-                <input type="hidden" asp-for="@comments[i].DisplayName"/>
-                <input id="rollbackComment" type="hidden" value="@comments[i].Comment"/>
+                <input type="hidden" asp-for="@comment.Id"/>
+                <input type="hidden" asp-for="@comment.TaskId"/>
+                <input type="hidden" asp-for="@comment.Created"/>
+                <input type="hidden" asp-for="@comment.DisplayName"/>
+                <input id="rollbackComment" type="hidden" value="@comment.Comment"/>
                 <div class="comment-edit-buttons pull-right btn-group-xs">
                     <a class="btn btn-xs comment-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit comment"></i></a>
                     <a class="btn btn-xs comment-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
-                    <input type="hidden" asp-for="@comments[i].IsDeleted"/>
+                    <input type="hidden" asp-for="@comment.IsDeleted"/>
                     <a class="btn btn-xs comment-delete-button"><i class="fa fa-trash" data-toggle="tooltip" title="Delete comment"></i></a>
                 </div>
-                <div class="task-comment-date" title="@comments[i].Created.FormattedDate()">
-                    <span>@comments[i].Created.LapsedTime()</span>
-                    <span>by @comments[i].DisplayName</span>
+                <div class="task-comment-date" title="@comment.Created.FormattedDate()">
+                    <span>@comment.Created.LapsedTime()</span>
+                    <span>by @comment.DisplayName</span>
                 </div>
                 <div class="task-comment">
-                    @if (comments[i]?.Comment != null)
+                    @if (comment?.Comment != null)
                     {
-                        <p>@Html.Raw(@comments[i].Comment.PreparedHtml())</p>
+                        <p>@Html.Raw(comment.Comment.PreparedHtml())</p>
                     }
                 </div>
                 <div class="comment-task-edit hide">
-                    <textarea data-autoresize rows="1" asp-for="@comments[i].Comment" class="comment-task-text form-control form-no-max-control"></textarea>
-                    <span asp-validation-for="@comments[i].Comment" class="text-danger"></span>
+                    <textarea data-autoresize rows="1" asp-for="@comment.Comment" class="comment-task-text form-control form-no-max-control"></textarea>
+                    <span asp-validation-for="@comment.Comment" class="text-danger"></span>
                 </div>
             </div>
         }

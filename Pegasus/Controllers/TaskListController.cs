@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Pegasus.Entities.Attributes;
+using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
@@ -55,16 +56,11 @@ namespace Pegasus.Controllers
                 TaskRef = $"{project.ProjectPrefix}-<tbc>",
                 ParentTaskId = id
             };
-            var model = await TaskViewModel.Create(new TaskViewModelArgs
+            var model = await CreateTaskViewModel(new TaskViewModelArgs
             {
-                ProjectsEndpoint = _projectsEndpoint,
-                TasksEndpoint = _tasksEndpoint,
-                CommentsEndpoint = _commentsEndpoint,
                 ProjectTask = taskModel,
                 Project = project
             });
-
-            model.ProjectTask = taskModel;
 
             return View(model);
         }
@@ -75,7 +71,6 @@ namespace Pegasus.Controllers
             [Bind("Description,Name,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask)
         {
-            projectTask.Created = projectTask.Modified = DateTime.Now;
             if (ModelState.IsValid)
             {
                 projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -83,11 +78,8 @@ namespace Pegasus.Controllers
                 return RedirectToAction("Edit", new { id = taskId});
             }
 
-            var model = await TaskViewModel.Create(new TaskViewModelArgs
+            var model = await CreateTaskViewModel(new TaskViewModelArgs
             {
-                ProjectsEndpoint = _projectsEndpoint,
-                TasksEndpoint = _tasksEndpoint,
-                CommentsEndpoint = _commentsEndpoint,
                 ProjectTask = projectTask
             });
 
@@ -100,17 +92,13 @@ namespace Pegasus.Controllers
             var projectTask = await _tasksEndpoint.GetTask(id);
             if (projectTask == null)
             {
-                //todo set a banner message, project task not found
                 return RedirectToAction("Index");
             }
             _settingsService.ProjectId = projectTask.ProjectId;
             _settingsService.SaveSettings();
 
-            var model = await TaskViewModel.Create(new TaskViewModelArgs
+            var model = await CreateTaskViewModel(new TaskViewModelArgs
             {
-                ProjectsEndpoint = _projectsEndpoint,
-                TasksEndpoint = _tasksEndpoint,
-                CommentsEndpoint = _commentsEndpoint,
                 ProjectTask = projectTask
             });
 
@@ -129,18 +117,15 @@ namespace Pegasus.Controllers
         {
             var taskViewModelArgs = new TaskViewModelArgs
             {
-                ProjectsEndpoint = _projectsEndpoint,
-                TasksEndpoint = _tasksEndpoint,
-                CommentsEndpoint = _commentsEndpoint,
                 ProjectTask = projectTask,
-                ExistingStatusId = existingTaskStatus,
+                CurrentStatusId = existingTaskStatus,
                 Comments = comments,
                 NewComment = newComment
             };
             
             if (ModelState.IsValid)
             {
-                if ((projectTask.IsClosed()) && await HasIncompleteSubTasks(projectTask.Id))
+                if (projectTask.IsClosed() && await HasIncompleteSubTasks(projectTask.Id))
                 {
                     // pass error message back to user client
                     taskViewModelArgs.BannerMessage =
@@ -148,13 +133,12 @@ namespace Pegasus.Controllers
                 }
                 else
                 {
-                    var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    projectTask.UserId = userId;
+                    projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     await _tasksEndpoint.UpdateTask(projectTask);
                     await _commentsEndpoint.UpdateComments(comments);
                     if (!string.IsNullOrWhiteSpace(newComment))
                         await _commentsEndpoint.AddComment(new TaskCommentModel
-                            {TaskId = projectTask.Id, Comment = newComment, UserId = userId});
+                            {TaskId = projectTask.Id, Comment = newComment, UserId = projectTask.UserId});
 
                     if (!string.IsNullOrWhiteSpace(addSubTask))
                     {
@@ -179,7 +163,7 @@ namespace Pegasus.Controllers
                 }
             }
 
-            var model = await TaskViewModel.Create(taskViewModelArgs);
+            var model = await CreateTaskViewModel(taskViewModelArgs);
 
             return View(model);
         }
@@ -215,6 +199,44 @@ namespace Pegasus.Controllers
             if (Request != null && Request.IsAjaxRequest()) return PartialView("../TaskList/_ProjectTaskList", model);
 
             return View("../TaskList/Index", model);
+        }
+
+
+        private async Task<TaskViewModel> CreateTaskViewModel(TaskViewModelArgs args)
+        {
+            var taskProperties = new TaskPropertiesViewModel
+            {
+                ProjectTask = args.ProjectTask,
+                TaskPriorities = new SelectList(await _tasksEndpoint.GetAllTaskPriorities(), "Id", "Name", 1),
+                TaskStatuses = new SelectList(await _tasksEndpoint.GetAllTaskStatuses(), "Id", "Name", 1),
+                TaskTypes = new SelectList(await _tasksEndpoint.GetAllTaskTypes(), "Id", "Name", 1)
+            };
+
+            var model = new TaskViewModel
+            {
+                BannerMessage = args.BannerMessage,
+                Comments =  await GetComments(args.Comments, args.ProjectTask.Id),
+                ExistingTaskStatus = args.CurrentStatusId != 0 ? args.CurrentStatusId : args.ProjectTask.TaskStatusId,
+                NewComment = args.NewComment,
+                ParentTask = await _tasksEndpoint.GetTask(args.ProjectTask.ParentTaskId ?? 0),
+                Project = args.Project ?? await _projectsEndpoint.GetProject(args.ProjectTask.ProjectId),
+                ProjectId = args.ProjectTask.ProjectId,
+                ProjectTask = args.ProjectTask,
+                SubTasks = await _tasksEndpoint.GetSubTasks(args.ProjectTask.Id),
+                TaskProperties = taskProperties
+            };
+
+            return model;
+        }
+
+        private async Task<CommentsViewModel> GetComments(IEnumerable<TaskCommentModel> comments, int projectTaskId)
+        {
+            comments ??= await _commentsEndpoint.GetComments(projectTaskId);
+
+            return new CommentsViewModel
+            {
+                Comments = _settingsService.CommentSortOrder == (int)CommentSortOrderEnum.DateAscending ? comments.ToList() : comments.OrderByDescending(x => x.Created).ToList()
+            };
         }
 
         private async Task<bool> HasIncompleteSubTasks(int taskId)

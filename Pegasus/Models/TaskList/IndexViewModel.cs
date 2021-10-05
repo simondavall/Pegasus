@@ -48,5 +48,20 @@ namespace Pegasus.Models.TaskList
                 return paginationViewModel;
             }
         }
+
+        public SelectionPanelViewModel SelectionPanelViewModel
+        {
+            get
+            {
+                return new SelectionPanelViewModel()
+                {
+                    Page = this.Page,
+                    ProjectId = ProjectId,
+                    Projects = Projects.Where(x => x.IsActive).OrderBy(x => x.Name),
+                    TaskFilterId = TaskFilterId,
+                    TaskFilters = TaskFilters
+                };
+            }
+        }
     }
 }
