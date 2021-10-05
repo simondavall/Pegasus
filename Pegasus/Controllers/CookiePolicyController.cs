@@ -17,11 +17,11 @@ namespace Pegasus.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SaveSelected(CookiePolicyModel model)
+        public IActionResult SaveSelected(SettingsModel model)
         {
-            _settingsService.CookiePolicyAccepted = true;
-            _settingsService.MarketingCookieEnabled = model.MarketingCookieEnabled;
-            _settingsService.AnalyticsCookieEnabled = model.AnalyticsCookieEnabled;
+            _settingsService.Settings.CookiePolicyAccepted = true;
+            _settingsService.Settings.MarketingCookieEnabled = model.MarketingCookieEnabled;
+            _settingsService.Settings.AnalyticsCookieEnabled = model.AnalyticsCookieEnabled;
             _settingsService.SaveSettings();
 
             return PartialView("_CookiePolicy", model);

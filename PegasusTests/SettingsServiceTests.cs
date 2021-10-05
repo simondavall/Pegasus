@@ -35,7 +35,7 @@ namespace PegasusTests
         public void SettingsService_SettingResidesInCookie_ReturnsCookieValue()
         {
             var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
-            var result = sut.TaskFilterId;
+            var result = sut.Settings.TaskFilterId;
             Assert.AreEqual(17, result);
         }
 
@@ -43,7 +43,7 @@ namespace PegasusTests
         public void SettingsService_SettingResidesInConfigButNotCookie_ReturnsConfigValue()
         {
             var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
-            var result = sut.PageSize;
+            var result = sut.Settings.PageSize;
             Assert.AreEqual(25, result);
         }
 
@@ -78,7 +78,7 @@ namespace PegasusTests
                 .Build();
 
             var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
-            var result = sut.PageSize;
+            var result = sut.Settings.PageSize;
             Assert.AreEqual(0, result);
         }
     }

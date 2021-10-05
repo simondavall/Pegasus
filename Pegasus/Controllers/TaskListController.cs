@@ -13,7 +13,6 @@ using Pegasus.Library.Models;
 using Pegasus.Models;
 using Pegasus.Models.TaskList;
 using Pegasus.Services;
-using Pegasus.Services.Models;
 
 namespace Pegasus.Controllers
 {
@@ -38,7 +37,7 @@ namespace Pegasus.Controllers
             _tasksEndpoint = tasksEndpoint;
             _commentsEndpoint = commentsEndpoint;
             _settingsService = settingsService;
-            _pageSize = settingsService.PageSize;
+            _pageSize = settingsService.Settings.PageSize;
 
             // this is here to simulate stored data, for cookie policy interaction.
             marketingService.SaveMarketingData("Some Marketing Data");
@@ -48,7 +47,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
-            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.Settings.ProjectId));
             var project = await _projectsEndpoint.GetProject(projectId);
             var taskModel = new TaskModel
             {
@@ -94,7 +93,7 @@ namespace Pegasus.Controllers
             {
                 return RedirectToAction("Index");
             }
-            _settingsService.ProjectId = projectTask.ProjectId;
+            _settingsService.Settings.ProjectId = projectTask.ProjectId;
             _settingsService.SaveSettings();
 
             var model = await CreateTaskViewModel(new TaskViewModelArgs
@@ -175,8 +174,8 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var taskFilterId = _settingsService.GetSetting<int>(nameof(_settingsService.TaskFilterId));
-            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.ProjectId));
+            var taskFilterId = _settingsService.GetSetting<int>(nameof(_settingsService.Settings.TaskFilterId));
+            var projectId = _settingsService.GetSetting<int>(nameof(_settingsService.Settings.ProjectId));
             var page = GetPage();
 
             var project = await _projectsEndpoint.GetProject(projectId) ?? new ProjectModel {Id = 0, Name = "All"};
@@ -184,7 +183,7 @@ namespace Pegasus.Controllers
                 ? await _tasksEndpoint.GetTasks(project.Id)
                 : await _tasksEndpoint.GetAllTasks();
 
-            var model = new IndexViewModel(projectTasks, taskFilterId, (SettingsModel) _settingsService)
+            var model = new IndexViewModel(projectTasks, taskFilterId, _settingsService.Settings)
             {
                 ProjectId = project.Id,
                 Page = page,
@@ -233,7 +232,7 @@ namespace Pegasus.Controllers
 
             return new CommentsViewModel
             {
-                Comments = _settingsService.CommentSortOrder == (int)CommentSortOrderEnum.DateAscending ? comments.ToList() : comments.OrderByDescending(x => x.Created).ToList()
+                Comments = _settingsService.Settings.CommentSortOrder == (int)CommentSortOrderEnum.DateAscending ? comments.ToList() : comments.OrderByDescending(x => x.Created).ToList()
             };
         }
 

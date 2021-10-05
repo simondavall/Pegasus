@@ -11,72 +11,57 @@ using Pegasus.Services.Models;
 
 namespace Pegasus.Services
 {
-    public class SettingsService : SettingsModel, ISettingsService
+    public class SettingsService : ISettingsService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
-        private const string Position = "PegasusSettings";
+        private const string ConfigSection = "PegasusSettings";
         private readonly Cookies _cookies;
 
         public SettingsService()
         {
+            Settings = new SettingsModel();
         }
 
         public SettingsService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
-            _cookies = new Cookies(httpContextAccessor, this);
             InitializeSettings();
+            _cookies = new Cookies(httpContextAccessor, this);
         }
+
+        public SettingsModel Settings { get; set; }
 
         public T GetSetting<T>(string settingName)
         {
             var request = _httpContextAccessor.HttpContext.Request;
             var property = GetProperty<T>(settingName);
-            var currentValue = property.GetValue(this);
+            var currentValue = property.GetValue(Settings);
 
             var qsValue = request.Query[settingName].FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(qsValue))
             {
                 currentValue = Convert.ChangeType(qsValue, property.PropertyType);
-                property.SetValue(this, currentValue);
+                property.SetValue(Settings, currentValue);
                 SaveSettings();
             }
 
             return (T)currentValue;
         }
 
-        public void SaveSetting(string settingName, string value)
-        {
-            var propertyValues = new Dictionary<string, object>();
-            var properties = typeof(SettingsService).GetProperties();
-            foreach (var property in properties)
-            {
-                var propertyValue = property.GetValue(this, null);
-                if (property.Name == settingName)
-                {
-                    propertyValue = value;
-                }
-                propertyValues.Add(property.Name, propertyValue);
-            }
-
-            var cookieData = JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, CookieExpiryDays);
-        }
-
         public void SaveSettings()
         {
             var propertyValues = new Dictionary<string, object>();
-            var properties = typeof(SettingsService).GetProperties();
+            var properties = typeof(SettingsModel).GetProperties();
             foreach (var property in properties)
             {
-                var value = property.GetValue(this, null);
+                var value = property.GetValue(Settings, null);
                 propertyValues.Add(property.Name, value);
             }
 
             var cookieData = JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, CookieExpiryDays);
+            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, Settings.CookieExpiryDays);
         }
 
         private void InitializeSettings()
@@ -86,10 +71,11 @@ namespace Pegasus.Services
             //workout whether the new setting is already stored in the cookie or not, as default values returned during
             //deserialization could be misleading.
             // E.g Say a new bool property is added, ShowWidget, with a config setting of 'true'. This setting would
-            // not currently exist in the cookie data and would default to 'false' upon retrieval from the cook and overwrite the
+            // not currently exist in the cookie data and would default to 'false' upon retrieval from the cookie and overwrite the
             // value set by config.
 
-            _configuration.GetSection(Position).Bind(this);
+            Settings ??= new SettingsModel();
+            _configuration.GetSection(ConfigSection).Bind(Settings);
 
             var cookieSettings = LoadSettingsFromCookies();
 
@@ -98,7 +84,7 @@ namespace Pegasus.Services
                 if (cookieSettings.TryGetValue(property.Name, out var value))
                 {
                     var convertedValue = Convert.ChangeType(value?.ToString(), property.PropertyType);
-                    property.SetValue(this, convertedValue);
+                    property.SetValue(Settings, convertedValue);
                 }
             }
         }

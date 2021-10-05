@@ -28,7 +28,7 @@
                     <span>by @comment.DisplayName</span>
                 </div>
                 <div class="task-comment">
-                    @if (comment?.Comment != null)
+                    @if (comment.Comment != null)
                     {
                         <p>@Html.Raw(comment.Comment.PreparedHtml())</p>
                     }

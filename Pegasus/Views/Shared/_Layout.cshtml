@@ -2,11 +2,11 @@
 @using Pegasus.Services.Models
 @inject ISettingsService _settingsService
 @{
-    var cookiePolicyModel = new CookiePolicyModel()
+    var cookiePolicyModel = new SettingsModel()
     {
-        AnalyticsCookieEnabled = _settingsService.AnalyticsCookieEnabled,
-        MarketingCookieEnabled = _settingsService.MarketingCookieEnabled,
-        CookiePolicyAccepted = _settingsService.CookiePolicyAccepted
+        AnalyticsCookieEnabled = _settingsService.Settings.AnalyticsCookieEnabled,
+        MarketingCookieEnabled = _settingsService.Settings.MarketingCookieEnabled,
+        CookiePolicyAccepted = _settingsService.Settings.CookiePolicyAccepted
     };
 }
 <!DOCTYPE html>

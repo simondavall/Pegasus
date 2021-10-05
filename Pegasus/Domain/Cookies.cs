@@ -12,7 +12,7 @@ namespace Pegasus.Domain
         public Cookies(IHttpContextAccessor httpContextAccessor, ISettingsService settings)
         {
             _httpContextAccessor = httpContextAccessor;
-            _cookieExpiryDays = settings.CookieExpiryDays;
+            _cookieExpiryDays = settings.Settings.CookieExpiryDays;
         }
 
         public void WriteCookie(HttpResponse response, string cookieName, string cookieData)

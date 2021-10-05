@@ -3,7 +3,7 @@
 @using Pegasus.Entities.Enumerations
 @using Pegasus.Extensions
 @using Pegasus.Services
-@inject ISettingsService _settings
+@inject ISettingsService _settingsService
 @inject IHttpContextAccessor _httpAccessor
 
 <div class="sidebar">
@@ -24,13 +24,13 @@
                     <div class="settings-section">
                         <div class="settings-section-title">PAGINATION SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PaginationEnabled">@_settings.GetDisplayName(nameof(_settings.PaginationEnabled))</label>
-                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(_settings.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" class="settings-checkbox" type="checkbox" value="true" @(_settingsService.Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
                             <input type="hidden" value="false" name="PaginationEnabled" />
                         </div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PageSize">@_settings.GetDisplayName(nameof(_settings.PageSize))</label>
-                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@_settings.PageSize">
+                            <label class="settings-label settings-label-font" for="PageSize">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.PageSize))</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@_settingsService.Settings.PageSize">
                         </div>
                     </div>
 
@@ -38,17 +38,17 @@
                     <div class="settings-section">
                         <div class="settings-section-title">PAGE SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="CommentSortOrder">@_settings.GetDisplayName(nameof(_settings.CommentSortOrder))</label>
-                            <select asp-for="@_settings.CommentSortOrder" id="CommentSortOrder" name="CommentSortOrder" asp-items="@Html.GetEnumSelectList<CommentSortOrderEnum>()">
+                            <label class="settings-label settings-label-font" for="CommentSortOrder">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.CommentSortOrder))</label>
+                            <select asp-for="@_settingsService.Settings.CommentSortOrder" id="CommentSortOrder" name="CommentSortOrder" asp-items="@Html.GetEnumSelectList<CommentSortOrderEnum>()">
                             </select>
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_FullWidth">Full Width</label>
-                            <input type="checkbox" id="SettingsModel_FullWidth" name="SettingsModel.FullWidthn" value="true">
+                            <input type="checkbox" id="SettingsModel_FullWidth" class="settings-checkbox" name="SettingsModel.FullWidthn" value="true">
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_SideBarRight">Sidebar Right</label>
-                            <input type="checkbox" id="SettingsModel_SideBarRight" name="SettingsModel.SideBarRight" value="true">
+                            <input type="checkbox" id="SettingsModel_SideBarRight" class="settings-checkbox" name="SettingsModel.SideBarRight" value="true">
                         </div>
                     </div>
 

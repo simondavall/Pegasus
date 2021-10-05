@@ -234,6 +234,10 @@ html {
     min-height: 400px;
 }
 
+.settings-checkbox {
+    margin-top: 4px;
+}
+
 a.settings-close {
     text-decoration: none;
     position: relative;
