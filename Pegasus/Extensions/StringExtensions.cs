@@ -15,9 +15,9 @@ namespace Pegasus.Extensions
             if (string.IsNullOrEmpty(value))
                 return value;
 
-            var newValue = Regex.Replace(value, regexPattern, replacementPattern);
+            var newValue = Regex.Replace( " " + value, regexPattern, replacementPattern);
 
-            return newValue;
+            return newValue.TrimStart();
         }
 
         /// <summary>
