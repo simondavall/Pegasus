@@ -36,7 +36,7 @@
                 <div class="task-comment">
                     @if (comments[i]?.Comment != null)
                     {
-                        <p>@Html.Raw(@comments[i].Comment.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
+                        <p>@Html.Raw(@comments[i].Comment.PreparedHtml())</p>
                     }
                 </div>
                 <div class="comment-task-edit hide">

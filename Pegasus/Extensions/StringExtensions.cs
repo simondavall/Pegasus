@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Pegasus.Extensions
 {
@@ -16,6 +18,17 @@ namespace Pegasus.Extensions
             var newValue = Regex.Replace(value, regexPattern, replacementPattern);
 
             return newValue;
+        }
+
+        /// <summary>
+        /// Prepares a string content to be displayed as raw html. This included HtmlEncoding, changing NewLine chars to <br/>
+        /// and detecting https:// web links and enclosing them in anchor tags.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string PreparedHtml(this string value)
+        {
+            return HttpUtility.HtmlEncode(value).Linkify()?.Replace(Environment.NewLine, "<br/>");
         }
     }
 }

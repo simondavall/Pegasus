@@ -46,7 +46,7 @@
                 <div class="task-description">
                     @if (Model.ProjectTask?.Description != null)
                     {
-                        <p>@Html.Raw(Model.ProjectTask.Description.Linkify().Replace(Environment.NewLine, "<br/>"))</p>
+                        <p>@Html.Raw(Model.ProjectTask.Description.PreparedHtml())</p>
                     }
                 </div>
                 <div class="task-description-edit hide">

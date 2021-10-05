@@ -1,10 +1,55 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Web;
+using NUnit.Framework;
 using Pegasus.Extensions;
 
 namespace PegasusTests.ExtensionTests
 {
     class StringExtensionTests
     {
+        [Test]
+        public void PreparedHtml_WithNullString_ReturnsNull()
+        {
+            var sut = ((string)null).PreparedHtml();
+
+            Assert.IsNull(sut);
+        }
+
+        [Test]
+        public void PreparedHtml_WithTaggedString_ReturnsEncodedString()
+        {
+            var unsafeText = "<script>alert('Some malevolent script')</script>";
+            
+            var sut = unsafeText.PreparedHtml();
+
+            Assert.AreNotEqual(unsafeText, sut);
+            Assert.AreEqual(HttpUtility.HtmlEncode(unsafeText), sut);
+        }
+
+        [Test]
+        public void PreparedHtml_WithNewLineString_ReturnsBRtaggedString()
+        {
+            var unsafeText = "<script>alert('Some malevolent script')</script> " + Environment.NewLine + "Some more text.";
+            
+            var sut = unsafeText.PreparedHtml();
+
+            Assert.AreNotEqual(unsafeText, sut);
+            Assert.AreNotEqual(-1, sut.IndexOf("<br/>", StringComparison.Ordinal));
+        }
+
+        [Test]
+        public void PreparedHtml_WithWebLinkString_ReturnsAnchorTaggedString()
+        {
+            var unsafeText = "<script>alert('Some malevolent script')</script> and a web link https://example.com" + Environment.NewLine + "Some more text.";
+            
+            var sut = unsafeText.PreparedHtml();
+
+            Assert.AreNotEqual(unsafeText, sut);
+            Assert.AreNotEqual(-1, sut.IndexOf("<a href=\"https://example.com\">", StringComparison.Ordinal));
+        }
+
+
+
         [Test]
         public void Linkify_NoUrlMatch_ReturnsUnchangedText()
         {
