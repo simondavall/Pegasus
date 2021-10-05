@@ -113,12 +113,12 @@ namespace Pegasus.Controllers
             [Bind(
                 "Id,Description,Name,Created,ProjectId,ParentTaskId,TaskRef,TaskStatusId,TaskTypeId,TaskPriorityId,FixedInRelease")]
             TaskModel projectTask,
-            int existingTaskStatus, string newComment, [Bind("Id,Comment")] IList<TaskCommentModel> comments, string addSubTask)
+            int currentTaskStatus, string newComment, [Bind("Id,Comment")] IList<TaskCommentModel> comments, string addSubTask)
         {
             var taskViewModelArgs = new TaskViewModelArgs
             {
                 ProjectTask = projectTask,
-                CurrentStatusId = existingTaskStatus,
+                CurrentStatusId = currentTaskStatus,
                 Comments = comments,
                 NewComment = newComment
             };
@@ -127,9 +127,7 @@ namespace Pegasus.Controllers
             {
                 if (projectTask.IsClosed() && await HasIncompleteSubTasks(projectTask.Id))
                 {
-                    // pass error message back to user client
-                    taskViewModelArgs.BannerMessage =
-                        "Update Failed: Cannot complete a task that still has open sub tasks.";
+                    taskViewModelArgs.BannerMessage = "Update Failed: Cannot complete a task that still has open sub tasks.";
                 }
                 else
                 {
@@ -145,7 +143,7 @@ namespace Pegasus.Controllers
                         return RedirectToAction("Create", new { id = addSubTask});
                     }
 
-                    if (projectTask.IsClosed() && projectTask.TaskStatusId != existingTaskStatus)
+                    if (projectTask.IsClosed() && projectTask.TaskStatusId != currentTaskStatus)
                     {
                         if (projectTask.HasParentTask())
                         {
@@ -216,7 +214,7 @@ namespace Pegasus.Controllers
             {
                 BannerMessage = args.BannerMessage,
                 Comments =  await GetComments(args.Comments, args.ProjectTask.Id),
-                ExistingTaskStatus = args.CurrentStatusId != 0 ? args.CurrentStatusId : args.ProjectTask.TaskStatusId,
+                CurrentTaskStatus = args.CurrentStatusId != 0 ? args.CurrentStatusId : args.ProjectTask.TaskStatusId,
                 NewComment = args.NewComment,
                 ParentTask = await _tasksEndpoint.GetTask(args.ProjectTask.ParentTaskId ?? 0),
                 Project = args.Project ?? await _projectsEndpoint.GetProject(args.ProjectTask.ProjectId),

@@ -8,7 +8,7 @@ namespace Pegasus.Models.TaskList
     {
         public string BannerMessage { get; set; }
         public CommentsViewModel Comments { get; set; }
-        public int ExistingTaskStatus { get; set; }
+        public int CurrentTaskStatus { get; set; }
         [Display(Name="Add Comment")]
         [DataType(DataType.MultilineText)]
         public string NewComment { get; set; }
