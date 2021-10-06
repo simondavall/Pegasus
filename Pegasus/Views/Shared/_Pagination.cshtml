@@ -10,17 +10,18 @@
                         <a class="pagination-list-item @(Model.ShowPrevPage ? "":"not-active")" asp-action="@Model.Action" value="@Model.PrevPage">Previous</a>
                     </td>
                     @{
-                        for (int i = 1; i <= Model.TotalPages; i++)
+                        for (var i = 1; i <= Model.TotalPages; i++)
                         {
-                            if (Model.CurrentPage == i)
+                            var pageNumber = i;
+                            if (Model.CurrentPage == pageNumber)
                             {
                                 <td>
-                                    <span class="pagination-list-item not-active">@i</span>
+                                    <span class="pagination-list-item not-active">@pageNumber</span>
                                 </td>
                             }
                             else
                             {
-                                <td><a class="pagination-list-item" asp-action="@Model.Action" value="@i">@i</a></td>
+                                <td><a class="pagination-list-item" asp-action="@Model.Action" value="@pageNumber">@pageNumber</a></td>
                             }
                         }
                     }

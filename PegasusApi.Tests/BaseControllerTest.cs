@@ -8,51 +8,51 @@ namespace PegasusApi.Tests
 {
     public class BaseControllerTest
     {
-        protected UserManager<IdentityUser> _userManager;
+        protected UserManager<IdentityUser> UserManager;
 
-        protected static readonly string _username = "test.user@email.com";
-        protected static readonly string _password = "SecretPassword";
-        protected static readonly string _userId = "12345";
-        protected static readonly string _phoneNumber = "+441234675890";
-        
+        protected const string Username = "test.user@email.com";
+        protected const string Password = "SecretPassword";
+        protected const string UserId = "12345";
+        protected const string PhoneNumber = "+441234675890";
+
         // bad data
-        protected static readonly string _badUserId = "BadValueId";
-        protected static readonly string _badUsername = "bad.user@email.com";
-        protected static readonly string _badPassword = "BadPassword";
-        protected static readonly string _badPhoneNumber = "+NotValid";
-        protected static readonly string _badDisplayName = "Bad Test User";
+        protected const string BadUserId = "BadValueId";
+        protected const string BadUsername = "bad.user@email.com";
+        protected const string BadPassword = "BadPassword";
+        protected const string BadPhoneNumber = "+NotValid";
+        protected const string BadDisplayName = "Bad Test User";
 
-        protected static IdentityError _testError;
+        protected static IdentityError TestError;
 
-        protected IdentityUser _user;
-        protected static UserModel _badUserModel;
+        protected IdentityUser User;
+        protected static UserModel BadUserModel;
 
         [OneTimeSetUp]
         public virtual void OneTimeSetup()
         {
-            _testError = new IdentityError {Code = "ErrorCode1002", Description = "An error has occurred."};
-            _user = new IdentityUser { Id = _userId, UserName = _username, PasswordHash = _password };
-            _badUserModel = new UserModel { DisplayName = _badDisplayName, Id = _userId };
-            _userManager = MockUserManager(_user).Object;
+            TestError = new IdentityError {Code = "ErrorCode1002", Description = "An error has occurred."};
+            User = new IdentityUser { Id = UserId, UserName = Username, PasswordHash = Password };
+            BadUserModel = new UserModel { DisplayName = BadDisplayName, Id = UserId };
+            UserManager = MockUserManager(User).Object;
         }
 
         private static Mock<UserManager<TUser>> MockUserManager<TUser>(TUser user) where TUser : class
         {
-            var identityErrors = new[]{_testError};
+            var identityErrors = new[]{TestError};
 
             var store = new Mock<IUserStore<TUser>>();
             var mgr = new Mock<UserManager<TUser>>(store.Object, null, null, null, null, null, null, null, null);
             // set up for success
-            mgr.Setup(x => x.FindByEmailAsync(_username)).ReturnsAsync(user);
-            mgr.Setup(x => x.FindByIdAsync(_userId)).ReturnsAsync(user);
-            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), _password)).ReturnsAsync(true);
-            mgr.Setup(x => x.GetPhoneNumberAsync(It.IsAny<TUser>())).ReturnsAsync(_phoneNumber);
-            mgr.Setup(x => x.SetPhoneNumberAsync(It.IsAny<TUser>(), _phoneNumber)).ReturnsAsync(IdentityResult.Success);
+            mgr.Setup(x => x.FindByEmailAsync(Username)).ReturnsAsync(user);
+            mgr.Setup(x => x.FindByIdAsync(UserId)).ReturnsAsync(user);
+            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), Password)).ReturnsAsync(true);
+            mgr.Setup(x => x.GetPhoneNumberAsync(It.IsAny<TUser>())).ReturnsAsync(PhoneNumber);
+            mgr.Setup(x => x.SetPhoneNumberAsync(It.IsAny<TUser>(), PhoneNumber)).ReturnsAsync(IdentityResult.Success);
             // set up for fail
-            mgr.Setup(x => x.FindByEmailAsync(_badUsername)).ReturnsAsync((TUser) null);
-            mgr.Setup(x => x.FindByIdAsync(_badUserId)).ReturnsAsync((TUser) null);
-            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), _badPassword)).ReturnsAsync(false);
-            mgr.Setup(x => x.SetPhoneNumberAsync(It.IsAny<TUser>(), _badPhoneNumber)).ReturnsAsync(IdentityResult.Failed(identityErrors));
+            mgr.Setup(x => x.FindByEmailAsync(BadUsername)).ReturnsAsync((TUser) null);
+            mgr.Setup(x => x.FindByIdAsync(BadUserId)).ReturnsAsync((TUser) null);
+            mgr.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), BadPassword)).ReturnsAsync(false);
+            mgr.Setup(x => x.SetPhoneNumberAsync(It.IsAny<TUser>(), BadPhoneNumber)).ReturnsAsync(IdentityResult.Failed(identityErrors));
 
             return mgr;
         }

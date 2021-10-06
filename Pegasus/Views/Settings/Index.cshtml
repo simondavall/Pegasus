@@ -1,15 +1,16 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Extensions
+@using Pegasus.Entities.Enumerations
 @using Pegasus.Extensions
 @using Pegasus.Services
-@inject ISettingsService Settings
-@inject IHttpContextAccessor HttpAccessor
+@inject ISettingsService _settingsService
+@inject IHttpContextAccessor _httpAccessor
 
 <div class="sidebar">
     <div class="settings-sidebar">
         @using (Html.BeginForm("SaveSettings", "Settings", FormMethod.Post))
         {
-            var rq = HttpAccessor.HttpContext.Request;
+            var rq = _httpAccessor.HttpContext.Request;
             var currentUrl = UriHelper.BuildRelative(rq.PathBase, rq.Path, rq.QueryString);
 
             @Html.Hidden("returnUrl", currentUrl)
@@ -23,30 +24,31 @@
                     <div class="settings-section">
                         <div class="settings-section-title">PAGINATION SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PaginationEnabled">@Settings.GetDisplayName(nameof(Settings.PaginationEnabled))</label>
-                            <input id="PaginationEnabled" name="PaginationEnabled" type="checkbox" value="true" @(Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
+                            <label class="settings-label settings-label-font" for="PaginationEnabled">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.PaginationEnabled))</label>
+                            <input id="PaginationEnabled" name="PaginationEnabled" class="settings-checkbox" type="checkbox" value="true" @(_settingsService.Settings.PaginationEnabled ? "checked=\"checked\"" : "") />
                             <input type="hidden" value="false" name="PaginationEnabled" />
                         </div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="PageSize">@Settings.GetDisplayName(nameof(Settings.PageSize))</label>
-                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@Settings.PageSize">
+                            <label class="settings-label settings-label-font" for="PageSize">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.PageSize))</label>
+                            <input class="settings-input-text" type="text" id="PageSize" name="PageSize" value="@_settingsService.Settings.PageSize">
                         </div>
                     </div>
 
                     <!-- Placeholder Setting-->
                     <div class="settings-section">
-                        <div class="settings-section-title">DEVICE SETTINGS</div>
+                        <div class="settings-section-title">PAGE SETTINGS</div>
                         <div class="settings-item">
-                            <label class="settings-label settings-label-font" for="SettingsModel_ScreenSize">Screen Size</label>
-                            <input class="settings-input-text" type="number" id="SettingsModel_ScreenSize" name="SettingsModel.ScreenSize" value="0">
+                            <label class="settings-label settings-label-font" for="CommentSortOrder">@_settingsService.GetDisplayName(nameof(_settingsService.Settings.CommentSortOrder))</label>
+                            <select asp-for="@_settingsService.Settings.CommentSortOrder" id="CommentSortOrder" name="CommentSortOrder" asp-items="@Html.GetEnumSelectList<CommentSortOrderEnum>()">
+                            </select>
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_FullWidth">Full Width</label>
-                            <input type="checkbox" id="SettingsModel_FullWidth" name="SettingsModel.FullWidthn" value="true">
+                            <input type="checkbox" id="SettingsModel_FullWidth" class="settings-checkbox" name="SettingsModel.FullWidthn" value="true">
                         </div>
                         <div class="settings-item">
                             <label class="settings-label settings-label-font" for="SettingsModel_SideBarRight">Sidebar Right</label>
-                            <input type="checkbox" id="SettingsModel_SideBarRight" name="SettingsModel.SideBarRight" value="true">
+                            <input type="checkbox" id="SettingsModel_SideBarRight" class="settings-checkbox" name="SettingsModel.SideBarRight" value="true">
                         </div>
                     </div>
 

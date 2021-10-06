@@ -26,11 +26,11 @@ namespace Pegasus.Library.Api
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, HttpMessageHandler messageHandler = null)
         {
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
-            InitializeClient();
+            InitializeClient(messageHandler);
         }
 
         public HttpClient ApiClient { get; private set; }
@@ -111,6 +111,21 @@ namespace Pegasus.Library.Api
 
             var token = _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             AddTokenToHeaders(token.Result);
+        }
+
+        private void InitializeClient(HttpMessageHandler httpMessageHandler)
+        {
+            if (httpMessageHandler == null)
+            {
+                InitializeClient();
+            }
+            else
+            {
+                ApiClient = new HttpClient(httpMessageHandler)
+                {
+                    BaseAddress = new Uri( "http://FakeUrl")
+                };
+            }
         }
     }
 }

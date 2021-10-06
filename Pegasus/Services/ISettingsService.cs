@@ -1,12 +1,10 @@
-﻿namespace Pegasus.Services
+﻿using Pegasus.Services.Models;
+
+namespace Pegasus.Services
 {
     public interface ISettingsService
     {
-        public int CookieExpiryDays { get; set; }
-        int PageSize { get; set; }
-        bool PaginationEnabled { get; set; }
-        public int ProjectId { get; set; }
-        public int TaskFilterId { get; set; }
+        public SettingsModel Settings { get; set; }
 
         T GetSetting<T>(string settingName);
         void SaveSettings();

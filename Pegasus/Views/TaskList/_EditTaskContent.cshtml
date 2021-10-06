@@ -1,4 +1,3 @@
-@using Pegasus.Entities.Enumerations
 @using Pegasus.Extensions
 @model Pegasus.Models.TaskList.TaskViewModel
 
@@ -7,8 +6,9 @@
     <input type="hidden" asp-for="ProjectTask.ProjectId" />
     <input type="hidden" asp-for="ProjectTask.Id" />
     <input type="hidden" asp-for="ProjectTask.Created" />
-    <input type="hidden" asp-for="ExistingTaskStatus" value="@Model.ExistingTaskStatus" />
+    <input type="hidden" asp-for="CurrentTaskStatus" value="@Model.CurrentTaskStatus" />
     <input type="hidden" asp-for="ProjectTask.ParentTaskId"/>
+    <input type="hidden" id="addSubTask" name="addSubTask" value=""/>
     <div class="col-sm-9">
         <div class="banner-message">
             <span>@Model.BannerMessage</span>
@@ -31,19 +31,33 @@
                 <span asp-validation-for="ProjectTask.TaskRef" class="text-danger"></span>
             </div>
             <div class="col-md-9">
-                <input asp-for="ProjectTask.Name" class="form-control form-no-max-control task-title" />
+                <textarea rows="1" asp-for="ProjectTask.Name" class="form-control form-no-max-control task-title" ></textarea>
                 <span asp-validation-for="ProjectTask.Name" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group task-description-section">
+            <input id="rollbackDescription" type="hidden" value="@Model.ProjectTask?.Description"/>
             <label asp-for="ProjectTask.Description" class="col-md-2 col-form-label"></label>
+            <span class="comment-edit-buttons btn-group-xs">
+                <a class="btn btn-xs task-description-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit description"></i></a>
+                <a class="btn btn-xs task-description-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
+            </span>
             <div class="col-md-12">
-                <textarea rows="5" asp-for="ProjectTask.Description" class="form-control form-no-max-control"></textarea>
-                <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
+                <div class="task-description">
+                    @if (Model.ProjectTask?.Description != null)
+                    {
+                        <p>@Html.Raw(Model.ProjectTask.Description.PreparedHtml())</p>
+                    }
+                </div>
+                <div class="task-description-edit hide">
+                    <textarea rows="5" asp-for="ProjectTask.Description" class="task-description-text form-control form-no-max-control"></textarea>
+                    <span asp-validation-for="ProjectTask.Description" class="text-danger"></span>
+                </div>
             </div>
         </div>
+        
+        <partial name="_CommentList" model="Model.Comments"/>
 
-        <partial name="_CommentList" model="Model.Comments.ToList()" />
         <div class="form-group">
             <label asp-for="@Model.NewComment" class="col-md-4 col-form-label"></label>
             <div class="col-md-8">
@@ -67,7 +81,7 @@
                 <input id="editTaskButton" type="submit" value="Update" class="btn btn-primary"/>
                 @if (!Model.ProjectTask.IsClosed())
                 {
-                    <a id="createSubTaskButton" class="btn btn-primary" asp-controller="TaskList" asp-action="Create" asp-route-id="@Model.ProjectTask.Id">Add Sub Task</a>
+                    <input id="addSubTaskButton" type="submit" value="Add Sub Task" class="btn btn-primary"/>
                 }
             </div>
         </div>

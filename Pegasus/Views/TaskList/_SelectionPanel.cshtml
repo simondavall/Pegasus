@@ -1,4 +1,4 @@
-﻿@model Pegasus.Models.TaskList.IndexViewModel
+﻿@model Pegasus.Models.TaskList.SelectionPanelViewModel
 
 <div class="card card-default card-expand-md">
     <input id="page" type="hidden" asp-for="Page" />
@@ -12,7 +12,7 @@
                 <a class="card-toggler stretched-link" data-toggle="collapse" href="#project-list-items" aria-label="Toggle projects list"></a>
             </div>
         </div>
-        <div id="project-list-items" class="collapse d-sm-inline-flex" data-parent="#project-list">
+        <div id="project-list-items" class="collapse d-sm-inline-flex project-flex" data-parent="#project-list">
             <div class="card-body project-list">
                 <div>
                     <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>

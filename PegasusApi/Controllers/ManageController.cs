@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using PegasusApi.Library.DataAccess;
 using PegasusApi.Library.Models.Manage;
 
@@ -22,15 +23,17 @@ namespace PegasusApi.Controllers
         private readonly IUsersData _usersData;
         private readonly UrlEncoder _urlEncoder;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<ManageController> _logger;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         public ManageController(UserManager<IdentityUser> userManager, IUsersData usersData, 
-            UrlEncoder urlEncoder, IConfiguration configuration)
+            UrlEncoder urlEncoder, IConfiguration configuration, ILogger<ManageController> logger)
         {
             _userManager = userManager;
             _usersData = usersData;
             _urlEncoder = urlEncoder;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [Route("AddPassword")]
@@ -39,11 +42,18 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
-            model.Succeeded = addPasswordResult.Succeeded;
+            if (addPasswordResult.Succeeded)
+            {
+                model.Succeeded = true;
+                return model;
+            }
+
             model.Errors = addPasswordResult.Errors.ToList();
+            LogErrors(model , "Failed to add password");
+
             return model;
         }
         
@@ -53,11 +63,18 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            model.Succeeded = changePasswordResult.Succeeded;
+            if (changePasswordResult.Succeeded)
+            {
+                model.Succeeded = true;
+                return model;
+            }
+
             model.Errors = changePasswordResult.Errors.ToList();
+            LogErrors(model , "Failed to add password");
+
             return model;
         }
 
@@ -67,12 +84,16 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {
                 model.IsUpdated = true;
                 model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+                if (model.RecoveryCodes is null || !model.RecoveryCodes.Any())
+                {
+                    _logger.LogError("Failed to return recovery codes for userId {UserId}.", model.UserId);
+                }
             }
 
             return model;
@@ -85,11 +106,13 @@ namespace PegasusApi.Controllers
             var model = new GenerateRecoveryCodesModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             return model;
         }
+
+        
 
         [Route("GetTwoFactorEnabled/{userId}")]
         [HttpGet]
@@ -98,7 +121,7 @@ namespace PegasusApi.Controllers
             var model = new GetTwoFactorEnabledModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.IsEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             return model;
@@ -111,7 +134,7 @@ namespace PegasusApi.Controllers
             var model = new UserDetailsModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.UserId = userId;
             model.Username = user.UserName;
@@ -130,7 +153,7 @@ namespace PegasusApi.Controllers
             var model = new HasPasswordModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.HasPassword = await _userManager.HasPasswordAsync(user);
             return model;
@@ -143,7 +166,7 @@ namespace PegasusApi.Controllers
             var model = new AuthenticatorKeyModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             return await LoadSharedKeyAndQrCodeUriAsync(user);
         }
@@ -154,12 +177,13 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             var set2FaResult =  await _userManager.SetTwoFactorEnabledAsync(user, false);
             if (!set2FaResult.Succeeded)
             {
                 model.Errors = set2FaResult.Errors.ToList();
+                LogErrors(model, "Failed to enable two factor authentication.");
                 return model;
             }
 
@@ -167,6 +191,7 @@ namespace PegasusApi.Controllers
             if (!resetResult.Succeeded)
             {
                 model.Errors = resetResult.Errors.ToList();
+                LogErrors(model, "Failed to reset authenticator key.");
             }
 
             return model;
@@ -178,11 +203,17 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             var set2FaEnabledResult = await _userManager.SetTwoFactorEnabledAsync(user, model.SetEnabled);
-            model.Succeeded = set2FaEnabledResult.Succeeded;
+            if (set2FaEnabledResult.Succeeded)
+            {
+                model.Succeeded = true;
+                return model;
+            }
+
             model.Errors = set2FaEnabledResult.Errors.ToList();
+            LogErrors(model , "Failed to set two factor authentication");
 
             return model;
         }
@@ -193,14 +224,17 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
+            //TODO Check this is not a bug, as cannot update username at the moment (overwritten be stored username)
+            // Leave a comment to say this is intentional if it is.
             model.Username = user.UserName;
             
             var setPhoneNumber = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
             if (!setPhoneNumber.Succeeded)
             {
                 model.Errors = setPhoneNumber.Errors.ToList();
+                LogErrors(model , "Failed to set phone number");
             }
 
             try
@@ -210,6 +244,7 @@ namespace PegasusApi.Controllers
             catch (Exception e)
             {
                 model.Errors.Add(Error( $"Error when saving custom User Settings. Message: {e.Message}"));
+                LogErrors(model , "Failed to set custom settings");
             }
 
             return model;
@@ -223,7 +258,7 @@ namespace PegasusApi.Controllers
             var model = new TwoFactorAuthenticationModel();
             var user = await GetUser(userId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
             model.Is2FaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
@@ -238,7 +273,7 @@ namespace PegasusApi.Controllers
         {
             var user = await GetUser(model.UserId, model);
             if (user == null)
-                return model;
+                return LogErrorReturnModel(model);
 
             model.IsTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, model.VerificationCode);
             return model;
@@ -308,6 +343,21 @@ namespace PegasusApi.Controllers
         private static List<IdentityError> UserNotFoundError(string userId)
         {
             return new List<IdentityError> {Error($"Unable to load user with userId '{userId}'.")};
-    }
+        }
+
+        private void LogErrors(ManageBaseModel model, string errorMessage)
+        {
+            foreach (var identityError in model.Errors)
+            {
+                _logger.LogError("{ErrorMessage} for userId {UserId}. Error - {Error}", errorMessage, model.UserId, identityError);
+            }
+        }
+
+        private T LogErrorReturnModel<T>(T model) where T : ManageBaseModel
+        {
+            model.Errors.Add(new IdentityError { Code = "404", Description = "User not found." });
+            _logger.LogError("User not found for userId {UserId}", model.UserId);
+            return model;
+        }
     }
 }
