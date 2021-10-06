@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Pegasus.Extensions;
 
@@ -19,7 +20,7 @@ namespace PegasusTests.ExtensionTests
         }
 
         [Test]
-        public void IsAjaxRequest_WithoutAjaxtHeaders_ReturnsFalse()
+        public void IsAjaxRequest_WithoutAjaxHeaders_ReturnsFalse()
         {
             HttpContext context = new DefaultHttpContext();
             var request = context.Request;
@@ -27,6 +28,29 @@ namespace PegasusTests.ExtensionTests
             var result = request.IsAjaxRequest();
 
             Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsAjaxRequest_RequestHeadersNull_ReturnsFalse()
+        {
+            HttpContext context = new DefaultHttpContext();
+            var request = context.Request;
+            request.Headers.Clear();
+            var result = request.IsAjaxRequest();
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void IsAjaxRequest_RequestIsNull_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>( NullCallToIsAjax );
+        }
+
+        void NullCallToIsAjax()
+        {
+            var result = (HttpRequest)null;
+            result.IsAjaxRequest();
         }
     }
 }

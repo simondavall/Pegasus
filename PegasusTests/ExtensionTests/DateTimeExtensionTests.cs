@@ -120,5 +120,26 @@ namespace PegasusTests.ExtensionTests
             Assert.AreNotEqual("just now", sut.LapsedTime());
         }
 
+        [Test]
+        public void FormattedDate_NoFormat_ReturnsDefaultFormat()
+        {
+            var defaultFormat = "dd MMM yy, HH:mm";
+            var currentDateTime = DateTime.Now;
+            var sut = currentDateTime.FormattedDate();
+
+            Assert.AreEqual(currentDateTime.ToString(defaultFormat), sut);
+        }
+
+        [Test]
+        public void FormattedDate_WithFormat_ReturnsCorrectFormat()
+        {
+            var customFormat = "yyyyMMddHHmm";
+            var currentDateTime = DateTime.Now;
+
+            var sut = currentDateTime.FormattedDate(customFormat);
+
+            Assert.AreEqual(currentDateTime.ToString(customFormat), sut);
+        }
+
     }
 }

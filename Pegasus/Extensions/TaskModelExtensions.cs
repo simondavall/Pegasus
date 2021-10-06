@@ -20,7 +20,7 @@ namespace Pegasus.Extensions
             if (model.TaskPriorityId > (int) TaskPriorityEnum.Normal)
             {
                 if (model.IsClosed()) return "priority-icon-closed";
-                return $"priority-icon-{model.ToString()?.ToLower()}";
+                return $"priority-icon-{model.TaskPriorityId}";
             }
 
             return string.Empty;
@@ -76,7 +76,7 @@ namespace Pegasus.Extensions
             return sorter.Sort(projectTasks);
         }
 
-        internal static IEnumerable<TaskModel> Filtered(this IEnumerable<TaskModel> projectTasks, int taskFilterId)
+        public static IEnumerable<TaskModel> Filtered(this IEnumerable<TaskModel> projectTasks, int taskFilterId)
         {
             switch ((TaskFilters)taskFilterId)
             {
