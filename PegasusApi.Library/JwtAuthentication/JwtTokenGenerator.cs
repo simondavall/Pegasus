@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using TokenOptions = PegasusApi.Library.JwtAuthentication.Models.TokenOptions;
@@ -18,13 +19,16 @@ namespace PegasusApi.Library.JwtAuthentication
 
         public JwtTokenGenerator(TokenOptions tokenOptions)
         {
-            _tokenOptions = tokenOptions ??
-                throw new ArgumentNullException(
-                    $"An instance of valid {nameof(TokenOptions)} must be passed in order to generate a JWT!");
+            Guard.Against.Null(tokenOptions, nameof(tokenOptions));
+            Guard.Against.Null(tokenOptions.SigningKey, nameof(tokenOptions.SigningKey));
+
+            _tokenOptions = tokenOptions;
         }
 
         public string GenerateAccessToken(IdentityUser user, IEnumerable<Claim> userClaims)
         {
+            Guard.Against.Null(user, nameof(user));
+
             var claims = MergeUserClaimsWithDefaultClaims(user, userClaims);
 
             var token = new JwtSecurityToken(
@@ -37,7 +41,7 @@ namespace PegasusApi.Library.JwtAuthentication
 
         private IEnumerable<Claim> MergeUserClaimsWithDefaultClaims(IdentityUser user, IEnumerable<Claim> userClaims)
         {
-            var claims = new List<Claim>(userClaims)
+            var claims = new List<Claim>(userClaims ?? new List<Claim>())
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),

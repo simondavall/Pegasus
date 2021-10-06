@@ -40,7 +40,7 @@ namespace PegasusApi.Library.DataAccess
 
         public async Task UpdateProject(ProjectModel project)
         {
-            var parameters = new { project.Id, project.Name, project.ProjectPrefix };
+            var parameters = new { project.Id, project.Name, project.ProjectPrefix, project.IsPinned, project.IsActive };
             await _dataAccess.SaveDataAsync<dynamic>("spProjects_Update", parameters, ConnectionStringName);
         }
     }

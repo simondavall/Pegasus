@@ -23,7 +23,8 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                 configuration["Token:SigningKey"],
                 configuration["Token:ExpiryInMinutes"]);
 
-            var hostingEnvironment = services.BuildServiceProvider().GetService<IHostEnvironment>();
+            var serviceProvider = services.BuildServiceProvider();
+            var hostingEnvironment = serviceProvider.GetService<IHostEnvironment>();
 
             // The JwtAuthTicketFormat representing the cookie needs an IDataProtector and
             // IDataSerializer to correctly encrypt/decrypt and serialize/deserialize the payload
@@ -41,7 +42,11 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                 .SetApplicationName(applicationName);
 
             services.AddScoped<IDataSerializer<AuthenticationTicket>, TicketSerializer>();
-            services.AddScoped<IJwtTokenAccessor, JwtTokenAccessor>(serviceProvider => new JwtTokenAccessor(tokenOptions));
+            services.AddScoped<IJwtTokenAccessor, JwtTokenAccessor>(tokenAccessor => new JwtTokenAccessor(tokenOptions));
+            
+            serviceProvider = services.BuildServiceProvider();
+            var dataProtector = serviceProvider.GetDataProtector(new[] { $"{applicationName}-Auth1" });
+            var dataSerializer = serviceProvider.GetService<IDataSerializer<AuthenticationTicket>>();
 
             services.AddAuthentication(options =>
                 {
@@ -49,11 +54,14 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddCookie(CookieConstants.TwoFactorRememberMeScheme, o => o.Cookie.Name = CookieConstants.TwoFactorRememberMeScheme)
-                .AddCookie(CookieConstants.TwoFactorUserIdScheme, o =>
+                .AddCookie(CookieConstants.TwoFactorRememberMeScheme, options =>
                 {
-                    o.Cookie.Name = CookieConstants.TwoFactorUserIdScheme;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Cookie.Name = CookieConstants.TwoFactorRememberMeScheme;
+                })
+                .AddCookie(CookieConstants.TwoFactorUserIdScheme, options =>
+                {
+                    options.Cookie.Name = CookieConstants.TwoFactorUserIdScheme;
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
@@ -77,8 +85,8 @@ namespace Pegasus.Library.JwtAuthentication.Extensions
                     // authentication will fail.
                     options.TicketDataFormat = new JwtAuthTicketFormat(
                         tokenOptions.ToTokenValidationParams(),
-                        services.BuildServiceProvider().GetService<IDataSerializer<AuthenticationTicket>>(),
-                        services.BuildServiceProvider().GetDataProtector(new[] { $"{applicationName}-Auth1" }));
+                        dataSerializer,
+                        dataProtector);
 
                     options.LoginPath = GetPath(authUrlOptions?.LoginPath, "/Account/Login");
                     options.LogoutPath = GetPath(authUrlOptions?.LogoutPath, "/Account/Logout");

@@ -8,7 +8,7 @@ namespace Pegasus.Extensions
     {
         public static string GetDisplayName(this ISettingsService service, string propertyName)
         {
-            var property = service?.GetType().GetProperty(propertyName);
+            var property = service?.Settings?.GetType().GetProperty(propertyName);
             return property?.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? string.Empty;
         }
     }

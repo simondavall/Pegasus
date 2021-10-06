@@ -20,6 +20,12 @@
                 <th>
                     @Html.DisplayNameFor(model => model.ProjectPrefix)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsPinned)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsActive)
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -45,6 +51,16 @@
                     <td>
                         <div class="table-row-condensed">
                             @Html.DisplayFor(modelItem => item.ProjectPrefix)
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-row-condensed">
+                            @Html.DisplayFor(modelItem => item.IsPinned)
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-row-condensed">
+                            @Html.DisplayFor(modelItem => item.IsActive)
                         </div>
                     </td>
                 </tr>

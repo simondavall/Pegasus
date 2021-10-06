@@ -274,7 +274,7 @@ namespace Pegasus.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction("Index", "TaskList");
             }
         }
     }

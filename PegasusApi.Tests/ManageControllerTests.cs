@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using PegasusApi.Controllers;
 using PegasusApi.Library.DataAccess;
@@ -9,8 +11,6 @@ namespace PegasusApi.Tests
     public class ManageControllerTests : BaseControllerTest
     {
         private IUsersData _usersData;
-        //private UrlEncoder _urlEncoder;
-        //private IConfiguration _configuration;
         private static UserModel _userModel;
 
         [OneTimeSetUp]
@@ -18,7 +18,7 @@ namespace PegasusApi.Tests
         {
             base.OneTimeSetup();
 
-            _userModel = new UserModel { DisplayName = "Test User", Id = _userId };
+            _userModel = new UserModel { DisplayName = "Test User", Id = UserId };
             _usersData = MockUsersData().Object;
         }
 
@@ -31,21 +31,23 @@ namespace PegasusApi.Tests
         [Test]
         public void GetUserDetails_ValidUserId_ReturnsDetails()
         {
-            var manageController = new ManageController(_userManager, _usersData, null, null);
-            var sut = manageController.GetUserDetails(_userId).Result;
+            var manageController = new ManageController(UserManager, _usersData, null, null, null);
+            var sut = manageController.GetUserDetails(UserId).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
 
-            Assert.AreEqual(_user.UserName, sut.Username);
+            Assert.AreEqual(User.UserName, sut.Username);
             Assert.AreEqual(_userModel.DisplayName, sut.DisplayName);
-            Assert.AreEqual(_phoneNumber, sut.PhoneNumber);
+            Assert.AreEqual(PhoneNumber, sut.PhoneNumber);
         }
 
         [Test]
         public void GetUserDetails_InvalidUserId_EmptyInstanceWithOneErrorCount()
         {
-            var manageController = new ManageController(_userManager, _usersData, null, null);
-            var sut = manageController.GetUserDetails(_badUserId).Result;
+            var mockLogger = MockLogger<ManageController>();
+
+            var manageController = new ManageController(UserManager, _usersData, null, null, mockLogger);
+            var sut = manageController.GetUserDetails(BadUserId).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
 
@@ -61,20 +63,20 @@ namespace PegasusApi.Tests
         {
             var userDetailsModel = new UserDetailsModel()
             {
-                UserId = _userId,
+                UserId = UserId,
                 DisplayName = "Test User",
-                Username = _username,
-                PhoneNumber = _phoneNumber
+                Username = Username,
+                PhoneNumber = PhoneNumber
             };
 
-            var manageController = new ManageController(_userManager, _usersData, null, null);
+            var manageController = new ManageController(UserManager, _usersData, null, null, null);
             var sut = manageController.SetUserDetails(userDetailsModel).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
 
-            Assert.AreEqual(_user.UserName, sut.Username);
+            Assert.AreEqual(User.UserName, sut.Username);
             Assert.AreEqual(_userModel.DisplayName, sut.DisplayName);
-            Assert.AreEqual(_phoneNumber, sut.PhoneNumber);
+            Assert.AreEqual(PhoneNumber, sut.PhoneNumber);
             Assert.Zero(sut.Errors.Count);
         }
 
@@ -83,22 +85,23 @@ namespace PegasusApi.Tests
         {
             var userDetailsModel = new UserDetailsModel()
             {
-                UserId = _userId,
+                UserId = UserId,
                 DisplayName = "Test User",
-                Username = _username,
-                PhoneNumber = _badPhoneNumber
+                Username = Username,
+                PhoneNumber = BadPhoneNumber
             };
+            var mockLogger = MockLogger<ManageController>();
 
-            var manageController = new ManageController(_userManager, _usersData, null, null);
+            var manageController = new ManageController(UserManager, _usersData, null, null, mockLogger);
             var sut = manageController.SetUserDetails(userDetailsModel).Result;
 
             Assert.IsInstanceOf<UserDetailsModel>(sut);
 
-            Assert.AreEqual(_user.UserName, sut.Username);
+            Assert.AreEqual(User.UserName, sut.Username);
             Assert.AreEqual(_userModel.DisplayName, sut.DisplayName);
-            Assert.AreEqual(_badPhoneNumber, sut.PhoneNumber);
+            Assert.AreEqual(BadPhoneNumber, sut.PhoneNumber);
             Assert.NotZero(sut.Errors.Count);
-            Assert.Contains(_testError, sut.Errors);
+            Assert.Contains(TestError, sut.Errors);
         }
 
         
@@ -106,12 +109,32 @@ namespace PegasusApi.Tests
         {
             var usersData = new Mock<IUsersData>();
             // set up for success
-            usersData.Setup(x => x.GetUser(_userId)).ReturnsAsync(_userModel);
+            usersData.Setup(x => x.GetUser(UserId)).ReturnsAsync(_userModel);
             usersData.Setup(x => x.UpdateUser(_userModel));
             //set up for fail
-            usersData.Setup(x => x.GetUser(_badUserId)).ReturnsAsync((UserModel) null);
+            usersData.Setup(x => x.GetUser(BadUserId)).ReturnsAsync((UserModel) null);
 
             return usersData;
+        }
+
+        private static ILogger<T> MockLogger<T>()
+        {
+            var mockLogger = new Mock<ILogger<T>>();
+            mockLogger.Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+            //loggerMock.Verify(
+            //    x => x.Log(
+            //        It.IsAny<LogLevel>(),
+            //        It.IsAny<EventId>(),
+            //        It.Is<It.IsAnyType>((v, t) => true),
+            //        It.IsAny<Exception>(),
+            //        It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+
+            return mockLogger.Object;
         }
     }
 }

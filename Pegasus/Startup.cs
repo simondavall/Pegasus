@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +7,6 @@ using Pegasus.Library.Api;
 using Pegasus.Library.Api.Extensions;
 using Pegasus.Library.JwtAuthentication.Extensions;
 using Pegasus.Services;
-using Pegasus.Services.Models;
 
 namespace Pegasus
 {
@@ -31,6 +29,8 @@ namespace Pegasus
             services.AddHttpContextAccessor();
             services.AddSingleton<IApiHelper, ApiHelper>();
             services.AddScoped<ISettingsService, SettingsService>();
+            services.AddScoped<IMarketingService, MarketingService>();
+            services.AddScoped<IAnalyticsService, AnalyticsService>();
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 
@@ -65,7 +65,7 @@ namespace Pegasus
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=TaskList}/{action=Index}/{id?}");
             });
         }
     }
