@@ -1,17 +1,18 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using Pegasus.Library.Services.Http;
 using Pegasus.Services;
 
 namespace Pegasus.Domain
 {
     public class Cookies
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextWrapper _httpContext;
         private readonly int _cookieExpiryDays;
 
-        public Cookies(IHttpContextAccessor httpContextAccessor, ISettingsService settings)
+        public Cookies(IHttpContextWrapper httpContextWrapper, ISettingsService settings)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextWrapper;
             _cookieExpiryDays = settings.Settings.CookieExpiryDays;
         }
 
@@ -30,7 +31,7 @@ namespace Pegasus.Domain
 
         public void DeleteCookie(HttpResponse response, string cookieName)
         {
-            if (_httpContextAccessor.HttpContext.Request.Cookies.ContainsKey(cookieName))
+            if (_httpContext.Request.Cookies.ContainsKey(cookieName))
                 response.Cookies.Delete(cookieName);
         }
     }

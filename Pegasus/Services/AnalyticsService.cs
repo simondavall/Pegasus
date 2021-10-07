@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Pegasus.Domain;
+﻿using Pegasus.Domain;
 using Pegasus.Library.JwtAuthentication.Constants;
+using Pegasus.Library.Services.Http;
 
 namespace Pegasus.Services
 {
@@ -11,28 +11,28 @@ namespace Pegasus.Services
 
     public class AnalyticsService : IAnalyticsService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextWrapper _httpContext;
         private readonly ISettingsService _settingsService;
 
         // create a marketing cookie to simulate a marketing scenario (might actually be a third party tool/plugin)
         private readonly Cookies _cookies;
 
-        public AnalyticsService(IHttpContextAccessor httpContextAccessor, ISettingsService settingsService)
+        public AnalyticsService(IHttpContextWrapper httpContextWrapper, ISettingsService settingsService)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextWrapper;
             _settingsService = settingsService;
-            _cookies = new Cookies(httpContextAccessor, settingsService);
+            _cookies = new Cookies(_httpContext, settingsService);
         }
 
         public void SaveAnalyticsData(string data)
         {
             if (_settingsService.Settings.AnalyticsCookieEnabled)
             {
-                _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.Analytics, data);
+                _cookies.WriteCookie(_httpContext.Response, CookieConstants.Analytics, data);
                 return;
             }
             
-            _cookies.DeleteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.Analytics);
+            _cookies.DeleteCookie(_httpContext.Response, CookieConstants.Analytics);
         }
     }
 }

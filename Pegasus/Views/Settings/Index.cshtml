@@ -1,16 +1,16 @@
-﻿@using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Http.Extensions
+﻿@using Microsoft.AspNetCore.Http.Extensions
 @using Pegasus.Entities.Enumerations
 @using Pegasus.Extensions
+@using Pegasus.Library.Services.Http
 @using Pegasus.Services
 @inject ISettingsService _settingsService
-@inject IHttpContextAccessor _httpAccessor
+@inject IHttpContextWrapper _httpContext
 
 <div class="sidebar">
     <div class="settings-sidebar">
         @using (Html.BeginForm("SaveSettings", "Settings", FormMethod.Post))
         {
-            var rq = _httpAccessor.HttpContext.Request;
+            var rq = _httpContext.Request;
             var currentUrl = UriHelper.BuildRelative(rq.PathBase, rq.Path, rq.QueryString);
 
             @Html.Hidden("returnUrl", currentUrl)
