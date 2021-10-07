@@ -4,13 +4,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
 using Pegasus.Library.JwtAuthentication.Constants;
 using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Account;
+using Pegasus.Library.Services.Http;
 using Pegasus.Models.Account;
 using Pegasus.Services.Models;
 using ClaimTypes = System.Security.Claims.ClaimTypes;
@@ -31,25 +31,25 @@ namespace Pegasus.Services
 
     public class SignInManager : ISignInManager
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextWrapper _httpContext;
         private readonly IAccountsEndpoint _accountsEndpoint;
         private readonly IApiHelper _apiHelper;
         private readonly IJwtTokenAccessor _tokenAccessor;
         private readonly IAuthenticationEndpoint _authenticationEndpoint;
 
-        public SignInManager(IHttpContextAccessor httpContextAccessor, IAccountsEndpoint accountsEndpoint, IApiHelper apiHelper,
+        public SignInManager(IHttpContextWrapper httpContextWrapper, IAccountsEndpoint accountsEndpoint, IApiHelper apiHelper,
             IJwtTokenAccessor tokenAccessor, IAuthenticationEndpoint authenticationEndpoint)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextWrapper;
             _accountsEndpoint = accountsEndpoint;
             _apiHelper = apiHelper;
             _tokenAccessor = tokenAccessor;
             _authenticationEndpoint = authenticationEndpoint;
         }
 
-        private HttpContext HttpContext
+        private IHttpContextWrapper HttpContext
         {
-            get { return _httpContextAccessor.HttpContext; }
+            get { return _httpContext; }
         }
 
         public async Task DoSignInAsync(string userId, bool rememberClient)

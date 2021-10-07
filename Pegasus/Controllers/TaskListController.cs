@@ -10,6 +10,7 @@ using Pegasus.Entities.Enumerations;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
+using Pegasus.Library.Services.Http;
 using Pegasus.Models;
 using Pegasus.Models.TaskList;
 using Pegasus.Services;
@@ -72,7 +73,8 @@ namespace Pegasus.Controllers
         {
             if (ModelState.IsValid)
             {
-                projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                IHttpContextWrapper httpContext = new HttpContextWrapper(this);
+                projectTask.UserId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var taskId = await _tasksEndpoint.AddTask(projectTask);
                 return RedirectToAction("Edit", new { id = taskId});
             }
@@ -130,7 +132,8 @@ namespace Pegasus.Controllers
                 }
                 else
                 {
-                    projectTask.UserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    IHttpContextWrapper httpContext = new HttpContextWrapper(this);
+                    projectTask.UserId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     await _tasksEndpoint.UpdateTask(projectTask);
                     await _commentsEndpoint.UpdateComments(comments);
                     if (!string.IsNullOrWhiteSpace(newComment))

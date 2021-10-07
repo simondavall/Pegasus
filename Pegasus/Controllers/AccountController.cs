@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models.Account;
+using Pegasus.Library.Services.Http;
 using Pegasus.Models.Account;
 using Pegasus.Services;
 
@@ -184,7 +184,9 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            IHttpContextWrapper httpContext = new HttpContextWrapper(this);
+            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             _apiHelper.RemoveTokenFromHeaders();
             _logger.LogInformation("User logged out.");
             ViewData["ReturnUrl"] = returnUrl;
