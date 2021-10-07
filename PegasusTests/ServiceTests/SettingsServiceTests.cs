@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System.IO;
@@ -15,7 +16,7 @@ namespace PegasusTests
         private Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
         [SetUp]
-        public void Setup()
+        public void SetupOnEachTest()
         {
             // setup configuration from json string
             const string myJsonConfig = "{\"PegasusSettings\":{\"TaskFilterId\":125,\"CookieExpiryDays\":20,\"PageSize\":25}}";
@@ -66,6 +67,37 @@ namespace PegasusTests
         {
             var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
             Assert.Throws<PropertyTypeInvalidException>(() => sut.GetSetting<string>("TaskFilterId"));
+        }
+
+        [Test]
+        public void GetProperty_ValidProperty_ReturnsPropertyValue()
+        {
+            _mockHttpContextAccessor.Setup(x => x.HttpContext.Request.Query[It.IsAny<string>()]).Returns("");
+            var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
+            Assert.AreEqual(17, sut.GetSetting<int>("TaskFilterId"));
+        }
+
+        [Test]
+        public void GetSetting_QueryStringPresent_ReturnsQueryStringValue()
+        {
+            _mockHttpContextAccessor.Setup(x => x.HttpContext.Request.Query["TaskFilterId"]).Returns("145");
+            _mockHttpContextAccessor
+                .Setup(x => x.HttpContext.Response.Cookies.Append(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+
+            var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
+            Assert.AreEqual(145, sut.GetSetting<int>("TaskFilterId"));
+        }
+
+        [Test]
+        public void LoadSettingsFromCookies_DoesNotFindSettingsInCookie_ReturnsEmptyDictionary()
+        {
+            // by implication. Setting cookies to empty string will force LoadSettingsFromCookies to return default value
+            _mockHttpContextAccessor.Setup(x => x.HttpContext.Request.Query[It.IsAny<string>()]).Returns("");
+            _mockHttpContextAccessor.Setup(x => x.HttpContext.Request.Cookies[It.IsAny<string>()])
+                .Returns("");
+            var sut = new SettingsService(_mockHttpContextAccessor.Object, _configuration);
+
+            Assert.AreEqual(125, sut.GetSetting<int>("TaskFilterId"));
         }
 
         [Test]

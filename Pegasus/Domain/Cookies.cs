@@ -4,7 +4,14 @@ using Pegasus.Services;
 
 namespace Pegasus.Domain
 {
-    public class Cookies
+    public interface ICookies
+    {
+        void WriteCookie(HttpResponse response, string cookieName, string cookieData);
+        void WriteCookie(HttpResponse response, string cookieName, string cookieData, int expiryDays);
+        void DeleteCookie(HttpResponse response, string cookieName);
+    }
+
+    public class Cookies : ICookies
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int _cookieExpiryDays;

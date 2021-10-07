@@ -44,13 +44,7 @@ namespace PegasusTests.ExtensionTests
         [Test]
         public void IsAjaxRequest_RequestIsNull_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>( NullCallToIsAjax );
-        }
-
-        void NullCallToIsAjax()
-        {
-            var result = (HttpRequest)null;
-            result.IsAjaxRequest();
+            Assert.Throws<ArgumentNullException>(() => ((HttpRequest)null).IsAjaxRequest());
         }
     }
 }
