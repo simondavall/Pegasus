@@ -11,7 +11,7 @@ using Pegasus.Entities.Enumerations;
 using Pegasus.Services;
 using Pegasus.Services.Models;
 
-namespace PegasusTests
+namespace PegasusTests.ServiceTests
 {
     class TaskFilterServiceTests
     {

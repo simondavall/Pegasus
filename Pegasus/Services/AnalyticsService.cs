@@ -21,18 +21,18 @@ namespace Pegasus.Services
         {
             _httpContext = httpContextWrapper;
             _settingsService = settingsService;
-            _cookies = new Cookies(_httpContext, settingsService);
+            Cookies = new Cookies(_httpContext, settingsService);
         }
 
         public void SaveAnalyticsData(string data)
         {
             if (_settingsService.Settings.AnalyticsCookieEnabled)
             {
-                _cookies.WriteCookie(_httpContext.Response, CookieConstants.Analytics, data);
+                Cookies.WriteCookie(_httpContext.Response, CookieConstants.Analytics, data);
                 return;
             }
             
-            _cookies.DeleteCookie(_httpContext.Response, CookieConstants.Analytics);
+            Cookies.DeleteCookie(_httpContext.Response, CookieConstants.Analytics);
         }
     }
 }

@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Pegasus.Domain;
 using Pegasus.Library.JwtAuthentication.Constants;
+using Pegasus.Library.Services.Http;
 using Pegasus.Services;
 using Pegasus.Services.Models;
 
@@ -10,18 +11,16 @@ namespace PegasusTests.ServiceTests
 {
     class MarketingServiceTests
     {
-        private Mock<IHttpContextAccessor> _mockHttpContextAccessor;
+        private Mock<IHttpContextWrapper> _mockHttpContextWrapper;
         private Mock<ISettingsService> _mockSettingsService;
         private Mock<ICookies> _mockCookies;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            _mockHttpContextWrapper = new Mock<IHttpContextWrapper>();
             _mockSettingsService = new Mock<ISettingsService>();
             _mockCookies = new Mock<ICookies>();
-
-            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(new DefaultHttpContext());
         }
 
         [Test]
@@ -31,7 +30,7 @@ namespace PegasusTests.ServiceTests
             _mockSettingsService.Setup(x => x.Settings).Returns(settingsModel);
             _mockCookies.Setup(x => x.WriteCookie(It.IsAny<HttpResponse>(), CookieConstants.Marketing, It.IsAny<string>()));
 
-            var sut = new TestableMarketingService(_mockHttpContextAccessor.Object, _mockSettingsService.Object, _mockCookies.Object);
+            var sut = new TestableMarketingService(_mockHttpContextWrapper.Object, _mockSettingsService.Object, _mockCookies.Object);
             sut.SaveMarketingData("Some data");
 
             _mockCookies.Verify(
@@ -47,7 +46,7 @@ namespace PegasusTests.ServiceTests
 
             _mockCookies.Setup(x => x.DeleteCookie(It.IsAny<HttpResponse>(), CookieConstants.Marketing));
 
-            var sut = new TestableMarketingService(_mockHttpContextAccessor.Object, _mockSettingsService.Object, _mockCookies.Object);
+            var sut = new TestableMarketingService(_mockHttpContextWrapper.Object, _mockSettingsService.Object, _mockCookies.Object);
             sut.SaveMarketingData("Some data");
 
             _mockCookies.Verify(
@@ -57,7 +56,7 @@ namespace PegasusTests.ServiceTests
 
         private class TestableMarketingService : MarketingService
         {
-            public TestableMarketingService(IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, ICookies cookies = null) : base(httpContextAccessor, settingsService)
+            public TestableMarketingService(IHttpContextWrapper httpContextWrapper, ISettingsService settingsService, ICookies cookies = null) : base(httpContextWrapper, settingsService)
             {
                 if(!(cookies is null))
                     Cookies = cookies;
