@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using Pegasus.Extensions;
 using Pegasus.Services;
-using Pegasus.Services.Models;
 
 namespace PegasusTests.ExtensionTests
 {

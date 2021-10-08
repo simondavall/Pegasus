@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Pegasus.Controllers;
 using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Services;
-using PegasusTests.TestUtilities;
 
 namespace PegasusTests.ExtensionTests
 {

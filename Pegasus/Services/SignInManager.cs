@@ -108,8 +108,10 @@ namespace Pegasus.Services
             {
                 await DoTwoFactorSignInAsync(userId, false);
             }
-
-            await DoSignInAsync(userId, false);
+            else
+            {
+                await DoSignInAsync(userId, false);
+            }
         }
 
         public async Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser)
