@@ -135,7 +135,7 @@ namespace Pegasus.Controllers
                     IHttpContextWrapper httpContext = new HttpContextWrapper(this);
                     projectTask.UserId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     await _tasksEndpoint.UpdateTask(projectTask);
-                    await _commentsEndpoint.UpdateComments(comments);
+                    await _commentsEndpoint.UpdateComments(comments.ToList());
                     if (!string.IsNullOrWhiteSpace(newComment))
                         await _commentsEndpoint.AddComment(new TaskCommentModel
                             {TaskId = projectTask.Id, Comment = newComment, UserId = projectTask.UserId});

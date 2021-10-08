@@ -14,10 +14,10 @@ namespace Pegasus.Library.Api
     {
         HttpClient ApiClient { get; }
         void AddTokenToHeaders(string token);
-        Task<T> GetFromUri<T>(string requestUri);
+        Task<T> GetFromUri<T>(string requestUri) where T : class, new();
         Task<List<T>> GetListFromUri<T>(string requestUri);
-        Task<T> PostAsync<T>(T model, string requestUri);
-        Task<TOut> PostAsync<T, TOut>(T model, string requestUri);
+        Task<T> PostAsync<T>(T model, string requestUri) where T : class, new();
+        Task<TOut> PostAsync<T, TOut>(T model, string requestUri) where TOut : notnull;
         void RemoveTokenFromHeaders();
     }
 
@@ -41,14 +41,14 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
 
-        public async Task<T> GetFromUri<T>(string requestUri)
+        public async Task<T> GetFromUri<T>(string requestUri) where T : class, new()
         {
             using (var response = await ApiClient.GetAsync(requestUri))
             {
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 var result = await response.Content.ReadAsAsync<T>();
-                return result;
+                return result ?? new T();
             }
         }
 
@@ -59,11 +59,11 @@ namespace Pegasus.Library.Api
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 var result = await response.Content.ReadAsAsync<List<T>>();
-                return result;
+                return result ?? new List<T>();
             }
         }
 
-        public async Task<T> PostAsync<T>(T model, string requestUri)
+        public async Task<T> PostAsync<T>(T model, string requestUri) where T : class, new()
         {
             HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
             using (var response = await ApiClient.PostAsync(requestUri, content))
@@ -71,11 +71,11 @@ namespace Pegasus.Library.Api
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 var result = await response.Content.ReadAsAsync<T>();
-                return result;
+                return result ?? new T();
             }
         }
         
-        public async Task<TOut> PostAsync<T, TOut>(T model, string requestUri)
+        public async Task<TOut> PostAsync<T, TOut>(T model, string requestUri) where TOut : notnull
         {
             HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
             using (var response = await ApiClient.PostAsync(requestUri, content))

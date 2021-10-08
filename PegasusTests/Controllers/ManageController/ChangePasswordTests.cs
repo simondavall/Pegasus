@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -9,14 +10,15 @@ using NUnit.Framework;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Manage;
+using Pegasus.Library.Services.Resources;
 using Pegasus.Services;
 
 namespace PegasusTests.Controllers.ManageController
 {
-    class ChangePasswordTests : ManageControllerBase
+    class ChangePasswordTests : ManageControllerTestsBase
     {
         [Test]
-        public async Task ChangePassword_HasErrors_ReturnsViewResult()
+        public async Task GET_ChangePassword_HasErrors_ReturnsViewResult()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
@@ -36,7 +38,7 @@ namespace PegasusTests.Controllers.ManageController
         }
 
         [Test]
-        public async Task ChangePassword_HasNoPassword_RedirectsToSetPassword()
+        public async Task GET_ChangePassword_HasNoPassword_RedirectsToSetPassword()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {StatusMessage = "OK", HasPassword = false});
@@ -57,7 +59,7 @@ namespace PegasusTests.Controllers.ManageController
         }
 
         [Test]
-        public async Task ChangePassword_HasPassword_ReturnsViewResult()
+        public async Task GET_ChangePassword_HasPassword_ReturnsViewResult()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {StatusMessage = "OK", HasPassword = true});
@@ -77,7 +79,7 @@ namespace PegasusTests.Controllers.ManageController
         }
 
         [Test]
-        public async Task ChangePassword_InvalidModelState_ReturnsViewResult()
+        public async Task POST_ChangePassword_InvalidModelState_ReturnsViewResult()
         {
             var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
             var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
@@ -94,7 +96,7 @@ namespace PegasusTests.Controllers.ManageController
         }
 
         [Test]
-        public async Task ChangePassword_PostHasErrors_ReturnsViewResultWithErrorInModelState()
+        public async Task POST_ChangePassword_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new ChangePasswordModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
@@ -112,11 +114,11 @@ namespace PegasusTests.Controllers.ManageController
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<ChangePasswordModel>(((ViewResult) result).Model);
-            Assert.NotZero(sut.ModelState.ErrorCount);
+            Assert.NotZero(sut.ModelState.ErrorCount, "An error occurred.");
         }
 
         [Test]
-        public async Task ChangePassword_NoErrors_ReturnsViewResultWithErrorInModelState()
+        public async Task POST_ChangePassword_NoErrors_ReturnsViewResultWithErrorInModelState()
         {
             var authResult = GetAuthenticateResult();
             _mockHttpContextWrapper.Setup(x => x.AuthenticateAsync(It.IsAny<string>())).ReturnsAsync(authResult);
@@ -143,7 +145,7 @@ namespace PegasusTests.Controllers.ManageController
             _mockHttpContextWrapper.Verify(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<ChangePasswordModel>(((ViewResult) result).Model);
-            Assert.AreEqual("Your password has been changed.", ((ChangePasswordModel)((ViewResult)result).Model).StatusMessage);
+            Assert.AreEqual(Resources.ControllerStrings.ManageController.PasswordChangedSuccess, ((ChangePasswordModel)((ViewResult)result).Model).StatusMessage);
         }
 
 

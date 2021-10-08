@@ -8,7 +8,7 @@ using Pegasus.Services;
 
 namespace PegasusTests.Controllers.ManageController
 {
-    class TwoFactorAuthenticationTests : ManageControllerBase
+    class TwoFactorAuthenticationTests : ManageControllerTestsBase
     {
         [Test]
         public async Task TwoFactorAuthentication_CallsApi_ReturnsViewResult()

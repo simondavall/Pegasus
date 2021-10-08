@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models.Manage;
+using Pegasus.Library.Services.Resources;
 using Pegasus.Services;
 
 
@@ -36,13 +37,15 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
-            var model = await _manageEndpoint.HasPasswordAsync(UserId);
-            if (HasErrors(model))
+            var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(UserId);
+            if (hasPasswordModel.HasErrors)
             {
+                LogErrors(hasPasswordModel);
+                ModelState.AddModelError(string.Empty, "Cannot change password at this time.");
                 return View();
             }
 
-            if (!model.HasPassword)
+            if (!hasPasswordModel.HasPassword)
             {
                 return RedirectToAction(nameof(SetPassword));
             }
@@ -64,19 +67,18 @@ namespace Pegasus.Controllers
             var changePasswordResult = await _manageEndpoint.ChangePasswordAsync(model);
             if (!changePasswordResult.Succeeded)
             {
-                foreach (var error in changePasswordResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                _logger.LogError("Failed to change password for User with ID '{UserId}'.", UserId);
+                LogErrors(changePasswordResult);
+                ModelState.AddModelError(string.Empty, Resources.ControllerStrings.ManageController.FailedToChangePassword);
                 return View(model);
             }
 
             await _signInManager.RefreshSignInAsync(UserId);
 
-            _logger.LogInformation("User with UserId {userId} changed their password successfully.", UserId);
+            _logger.LogInformation("User with UserId {UserId} changed their password successfully.", UserId);
             model = new ChangePasswordModel
             {
-                StatusMessage = "Your password has been changed."
+                StatusMessage = Resources.ControllerStrings.ManageController.PasswordChangedSuccess
             };
 
             return View(model);
@@ -87,18 +89,27 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Disable2Fa()
         {
             var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
+
+            var model = new Disable2FaModel();
             if (!twoFactorAuthentication.IsEnabled)
             {
-                ModelState.AddModelError(string.Empty, $"Cannot disable 2FA for user with ID '{UserId}' as it's not currently enabled.");
+                model.StatusMessage = Resources.ControllerStrings.ManageController.CannotDisable2Fa;
             }
 
-            return View();
+            return View(model);
         }
 
         [Route(nameof(Disable2Fa))]
         [HttpPost]
         public async Task<IActionResult> Disable2Fa(Disable2FaModel model)
         {
+            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
+            if (!twoFactorAuthentication.IsEnabled)
+            {
+                model.StatusMessage = Resources.ControllerStrings.ManageController.CannotDisable2Fa;
+                return View(model);
+            }
+
             var setTwoFactorEnabled = new SetTwoFactorEnabledModel
             {
                 UserId = UserId,
@@ -106,13 +117,15 @@ namespace Pegasus.Controllers
             };
 
             var disable2FaResult = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabled);
-            if (!disable2FaResult.Succeeded || HasErrors(disable2FaResult))
+            if (!disable2FaResult.Succeeded)
             {
                 _logger.LogError("Failed to disable 2fa for User with ID '{UserId}'.", UserId);
+                LogErrors(disable2FaResult);
+                model.StatusMessage = Resources.ControllerStrings.ManageController.FailedToDisable2Fa;
                 return View(model);
             }
             
-            _logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", UserId);
+            _logger.LogTrace("User with ID '{UserId}' has disabled 2fa.", UserId);
             return RedirectToAction("TwoFactorAuthentication", "Manage");
         }
 
@@ -122,8 +135,11 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> EnableAuthenticator()
         {
             var model = await LoadEnableAuthenticatorModel(UserId);
-            HasErrors(model);
-            
+            if (model.HasErrors)
+            {
+                LogErrors(model);
+            }
+
             return View(model);
         }
 
@@ -134,7 +150,11 @@ namespace Pegasus.Controllers
             if (!ModelState.IsValid)
             {
                 model = await LoadEnableAuthenticatorModel(UserId);
-                HasErrors(model);
+                if (model.HasErrors)
+                {
+                    LogErrors(model);
+                }
+
                 return View(model);
             }
 
@@ -145,15 +165,19 @@ namespace Pegasus.Controllers
             };
 
             verifyTwoFactorTokenModel = await _manageEndpoint.VerifyTwoFactorTokenAsync(verifyTwoFactorTokenModel);
-            if (HasErrors(verifyTwoFactorTokenModel))
+            if (verifyTwoFactorTokenModel.HasErrors)
             {
+                LogErrors(verifyTwoFactorTokenModel);
                 return View(model);
             }
             if (!verifyTwoFactorTokenModel.IsTokenValid)
             {
                 ModelState.AddModelError("Code", "Verification code is invalid.");
                 model = await LoadEnableAuthenticatorModel(UserId);
-                HasErrors(model);
+                if (model.HasErrors)
+                {
+                    LogErrors(model);
+                }
                 return View(model);
             }
 
@@ -165,8 +189,9 @@ namespace Pegasus.Controllers
                 SetEnabled = true
             };
             var set2FaEnabled = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabledModel);
-            if (HasErrors(set2FaEnabled))
+            if (set2FaEnabled.HasErrors)
             {
+                LogErrors(set2FaEnabled);
                 _logger.LogError("Failed to enable 2FA with an authenticator app for User with ID '{UserId}'.", set2FaEnabled.UserId);
                 return View(model);
             }
@@ -175,8 +200,9 @@ namespace Pegasus.Controllers
 
             var recoveryCodeStatus = new RecoveryCodeStatusModel {UserId = UserId};
             recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatus(recoveryCodeStatus);
-            if (HasErrors(model))
+            if (model.HasErrors)
             {
+                LogErrors(model);
                 return View(model);
             }
             if (recoveryCodeStatus.IsUpdated)
@@ -216,8 +242,9 @@ namespace Pegasus.Controllers
             }
 
             var model = await _manageEndpoint.GenerateNewRecoveryCodesAsync(UserId);
-            if (HasErrors(model))
+            if (model.HasErrors)
             {
+                LogErrors(model);
                 return View(nameof(GenerateRecoveryCodes));
             }
             var showRecoveryCodes = new ShowRecoveryCodesModel
@@ -236,7 +263,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Index()
         {
             var model = await _manageEndpoint.GetUserDetails(UserId);
-            HasErrors(model);
+            LogErrors(model);
             return View(model);
         }
 
@@ -251,8 +278,9 @@ namespace Pegasus.Controllers
             }
 
             model = await _manageEndpoint.SetUserDetails(model);
-            if (HasErrors(model))
+            if (model.HasErrors)
             {
+                LogErrors(model);
                 return View(model);
             }
 
@@ -274,8 +302,9 @@ namespace Pegasus.Controllers
         {
             model.UserId = UserId;
             model = await _manageEndpoint.ResetAuthenticatorAsync(model);
-            if (HasErrors(model))
+            if (model.HasErrors)
             {
+                LogErrors(model);
                 return View(model);
             }
             
@@ -295,8 +324,9 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> SetPassword()
         {
             var model = await _manageEndpoint.HasPasswordAsync(UserId);
-            if (HasErrors(model))
+            if (model.HasErrors)
             {
+                LogErrors(model);
                 return View();
             }
 
@@ -379,16 +409,13 @@ namespace Pegasus.Controllers
             return model;
         }
 
-        private bool HasErrors(ManageBaseModel model)
+        private void LogErrors(ManageBaseModel model)
         {
-            if (model.Errors == null || !model.Errors.Any()) return false;
+            if (model is null || !model.HasErrors) return;
             foreach (var error in model.Errors)
             {
-                _logger.LogError("Error processing userId {UserId}: {Error}", model.UserId, error);
-                ModelState.AddModelError(string.Empty, error.Description);
+                _logger.LogError("Error: userId {UserId} code {ErrorCode} message {ErrorMessage}", model.UserId, error.Code, error.Description);
             }
-
-            return true;
         }
     }
 }

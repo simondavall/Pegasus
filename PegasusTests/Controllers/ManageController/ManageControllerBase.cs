@@ -13,8 +13,9 @@ using Pegasus.Library.Services.Http;
 
 namespace PegasusTests.Controllers.ManageController
 {
-    class ManageControllerBase
+    class ManageControllerTestsBase
     {
+        protected const string UserId = "user-id";
         protected ControllerContext _controllerContext;
         protected Mock<IHttpContextWrapper> _mockHttpContextWrapper;
         protected Mock<IAccountsEndpoint> _mockAccountsEndpoint;
@@ -58,7 +59,7 @@ namespace PegasusTests.Controllers.ManageController
             };
 
             var userMock = new Mock<ClaimsPrincipal>(identity.Object);
-            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, "user-id") };
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, UserId) };
             userMock.Setup(p => p.Claims).Returns(claims);
 
             var context = new DefaultHttpContext {User = userMock.Object};
