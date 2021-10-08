@@ -28,11 +28,12 @@ namespace Pegasus
             services.AddApiEndpoints();
 
             services.AddHttpContextAccessor();
+            services.AddScoped<IHttpContextWrapper, HttpContextWrapper>();
             services.AddSingleton<IApiHelper, ApiHelper>();
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<IMarketingService, MarketingService>();
             services.AddScoped<IAnalyticsService, AnalyticsService>();
-            services.AddScoped<IHttpContextWrapper, HttpContextWrapper>();
+
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 

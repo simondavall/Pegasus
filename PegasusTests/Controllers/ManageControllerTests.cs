@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
+using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Http;
 using Pegasus.Services;
@@ -167,9 +168,34 @@ namespace PegasusTests.Controllers
         }
 
         [Test]
-        public void POST_ChangePassword_NoErrors_ReturnsViewResultWithErrorInModelState()
+        public async Task ChangePassword_NoErrors_ReturnsViewResultWithErrorInModelState()
         {
+            var authResult = GetAuthenticateResult();
+            _mockHttpContextWrapper.Setup(x => x.AuthenticateAsync(It.IsAny<string>())).ReturnsAsync(authResult);
 
+            _mockAuthenticationEndpoint.Setup(x => x.Authenticate2Fa(It.IsAny<string>())).ReturnsAsync(new AuthenticatedUser {AccessToken = "access-token", Authenticated = true});
+
+            _mockTokenAccessor.Setup(x => x.GetAccessTokenWithClaimsPrincipal(It.IsAny<AuthenticatedUser>())).Returns(new TokenWithClaimsPrincipal());
+
+            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()))
+                .ReturnsAsync(new ChangePasswordModel {Succeeded = true, StatusMessage = "OK"});
+            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
+
+            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
+
+            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
+            {
+                ControllerContext = _controllerContext
+            };
+
+            var result = await sut.ChangePassword(new ChangePasswordModel());
+
+            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()), Times.Exactly(1));
+            _mockHttpContextWrapper.Verify(x => x.SignOutAsync(), Times.Exactly(1));
+            _mockHttpContextWrapper.Verify(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()), Times.Exactly(1));
+            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.IsInstanceOf<ChangePasswordModel>(((ViewResult) result).Model);
+            Assert.AreEqual("Your password has been changed.", ((ChangePasswordModel)((ViewResult)result).Model).StatusMessage);
         }
 
         private void SetupAuthenticationMock()
@@ -199,6 +225,18 @@ namespace PegasusTests.Controllers
             };
         }
 
+        private AuthenticateResult GetAuthenticateResult()
+        {
+            var testScheme = "FakeScheme";
+            var principal = new ClaimsPrincipal();
+            principal.AddIdentity(new ClaimsIdentity(new[] {
+                new Claim("amr", "access-token"),
+                new Claim("Manager", "yes"),
+                new Claim(ClaimTypes.Role, "Administrator"),
+                new Claim(ClaimTypes.NameIdentifier, "John")
+            }, testScheme));
 
+            return AuthenticateResult.Success(new AuthenticationTicket(principal, new AuthenticationProperties(), testScheme));
+        }
     }
 }

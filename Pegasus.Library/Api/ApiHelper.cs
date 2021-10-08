@@ -4,8 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Pegasus.Library.Services.Http;
 
 namespace Pegasus.Library.Api
 {
@@ -23,12 +24,12 @@ namespace Pegasus.Library.Api
     public class ApiHelper : IApiHelper
     {
         private readonly IConfiguration _configuration;
-        private readonly IHttpContextWrapper _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiHelper(IConfiguration configuration, IHttpContextWrapper httpContextWrapper, HttpMessageHandler messageHandler = null)
+        public ApiHelper(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, HttpMessageHandler messageHandler = null)
         {
             _configuration = configuration;
-            _httpContext = httpContextWrapper;
+            _httpContextAccessor = httpContextAccessor;
             InitializeClient(messageHandler);
         }
 
@@ -108,7 +109,7 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var token = _httpContext.GetTokenAsync("access_token");
+            var token = _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             AddTokenToHeaders(token.Result);
         }
 
