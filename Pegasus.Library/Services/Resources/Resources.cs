@@ -15,7 +15,10 @@
                 public static string CannotEnableAuthenticatorSet2FaEnabled => "Cannot enable Authenticator at the moment - Problem setting 2Fa enabled.";
                 public static string CannotEnableAuthenticatorTokenInvalid => "Cannot enable Authenticator at the moment - Token invalid.";
                 public static string CannotEnableAuthenticatorVerifyToken => "Cannot enable Authenticator at the moment - Problem verifying token.";
-                
+
+                public static string CannotGenerateRecoveryCodes => "Cannot generate recovery codes at the moment - Problem generating codes.";
+                public static string CannotGenerateRecoveryCodes2FaCheck => "Cannot generate recovery codes at the moment - Problem checking 2Fa enabled.";
+                public static string CannotGenerateRecoveryCodesNotEnabled => "Cannot generate recovery codes because 2FA is not enabled.";
 
                 public static string FailedToChangePassword => "Failed to change password.";
                 public static string FailedToDisable2Fa => "Failed to disable Two Factor Authentication.";

@@ -10,7 +10,7 @@ using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Resources;
 
-namespace PegasusTests.Controllers.ManageController
+namespace PegasusTests.Controllers.ManageControllerTests
 {
     class ChangePasswordTests : ManageControllerTestsBase
     {

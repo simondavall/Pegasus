@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Resources;
 
-namespace PegasusTests.Controllers.ManageController
+namespace PegasusTests.Controllers.ManageControllerTests
 {
     class Disable2FaTests : ManageControllerTestsBase
     {

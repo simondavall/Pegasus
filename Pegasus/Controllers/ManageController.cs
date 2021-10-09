@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -216,39 +215,30 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateRecoveryCodes()
         {
-            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
-            if (!twoFactorAuthentication.IsEnabled)
-            {
-                throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{UserId}' because they do not have 2FA enabled.");
-            }
-
-            return View();
+            var check2Fa = await CheckTwoFactorIsEnabled();
+            return check2Fa ?? View();
         }
 
         [Route(nameof(GenerateRecoveryCodes))]
         [HttpPost]
         public async Task<IActionResult> GenerateRecoveryCodesPost()
         {
-            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
-            if (!twoFactorAuthentication.IsEnabled)
+            var check2Fa = await CheckTwoFactorIsEnabled();
+            if (check2Fa != null) 
             {
-                throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{UserId}' as they do not have 2FA enabled.");
+                return check2Fa;
             }
 
-            var model = await _manageEndpoint.GenerateNewRecoveryCodesAsync(UserId);
-            if (model.HasErrors)
-            {
-                LogErrors(model);
-                return View(nameof(GenerateRecoveryCodes));
-            }
+            var generateCodesModel = await _manageEndpoint.GenerateNewRecoveryCodesAsync(UserId);
+            if (generateCodesModel.HasErrors) return HasErrors(generateCodesModel, nameof(GenerateRecoveryCodes), ManageControllerStrings.CannotGenerateRecoveryCodes);
+
             var showRecoveryCodes = new ShowRecoveryCodesModel
             {
-                RecoveryCodes = model.RecoveryCodes.ToArray()
+                RecoveryCodes = generateCodesModel.RecoveryCodes?.ToArray()
             };
 
             _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", UserId);
 
-            showRecoveryCodes.StatusMessage = "You have generated new recovery codes.";
             return RedirectToAction("ShowRecoveryCodes", showRecoveryCodes);
         }
         
@@ -401,6 +391,27 @@ namespace Pegasus.Controllers
                 AuthenticatorUri = authenticatorKeyModel.AuthenticatorUri
             };
             return model;
+        }
+
+        private async Task<IActionResult> CheckTwoFactorIsEnabled()
+        {
+            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
+            if (twoFactorAuthentication.HasErrors) return HasErrors(twoFactorAuthentication, nameof(GenerateRecoveryCodes), ManageControllerStrings.CannotGenerateRecoveryCodes2FaCheck);
+
+            if (!twoFactorAuthentication.IsEnabled)
+            {
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotGenerateRecoveryCodesNotEnabled);
+                return View(nameof(GenerateRecoveryCodes));
+            }
+
+            return null;
+        }
+
+        private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage)
+        {
+            LogErrors(model);
+            ModelState.AddModelError(string.Empty, modelSateMessage);
+            return View(viewName);
         }
 
         private void LogErrors(ManageBaseModel model)

@@ -7,12 +7,12 @@ using NUnit.Framework;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Resources;
 
-namespace PegasusTests.Controllers.ManageController
+namespace PegasusTests.Controllers.ManageControllerTests
 {
     class EnableAuthenticatorTests : ManageControllerTestsBase
     {
         [Test]
-        public async Task GET_EnableAuthenticator_HasErrors_ReturnsViewResult()
+        public async Task GET_EnableAuthenticator_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<AuthenticatorKeyModel>(It.IsAny<string>()))
                 .ReturnsAsync(new AuthenticatorKeyModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
@@ -43,7 +43,7 @@ namespace PegasusTests.Controllers.ManageController
         }
 
         [Test]
-        public async Task POST_EnableAuthenticator_InvalidModelState_ReturnsViewResult()
+        public async Task POST_EnableAuthenticator_InvalidModelState_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<AuthenticatorKeyModel>(It.IsAny<string>()))
                 .ReturnsAsync(new AuthenticatorKeyModel {StatusMessage = "OK"});

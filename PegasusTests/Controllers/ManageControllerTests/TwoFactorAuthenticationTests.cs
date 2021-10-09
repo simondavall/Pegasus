@@ -6,7 +6,7 @@ using Pegasus.Library.Api;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Services;
 
-namespace PegasusTests.Controllers.ManageController
+namespace PegasusTests.Controllers.ManageControllerTests
 {
     class TwoFactorAuthenticationTests : ManageControllerTestsBase
     {

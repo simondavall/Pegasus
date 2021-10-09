@@ -14,7 +14,7 @@ using Pegasus.Library.Models.Account;
 using Pegasus.Library.Services.Http;
 using Pegasus.Services;
 
-namespace PegasusTests.Controllers.ManageController
+namespace PegasusTests.Controllers.ManageControllerTests
 {
     class ManageControllerTestsBase
     {
