@@ -9,7 +9,10 @@ using Moq;
 using NUnit.Framework;
 using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication;
+using Pegasus.Library.JwtAuthentication.Models;
+using Pegasus.Library.Models.Account;
 using Pegasus.Library.Services.Http;
+using Pegasus.Services;
 
 namespace PegasusTests.Controllers.ManageController
 {
@@ -42,6 +45,20 @@ namespace PegasusTests.Controllers.ManageController
             SetupContextUser();
         }
 
+        protected Pegasus.Controllers.ManageController CreateManageController()
+        {
+            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
+
+            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object,
+                _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
+
+            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
+            {
+                ControllerContext = _controllerContext
+            };
+            return sut;
+        }
+
         private void SetupAuthenticationMock()
         {
             _mockHttpContextWrapper = new Mock<IHttpContextWrapper>();
@@ -49,6 +66,18 @@ namespace PegasusTests.Controllers.ManageController
             _mockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
             _mockHttpContextWrapper.Setup(x => x.SignOutAsync(It.IsAny<string>()));
             _mockHttpContextWrapper.Setup(x => x.SignOutAsync());
+        }
+
+        protected void SetupSignInMocks()
+        {
+            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<string>()))
+                .ReturnsAsync(new AuthenticatedUser { UserId = UserId });
+            _mockAuthenticationEndpoint.Setup(x => x.Authenticate2Fa(It.IsAny<string>()))
+                .ReturnsAsync(new AuthenticatedUser { UserId = UserId });
+            _mockTokenAccessor.Setup(x => x.GetAccessTokenWithClaimsPrincipal(It.IsAny<AuthenticatedUser>()))
+                .Returns(new TokenWithClaimsPrincipal());
+            _mockAccountsEndpoint.Setup(x => x.RememberClientAsync(It.IsAny<string>())).ReturnsAsync(new RememberClientModel
+                { SupportsUserSecurityStamp = true, SecurityStamp = "security-stamp" });
         }
 
         private void SetupContextUser()

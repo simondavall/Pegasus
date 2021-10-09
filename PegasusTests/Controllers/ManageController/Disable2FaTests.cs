@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Pegasus.Library.Api;
 using Pegasus.Library.Models.Manage;
-using Pegasus.Services;
 using Pegasus.Library.Services.Resources;
 
 namespace PegasusTests.Controllers.ManageController
@@ -19,15 +16,8 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = true});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.Disable2Fa();
 
             _mockApiHelper.Verify(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()), Times.Exactly(1));
@@ -40,15 +30,8 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = false});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.Disable2Fa();
 
             _mockApiHelper.Verify(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()), Times.Exactly(1));
@@ -63,15 +46,8 @@ namespace PegasusTests.Controllers.ManageController
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = false});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.Disable2Fa(new Disable2FaModel());
 
             _mockApiHelper.Verify(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()), Times.Exactly(1));
@@ -86,15 +62,8 @@ namespace PegasusTests.Controllers.ManageController
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = true});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.Disable2Fa(new Disable2FaModel());
 
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()), Times.Exactly(1));
@@ -111,15 +80,8 @@ namespace PegasusTests.Controllers.ManageController
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = true});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = true, StatusMessage = "OK"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.Disable2Fa(new Disable2FaModel());
 
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()), Times.Exactly(1));

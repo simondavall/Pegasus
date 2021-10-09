@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -7,11 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Pegasus.Library.Api;
 using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Resources;
-using Pegasus.Services;
 
 namespace PegasusTests.Controllers.ManageController
 {
@@ -22,19 +19,13 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
 
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            var sut = CreateManageController();
             var result = await sut.ChangePassword();
 
             _mockApiHelper.Verify(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
+            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
         }
 
         [Test]
@@ -42,15 +33,8 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {StatusMessage = "OK", HasPassword = false});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.ChangePassword();
 
             _mockApiHelper.Verify(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()), Times.Exactly(1));
@@ -63,15 +47,8 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
                 .ReturnsAsync(new HasPasswordModel {StatusMessage = "OK", HasPassword = true});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.ChangePassword();
 
             _mockApiHelper.Verify(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()), Times.Exactly(1));
@@ -81,13 +58,7 @@ namespace PegasusTests.Controllers.ManageController
         [Test]
         public async Task POST_ChangePassword_InvalidModelState_ReturnsViewResult()
         {
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
+            var sut = CreateManageController();
             sut.ModelState.AddModelError("Error", "An error occurred.");
             var result = await sut.ChangePassword(new ChangePasswordModel());
 
@@ -100,15 +71,8 @@ namespace PegasusTests.Controllers.ManageController
         {
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new ChangePasswordModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object,_mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.ChangePassword(new ChangePasswordModel());
 
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()), Times.Exactly(1));
@@ -129,15 +93,8 @@ namespace PegasusTests.Controllers.ManageController
 
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new ChangePasswordModel {Succeeded = true, StatusMessage = "OK"});
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
-
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object, _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
-
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
-            {
-                ControllerContext = _controllerContext
-            };
-
+            
+            var sut = CreateManageController();
             var result = await sut.ChangePassword(new ChangePasswordModel());
 
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()), Times.Exactly(1));

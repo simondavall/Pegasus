@@ -6,7 +6,16 @@
         {
             public static class ManageController
             {
+                public static string AuthenticatorAppVerified => "Your authenticator app has been verified.";
+                public static string CannotChangePassword => "Cannot change password at this time.";
                 public static string CannotDisable2Fa => $"Cannot disable 2FA, it's not currently enabled.";
+
+                public static string CannotEnableAuthenticator => "Cannot enable Authenticator at this moment.";
+                public static string CannotEnableAuthenticatorRecoveryCodes => "The was a problem checking recovery codes. Try repeating the process.";
+                public static string CannotEnableAuthenticatorSet2FaEnabled => "Cannot enable Authenticator at the moment - Problem setting 2Fa enabled.";
+                public static string CannotEnableAuthenticatorTokenInvalid => "Cannot enable Authenticator at the moment - Token invalid.";
+                public static string CannotEnableAuthenticatorVerifyToken => "Cannot enable Authenticator at the moment - Problem verifying token.";
+                
 
                 public static string FailedToChangePassword => "Failed to change password.";
                 public static string FailedToDisable2Fa => "Failed to disable Two Factor Authentication.";

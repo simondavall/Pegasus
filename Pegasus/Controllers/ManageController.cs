@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models.Manage;
-using Pegasus.Library.Services.Resources;
 using Pegasus.Services;
+using ManageControllerStrings = Pegasus.Library.Services.Resources.Resources.ControllerStrings.ManageController;
 
 
 namespace Pegasus.Controllers
@@ -41,7 +41,7 @@ namespace Pegasus.Controllers
             if (hasPasswordModel.HasErrors)
             {
                 LogErrors(hasPasswordModel);
-                ModelState.AddModelError(string.Empty, "Cannot change password at this time.");
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotChangePassword);
                 return View();
             }
 
@@ -69,7 +69,7 @@ namespace Pegasus.Controllers
             {
                 _logger.LogError("Failed to change password for User with ID '{UserId}'.", UserId);
                 LogErrors(changePasswordResult);
-                ModelState.AddModelError(string.Empty, Resources.ControllerStrings.ManageController.FailedToChangePassword);
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.FailedToChangePassword);
                 return View(model);
             }
 
@@ -78,7 +78,7 @@ namespace Pegasus.Controllers
             _logger.LogInformation("User with UserId {UserId} changed their password successfully.", UserId);
             model = new ChangePasswordModel
             {
-                StatusMessage = Resources.ControllerStrings.ManageController.PasswordChangedSuccess
+                StatusMessage = ManageControllerStrings.PasswordChangedSuccess
             };
 
             return View(model);
@@ -93,7 +93,7 @@ namespace Pegasus.Controllers
             var model = new Disable2FaModel();
             if (!twoFactorAuthentication.IsEnabled)
             {
-                model.StatusMessage = Resources.ControllerStrings.ManageController.CannotDisable2Fa;
+                model.StatusMessage = ManageControllerStrings.CannotDisable2Fa;
             }
 
             return View(model);
@@ -106,7 +106,7 @@ namespace Pegasus.Controllers
             var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
             if (!twoFactorAuthentication.IsEnabled)
             {
-                model.StatusMessage = Resources.ControllerStrings.ManageController.CannotDisable2Fa;
+                model.StatusMessage = ManageControllerStrings.CannotDisable2Fa;
                 return View(model);
             }
 
@@ -121,7 +121,7 @@ namespace Pegasus.Controllers
             {
                 _logger.LogError("Failed to disable 2fa for User with ID '{UserId}'.", UserId);
                 LogErrors(disable2FaResult);
-                model.StatusMessage = Resources.ControllerStrings.ManageController.FailedToDisable2Fa;
+                model.StatusMessage = ManageControllerStrings.FailedToDisable2Fa;
                 return View(model);
             }
             
@@ -129,18 +129,18 @@ namespace Pegasus.Controllers
             return RedirectToAction("TwoFactorAuthentication", "Manage");
         }
 
-        
         [Route(nameof(EnableAuthenticator))]
         [HttpGet]
         public async Task<IActionResult> EnableAuthenticator()
         {
-            var model = await LoadEnableAuthenticatorModel(UserId);
-            if (model.HasErrors)
+            var enableAuthenticatorModel = await LoadEnableAuthenticatorModel(UserId);
+            if (enableAuthenticatorModel.HasErrors)
             {
-                LogErrors(model);
+                LogErrors(enableAuthenticatorModel);
+                ModelState.AddModelError(string.Empty,  ManageControllerStrings.CannotEnableAuthenticator);
             }
 
-            return View(model);
+            return View(enableAuthenticatorModel);
         }
 
         [Route(nameof(EnableAuthenticator))]
@@ -149,36 +149,26 @@ namespace Pegasus.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = await LoadEnableAuthenticatorModel(UserId);
-                if (model.HasErrors)
-                {
-                    LogErrors(model);
-                }
-
-                return View(model);
+                return await EnableAuthenticator();
             }
 
             var verifyTwoFactorTokenModel = new VerifyTwoFactorTokenModel
             {
                 UserId = UserId,
-                VerificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty)
+                VerificationCode = model.Code?.Replace(" ", string.Empty).Replace("-", string.Empty)
             };
 
             verifyTwoFactorTokenModel = await _manageEndpoint.VerifyTwoFactorTokenAsync(verifyTwoFactorTokenModel);
             if (verifyTwoFactorTokenModel.HasErrors)
             {
                 LogErrors(verifyTwoFactorTokenModel);
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorVerifyToken);
                 return View(model);
             }
             if (!verifyTwoFactorTokenModel.IsTokenValid)
             {
-                ModelState.AddModelError("Code", "Verification code is invalid.");
-                model = await LoadEnableAuthenticatorModel(UserId);
-                if (model.HasErrors)
-                {
-                    LogErrors(model);
-                }
-                return View(model);
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorTokenInvalid);
+                return await EnableAuthenticator();
             }
 
             await _signInManager.DoTwoFactorSignInAsync(UserId, false);
@@ -191,18 +181,22 @@ namespace Pegasus.Controllers
             var set2FaEnabled = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabledModel);
             if (set2FaEnabled.HasErrors)
             {
-                LogErrors(set2FaEnabled);
                 _logger.LogError("Failed to enable 2FA with an authenticator app for User with ID '{UserId}'.", set2FaEnabled.UserId);
+                LogErrors(set2FaEnabled);
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorSet2FaEnabled);
                 return View(model);
             }
+
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", set2FaEnabled.UserId);
-            model.StatusMessage = "Your authenticator app has been verified.";
+            model.StatusMessage = ManageControllerStrings.AuthenticatorAppVerified;
 
             var recoveryCodeStatus = new RecoveryCodeStatusModel {UserId = UserId};
             recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatus(recoveryCodeStatus);
-            if (model.HasErrors)
+            if (recoveryCodeStatus.HasErrors)
             {
-                LogErrors(model);
+                _logger.LogError("Failed to check recovery codes for User with ID '{UserId}'.", set2FaEnabled.UserId);
+                LogErrors(recoveryCodeStatus);
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorRecoveryCodes);
                 return View(model);
             }
             if (recoveryCodeStatus.IsUpdated)
@@ -210,7 +204,7 @@ namespace Pegasus.Controllers
                 var showRecoveryCodesModel = new ShowRecoveryCodesModel()
                 {
                     StatusMessage = model.StatusMessage,
-                    RecoveryCodes = recoveryCodeStatus.RecoveryCodes.ToArray()
+                    RecoveryCodes = recoveryCodeStatus.RecoveryCodes?.ToArray()
                 };
                 return RedirectToAction("ShowRecoveryCodes", showRecoveryCodesModel);
             }
