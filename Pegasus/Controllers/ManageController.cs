@@ -251,11 +251,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> SetPassword()
         {
             var model = await _manageEndpoint.HasPasswordAsync(UserId);
-            if (model.HasErrors)
-            {
-                LogErrors(model);
-                return View();
-            }
+            if (model.HasErrors) return HasErrors(model, nameof(SetPassword));
 
             if (model.HasPassword)
             {
@@ -277,18 +273,17 @@ namespace Pegasus.Controllers
             model.UserId = UserId;
 
             var addPasswordResult = await _manageEndpoint.AddPasswordAsync(model);
+            if (addPasswordResult.HasErrors) return HasErrors(addPasswordResult, nameof(SetPassword), null, model);
+
             if (!addPasswordResult.Succeeded)
             {
-                foreach (var error in addPasswordResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.FailedToSetPassword);
                 return View(model);
             }
 
             await _signInManager.RefreshSignInAsync(model.UserId);
 
-            model = new SetPasswordModel {StatusMessage = "Your password has been set."};
+            model = new SetPasswordModel {StatusMessage = ManageControllerStrings.PasswordSetSuccess};
             return View(model);
         }
 
@@ -298,7 +293,7 @@ namespace Pegasus.Controllers
         {
             if (model.RecoveryCodes == null || model.RecoveryCodes.Length == 0)
             {
-                return RedirectToAction("TwoFactorAuthentication");
+                return RedirectToAction(nameof(TwoFactorAuthentication));
             }
 
             return View(model);
@@ -306,22 +301,23 @@ namespace Pegasus.Controllers
 
         [Route(nameof(TwoFactorAuthentication))]
         [HttpGet]
-        public async Task<IActionResult> TwoFactorAuthentication()
+        public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
         {
-            var model = await _manageEndpoint.TwoFactorAuthentication(UserId);
+            if (string.IsNullOrWhiteSpace(model?.UserId))
+                model = await _manageEndpoint.TwoFactorAuthentication(UserId);
+
             model.IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(UserId);
             return View(model);
         }
 
-        [Route(nameof(TwoFactorAuthentication))]
-        [HttpPost]
-        // ReSharper disable once RedundantAssignment
-        public async Task<IActionResult> TwoFactorAuthentication(TwoFactorAuthenticationModel model)
+        [Route(nameof(ForgetThisBrowser))]
+        [HttpGet]
+        public async Task<IActionResult> ForgetThisBrowser()
         {
             await _signInManager.ForgetTwoFactorClientAsync();
-            model = await _manageEndpoint.TwoFactorAuthentication(UserId);
-            model.StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
-            return View(model);
+            var model = await _manageEndpoint.TwoFactorAuthentication(UserId);
+            model.StatusMessage = ManageControllerStrings.CurrentBrowserForgotten;
+            return RedirectToAction(nameof(TwoFactorAuthentication), model);
         }
 
 
@@ -375,7 +371,7 @@ namespace Pegasus.Controllers
             return (true, null);
         }
 
-        private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage, ManageBaseModel returnModel = null)
+        private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage = null, ManageBaseModel returnModel = null)
         {
             if (model is { HasErrors: true })
             {

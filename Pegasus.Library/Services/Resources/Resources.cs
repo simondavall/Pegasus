@@ -25,14 +25,17 @@
 
                 
 
-                public static string CannotUpdateUserDetails = "Cannot update user details at the moment.";
+                public static string CannotUpdateUserDetails => "Cannot update user details at the moment.";
+
+                public static string CurrentBrowserForgotten =>  "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
+
                 public static string FailedToChangePassword => "Failed to change password.";
                 public static string FailedToDisable2Fa => "Failed to disable Two Factor Authentication.";
                 public static string FailedToResetAuthenticator => "Failed to reset Authenticator.";
-
+                public static string FailedToSetPassword => "Failed to set password.";
 
                 public static string PasswordChangedSuccess => "Your password has been changed.";
-
+                public static string PasswordSetSuccess => "Your password has been set.";
                 public static string TwoFactorNotEnabled => "Two factor authentication is not currently enabled.";
 
                 public static string UserDetailsUpdated => "User details were updated.";

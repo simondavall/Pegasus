@@ -262,6 +262,7 @@ namespace PegasusApi.Controllers
             model.HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
             model.Is2FaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             model.RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
+            model.UserId = userId;
 
             return model;
         }

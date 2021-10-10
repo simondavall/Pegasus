@@ -48,7 +48,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             
             var sut = CreateManageController();
             sut.ModelState.AddModelError(string.Empty, "Test error.");
-            var result = await sut.EnableAuthenticator();
+            var result = await sut.EnableAuthenticator(new EnableAuthenticatorModel());
 
             _mockApiHelper.Verify(x => x.GetFromUri<AuthenticatorKeyModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
