@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -26,6 +27,9 @@ namespace PegasusTests.Controllers.ManageControllerTests
         protected Mock<IJwtTokenAccessor> _mockTokenAccessor;
         protected Mock<IAuthenticationEndpoint> _mockAuthenticationEndpoint;
         protected Mock<ILogger<Pegasus.Controllers.ManageController>> _logger;
+
+        protected static IEnumerable<IdentityError> TestErrors => new List<IdentityError>
+            { new IdentityError { Code = "ErrorCode", Description = "Error Message" } };
 
         [OneTimeSetUp]
         public void OneTimeSetup()

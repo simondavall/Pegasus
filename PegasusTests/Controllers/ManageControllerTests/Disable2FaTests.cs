@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -36,7 +34,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
 
             _mockApiHelper.Verify(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
-            Assert.AreEqual(Resources.ControllerStrings.ManageController.CannotDisable2Fa, ((Disable2FaModel)((ViewResult)result).Model).StatusMessage);
+            Assert.AreEqual(Resources.ControllerStrings.ManageController.TwoFactorNotEnabled, ((Disable2FaModel)((ViewResult)result).Model).StatusMessage);
         }
 
         [Test]
@@ -45,14 +43,14 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = false});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
             var result = await sut.Disable2Fa(new Disable2FaModel());
 
             _mockApiHelper.Verify(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
-            Assert.AreEqual(Resources.ControllerStrings.ManageController.CannotDisable2Fa, ((Disable2FaModel)((ViewResult)result).Model).StatusMessage);
+            Assert.AreEqual(Resources.ControllerStrings.ManageController.TwoFactorNotEnabled, ((Disable2FaModel)((ViewResult)result).Model).StatusMessage);
         }
 
         [Test]
@@ -61,7 +59,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = true});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new SetTwoFactorEnabledModel {Succeeded = false, Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
             var result = await sut.Disable2Fa(new Disable2FaModel());

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -18,7 +16,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task GET_ChangePassword_HasErrors_ReturnsViewResult()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<HasPasswordModel>(It.IsAny<string>()))
-                .ReturnsAsync(new HasPasswordModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new HasPasswordModel {Errors = TestErrors, StatusMessage = "Error"});
 
             var sut = CreateManageController();
             var result = await sut.ChangePassword();
@@ -70,7 +68,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task POST_ChangePassword_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ChangePasswordModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new ChangePasswordModel {Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new ChangePasswordModel {Succeeded = false, Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
             var result = await sut.ChangePassword(new ChangePasswordModel());

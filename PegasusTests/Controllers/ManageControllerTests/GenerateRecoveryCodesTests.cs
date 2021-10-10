@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +13,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task GET_GenerateRecoveryCodes_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
-                .ReturnsAsync(new GetTwoFactorEnabledModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new GetTwoFactorEnabledModel {Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
 
@@ -63,7 +61,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task POST_GenerateRecoveryCodes_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
-                .ReturnsAsync(new GetTwoFactorEnabledModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new GetTwoFactorEnabledModel {Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
 
@@ -97,7 +95,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Setup(x => x.GetFromUri<GetTwoFactorEnabledModel>(It.IsAny<string>()))
                 .ReturnsAsync(new GetTwoFactorEnabledModel { IsEnabled = true, StatusMessage = "OK"});
             _mockApiHelper.Setup(x => x.GetFromUri<GenerateRecoveryCodesModel>(It.IsAny<string>()))
-                .ReturnsAsync(new GenerateRecoveryCodesModel { Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new GenerateRecoveryCodesModel { Errors = TestErrors, StatusMessage = "Error"});
 
             var sut = CreateManageController();
 

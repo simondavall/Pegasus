@@ -37,12 +37,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> ChangePassword()
         {
             var hasPasswordModel = await _manageEndpoint.HasPasswordAsync(UserId);
-            if (hasPasswordModel.HasErrors)
-            {
-                LogErrors(hasPasswordModel);
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotChangePassword);
-                return View();
-            }
+            if (hasPasswordModel.HasErrors) return HasErrors(hasPasswordModel, nameof(ChangePassword), ManageControllerStrings.CannotChangePassword);
 
             if (!hasPasswordModel.HasPassword)
             {
@@ -87,12 +82,11 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> Disable2Fa()
         {
-            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
-
             var model = new Disable2FaModel();
-            if (!twoFactorAuthentication.IsEnabled)
+            var (enabled, actionResult) = await CheckTwoFactorEnabledAsync(model);
+            if (!enabled)
             {
-                model.StatusMessage = ManageControllerStrings.CannotDisable2Fa;
+                return actionResult;
             }
 
             return View(model);
@@ -102,12 +96,9 @@ namespace Pegasus.Controllers
         [HttpPost]
         public async Task<IActionResult> Disable2Fa(Disable2FaModel model)
         {
-            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
-            if (!twoFactorAuthentication.IsEnabled)
-            {
-                model.StatusMessage = ManageControllerStrings.CannotDisable2Fa;
-                return View(model);
-            }
+            var (enabled, actionResult) = await CheckTwoFactorEnabledAsync(model);
+            if (!enabled)
+                return actionResult;
 
             var setTwoFactorEnabled = new SetTwoFactorEnabledModel
             {
@@ -151,61 +142,23 @@ namespace Pegasus.Controllers
                 return await EnableAuthenticator();
             }
 
-            var verifyTwoFactorTokenModel = new VerifyTwoFactorTokenModel
-            {
-                UserId = UserId,
-                VerificationCode = model.Code?.Replace(" ", string.Empty).Replace("-", string.Empty)
-            };
-
-            verifyTwoFactorTokenModel = await _manageEndpoint.VerifyTwoFactorTokenAsync(verifyTwoFactorTokenModel);
-            if (verifyTwoFactorTokenModel.HasErrors)
-            {
-                LogErrors(verifyTwoFactorTokenModel);
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorVerifyToken);
-                return View(model);
-            }
-            if (!verifyTwoFactorTokenModel.IsTokenValid)
-            {
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorTokenInvalid);
-                return await EnableAuthenticator();
-            }
+            var (verified, actionResult) = await VerifyTwoFactorTokenAsync(model);
+            if (!verified) 
+                return actionResult;
 
             await _signInManager.DoTwoFactorSignInAsync(UserId, false);
 
-            var setTwoFactorEnabledModel = new SetTwoFactorEnabledModel
-            {
-                UserId = UserId,
-                SetEnabled = true
-            };
-            var set2FaEnabled = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabledModel);
-            if (set2FaEnabled.HasErrors)
-            {
-                _logger.LogError("Failed to enable 2FA with an authenticator app for User with ID '{UserId}'.", set2FaEnabled.UserId);
-                LogErrors(set2FaEnabled);
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorSet2FaEnabled);
-                return View(model);
-            }
+            var (enabled, actionResult1) = await SetTwoFactorEnabledAsync(model);
+            if (!enabled) 
+                return actionResult1;
 
-            _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", set2FaEnabled.UserId);
+            _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", UserId);
             model.StatusMessage = ManageControllerStrings.AuthenticatorAppVerified;
 
-            var recoveryCodeStatus = new RecoveryCodeStatusModel {UserId = UserId};
-            recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatus(recoveryCodeStatus);
-            if (recoveryCodeStatus.HasErrors)
+            var (isUpdated, actionResult2) = await CheckRecoveryCodesStatusAsync(model);
+            if (isUpdated)
             {
-                _logger.LogError("Failed to check recovery codes for User with ID '{UserId}'.", set2FaEnabled.UserId);
-                LogErrors(recoveryCodeStatus);
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorRecoveryCodes);
-                return View(model);
-            }
-            if (recoveryCodeStatus.IsUpdated)
-            {
-                var showRecoveryCodesModel = new ShowRecoveryCodesModel()
-                {
-                    StatusMessage = model.StatusMessage,
-                    RecoveryCodes = recoveryCodeStatus.RecoveryCodes?.ToArray()
-                };
-                return RedirectToAction("ShowRecoveryCodes", showRecoveryCodesModel);
+                return actionResult2;
             }
 
             return RedirectToAction("TwoFactorAuthentication");
@@ -262,11 +215,7 @@ namespace Pegasus.Controllers
             }
 
             model = await _manageEndpoint.SetUserDetails(model);
-            if (model.HasErrors)
-            {
-                LogErrors(model);
-                return View(model);
-            }
+            if (model.HasErrors) return HasErrors(model, nameof(Index), ManageControllerStrings.CannotUpdateUserDetails, model);
 
             model.StatusMessage = "User details were updated.";
             return View(model);
@@ -381,18 +330,31 @@ namespace Pegasus.Controllers
             return View(model);
         }
 
-        private async Task<EnableAuthenticatorModel> LoadEnableAuthenticatorModel(string userId)
+
+                
+        private async Task<(bool isUpdated, IActionResult actionResult)> CheckRecoveryCodesStatusAsync(EnableAuthenticatorModel model)
         {
-            var authenticatorKeyModel =  await _manageEndpoint.LoadSharedKeyAndQrCodeUriAsync(userId);
-            var model = new EnableAuthenticatorModel
+            var recoveryCodeStatus = new RecoveryCodeStatusModel {UserId = UserId};
+            recoveryCodeStatus = await _manageEndpoint.CheckRecoveryCodesStatusAsync(recoveryCodeStatus);
+            if (recoveryCodeStatus.HasErrors)
             {
-                Errors = authenticatorKeyModel.Errors,
-                SharedKey = authenticatorKeyModel.SharedKey, 
-                AuthenticatorUri = authenticatorKeyModel.AuthenticatorUri
-            };
-            return model;
+                var result = HasErrors(recoveryCodeStatus, nameof(EnableAuthenticator), ManageControllerStrings.CannotEnableAuthenticatorRecoveryCodes, model);
+                return (true, result);
+            }
+            
+            if (recoveryCodeStatus.IsUpdated)
+            {
+                var showRecoveryCodesModel = new ShowRecoveryCodesModel()
+                {
+                    StatusMessage = model.StatusMessage,
+                    RecoveryCodes = recoveryCodeStatus.RecoveryCodes?.ToArray()
+                };
+                return (true, RedirectToAction("ShowRecoveryCodes", showRecoveryCodesModel));
+            }
+            return (false, null);
         }
 
+        //TODO see if we can combine these two calls to GetTwoFactorEnabledAsync
         private async Task<IActionResult> CheckTwoFactorIsEnabled()
         {
             var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
@@ -406,12 +368,38 @@ namespace Pegasus.Controllers
 
             return null;
         }
+        //TODO see if we can combine these two calls to GetTwoFactorEnabledAsync
+        private async Task<(bool enabled, IActionResult actionResult)> CheckTwoFactorEnabledAsync(ManageBaseModel model)
+        {
+            var twoFactorAuthentication = await _manageEndpoint.GetTwoFactorEnabledAsync(UserId);
+            if (!twoFactorAuthentication.IsEnabled)
+            {
+                model.StatusMessage = ManageControllerStrings.TwoFactorNotEnabled;
+                return (false, View(model));
+            }
 
-        private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage)
+            return (true, null);
+        }
+
+        
+
+        private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage, ManageBaseModel returnModel = null)
         {
             LogErrors(model);
             ModelState.AddModelError(string.Empty, modelSateMessage);
-            return View(viewName);
+            return View(viewName, returnModel);
+        }
+
+        private async Task<EnableAuthenticatorModel> LoadEnableAuthenticatorModel(string userId)
+        {
+            var authenticatorKeyModel =  await _manageEndpoint.LoadSharedKeyAndQrCodeUriAsync(userId);
+            var model = new EnableAuthenticatorModel
+            {
+                Errors = authenticatorKeyModel.Errors,
+                SharedKey = authenticatorKeyModel.SharedKey, 
+                AuthenticatorUri = authenticatorKeyModel.AuthenticatorUri
+            };
+            return model;
         }
 
         private void LogErrors(ManageBaseModel model)
@@ -420,7 +408,51 @@ namespace Pegasus.Controllers
             foreach (var error in model.Errors)
             {
                 _logger.LogError("Error: userId {UserId} code {ErrorCode} message {ErrorMessage}", model.UserId, error.Code, error.Description);
+                ModelState.AddModelError(error.Code, error.Description);
             }
         }
+
+        private async Task<(bool enabled, IActionResult actionResult)> SetTwoFactorEnabledAsync(EnableAuthenticatorModel model)
+        {
+            var setTwoFactorEnabledModel = new SetTwoFactorEnabledModel
+            {
+                UserId = UserId,
+                SetEnabled = true
+            };
+            var set2FaEnabled = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabledModel);
+            if (set2FaEnabled.HasErrors)
+            {
+                var result = HasErrors(set2FaEnabled, nameof(EnableAuthenticator), ManageControllerStrings.CannotEnableAuthenticatorSet2FaEnabled, model);
+                return (false, result);
+            }
+            
+            return (true, null);
+        }
+
+        private async Task<(bool verified, IActionResult actionResult)> VerifyTwoFactorTokenAsync(EnableAuthenticatorModel model)
+        {
+            var verifyTwoFactorTokenModel = new VerifyTwoFactorTokenModel
+            {
+                UserId = UserId,
+                VerificationCode = model.Code?.Replace(" ", string.Empty).Replace("-", string.Empty)
+            };
+
+            verifyTwoFactorTokenModel = await _manageEndpoint.VerifyTwoFactorTokenAsync(verifyTwoFactorTokenModel);
+            if (verifyTwoFactorTokenModel.HasErrors)
+            {
+                var result1 = HasErrors(verifyTwoFactorTokenModel, nameof(EnableAuthenticator), ManageControllerStrings.CannotEnableAuthenticatorVerifyToken, model);
+                return (false, result1);
+            }
+            
+            if (!verifyTwoFactorTokenModel.IsTokenValid)
+            {
+                ModelState.AddModelError(string.Empty, ManageControllerStrings.CannotEnableAuthenticatorTokenInvalid);
+                var result = await EnableAuthenticator();
+                return (false, result);
+            }
+
+            return (true, null);
+        }
+
     }
 }

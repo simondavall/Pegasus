@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +13,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task GET_EnableAuthenticator_HasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.GetFromUri<AuthenticatorKeyModel>(It.IsAny<string>()))
-                .ReturnsAsync(new AuthenticatorKeyModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new AuthenticatorKeyModel {Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
 
@@ -62,7 +60,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         public async Task POST_EnableAuthenticator_VerifyTokenHasErrors_ReturnsViewResultWithErrorInModelState()
         {
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<VerifyTwoFactorTokenModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new VerifyTwoFactorTokenModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new VerifyTwoFactorTokenModel {Errors = TestErrors, StatusMessage = "Error"});
             
             var sut = CreateManageController();
             var result = await sut.EnableAuthenticator(new EnableAuthenticatorModel());
@@ -99,7 +97,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<VerifyTwoFactorTokenModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new VerifyTwoFactorTokenModel {IsTokenValid = true, StatusMessage = "OK"});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new SetTwoFactorEnabledModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new SetTwoFactorEnabledModel {Errors = TestErrors, StatusMessage = "Error"});
 
             SetupSignInMocks();
             
@@ -124,7 +122,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<SetTwoFactorEnabledModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new SetTwoFactorEnabledModel {StatusMessage = "OK"});
             _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<RecoveryCodeStatusModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new RecoveryCodeStatusModel {Errors = new List<IdentityError> {new IdentityError {Description = "Error Message"}}, StatusMessage = "Error"});
+                .ReturnsAsync(new RecoveryCodeStatusModel {Errors = TestErrors, StatusMessage = "Error"});
 
             SetupSignInMocks();
             
@@ -163,7 +161,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<RecoveryCodeStatusModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<RedirectToActionResult>(result);
             var routeValues = ((RedirectToActionResult)result).RouteValues;
-            Assert.NotZero((int)routeValues.Count);
+            Assert.NotZero(routeValues.Count);
             Assert.AreEqual(Resources.ControllerStrings.ManageController.AuthenticatorAppVerified, routeValues["StatusMessage"]);
             Assert.AreEqual( "ShowRecoveryCodes", ((RedirectToActionResult) result).ActionName);
             Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");
