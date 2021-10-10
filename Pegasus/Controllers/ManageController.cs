@@ -123,7 +123,7 @@ namespace Pegasus.Controllers
         [HttpGet]
         public async Task<IActionResult> EnableAuthenticator()
         {
-            var enableAuthenticatorModel = await LoadEnableAuthenticatorModel(UserId);
+            var enableAuthenticatorModel = await GetEnableAuthenticatorModel(UserId);
             if (enableAuthenticatorModel.HasErrors)
             {
                 LogErrors(enableAuthenticatorModel);
@@ -210,14 +210,14 @@ namespace Pegasus.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.Username = User.Identity.Name;
+                model.Username = User.Identity?.Name;
                 return View(model);
             }
 
             model = await _manageEndpoint.SetUserDetails(model);
             if (model.HasErrors) return HasErrors(model, nameof(Index), ManageControllerStrings.CannotUpdateUserDetails, model);
 
-            model.StatusMessage = "User details were updated.";
+            model.StatusMessage = ManageControllerStrings.UserDetailsUpdated;
             return View(model);
         }
 
@@ -235,21 +235,15 @@ namespace Pegasus.Controllers
         {
             model.UserId = UserId;
             model = await _manageEndpoint.ResetAuthenticatorAsync(model);
-            if (model.HasErrors)
-            {
-                LogErrors(model);
-                return View(model);
-            }
-            
+            if (model.HasErrors) return HasErrors(model, nameof(ResetAuthenticator), ManageControllerStrings.FailedToResetAuthenticator, model);
+
             _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", model.UserId);
             var enableAuthenticatorModel = new EnableAuthenticatorModel
             {
-                StatusMessage =
-                    "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key."
+                StatusMessage = ManageControllerStrings.AuthenticatorResetSuccess
             };
 
-
-            return RedirectToAction("EnableAuthenticator", "Manage", enableAuthenticatorModel);
+            return RedirectToAction(nameof(EnableAuthenticator), enableAuthenticatorModel);
         }
                 
         [Route(nameof(SetPassword))]
@@ -381,16 +375,22 @@ namespace Pegasus.Controllers
             return (true, null);
         }
 
-        
-
         private IActionResult HasErrors(ManageBaseModel model, string viewName, string modelSateMessage, ManageBaseModel returnModel = null)
         {
-            LogErrors(model);
-            ModelState.AddModelError(string.Empty, modelSateMessage);
+            if (model is { HasErrors: true })
+            {
+                if (!string.IsNullOrWhiteSpace(modelSateMessage))
+                {
+                    ModelState.AddModelError(string.Empty, modelSateMessage);
+                }
+
+                LogErrors(model);
+            }
+
             return View(viewName, returnModel);
         }
 
-        private async Task<EnableAuthenticatorModel> LoadEnableAuthenticatorModel(string userId)
+        private async Task<EnableAuthenticatorModel> GetEnableAuthenticatorModel(string userId)
         {
             var authenticatorKeyModel =  await _manageEndpoint.LoadSharedKeyAndQrCodeUriAsync(userId);
             var model = new EnableAuthenticatorModel

@@ -7,6 +7,10 @@
             public static class ManageController
             {
                 public static string AuthenticatorAppVerified => "Your authenticator app has been verified.";
+
+                public static string AuthenticatorResetSuccess =>
+                    "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
+
                 public static string CannotChangePassword => "Cannot change password at this time.";
 
                 public static string CannotEnableAuthenticator => "Cannot enable Authenticator at this moment.";
@@ -19,14 +23,19 @@
                 public static string CannotGenerateRecoveryCodes2FaCheck => "Cannot generate recovery codes at the moment - Problem checking 2Fa enabled.";
                 public static string CannotGenerateRecoveryCodesNotEnabled => "Cannot generate recovery codes because 2FA is not enabled.";
 
+                
+
                 public static string CannotUpdateUserDetails = "Cannot update user details at the moment.";
                 public static string FailedToChangePassword => "Failed to change password.";
                 public static string FailedToDisable2Fa => "Failed to disable Two Factor Authentication.";
+                public static string FailedToResetAuthenticator => "Failed to reset Authenticator.";
 
 
                 public static string PasswordChangedSuccess => "Your password has been changed.";
 
                 public static string TwoFactorNotEnabled => "Two factor authentication is not currently enabled.";
+
+                public static string UserDetailsUpdated => "User details were updated.";
             }
         }
 
