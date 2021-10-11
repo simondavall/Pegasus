@@ -4,6 +4,19 @@
     {
         public static class ControllerStrings
         {
+            public static class AccountController
+            {
+                
+
+                public static string CannotFind2FaUser => "Unable to load two-factor authentication user.";
+
+                public static string InvalidAuthenticationCode => "Invalid authenticator code.";
+
+                public static string InvalidLoginAttempt => "Invalid login attempt.";
+
+                public static string InvalidRecoveryCode => "Invalid recovery code entered.";
+
+            }
             public static class ManageController
             {
                 public static string AuthenticatorAppVerified => "Your authenticator app has been verified.";

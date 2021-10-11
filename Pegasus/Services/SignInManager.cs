@@ -26,6 +26,7 @@ namespace Pegasus.Services
         Task<bool> IsTwoFactorClientRememberedAsync(string userId);
         Task RefreshSignInAsync(string userId);
         Task<SignInResultModel> SignInOrTwoFactor(AuthenticatedUser authenticatedUser);
+        Task SignOutAsync(string scheme);
         Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode);
     }
 
@@ -138,6 +139,11 @@ namespace Pegasus.Services
             signInResultModel.Success = true;
 
             return signInResultModel;
+        }
+
+        public async Task SignOutAsync(string scheme)
+        {
+            await HttpContext.SignOutAsync(scheme);
         }
 
         public async Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
