@@ -73,7 +73,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
 
             var returnUrl = "/";
             var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
-            sut.Url = Url;
+            sut.Url = GetUrl();
             var result = await sut.Login(new LoginViewModel(), returnUrl);
 
             Assert.IsInstanceOf<LocalRedirectResult>(result);
@@ -90,7 +90,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
                 .ReturnsAsync(new SignInResultModel { Success = true });
 
             var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
-            sut.Url = Url;
+            sut.Url = GetUrl();
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<RedirectToActionResult>(result);
@@ -107,12 +107,36 @@ namespace PegasusTests.Controllers.AccountControllerTests
                 .ReturnsAsync(new SignInResultModel { Success = false, RequiresTwoFactor = true});
 
             var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
-            sut.Url = Url;
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<RedirectToActionResult>(result);
             Assert.AreEqual(nameof(AccountController.LoginWith2Fa), ((RedirectToActionResult)result).ActionName);
             Assert.Zero(sut.ModelState.ErrorCount, "Error count failed");
+        }
+
+        [Test]
+        public async Task POST_Login_SignInFailsAndNo2FaRequestRequired_ReturnsViewRequestWithErrors()
+        {
+            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+                .ReturnsAsync(new AuthenticatedUser { Authenticated = true });
+            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+                .ReturnsAsync(new SignInResultModel { Success = false, RequiresTwoFactor = false});
+
+            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var result = await sut.Login(new LoginViewModel(), string.Empty);
+
+            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.IsInstanceOf<LoginViewModel>(((ViewResult)result).Model);
+            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed");
+        }
+
+        private static IUrlHelper GetUrl()
+        {
+            var mockUrlHelper = new Mock<IUrlHelper>();
+            mockUrlHelper.Setup(x => x.IsLocalUrl(It.IsAny<string>())).Returns(true);
+            mockUrlHelper.Setup(x => x.IsLocalUrl(string.Empty)).Returns(false);
+            mockUrlHelper.Setup(x => x.IsLocalUrl(null)).Returns(false);
+            return mockUrlHelper.Object;
         }
     }
 }

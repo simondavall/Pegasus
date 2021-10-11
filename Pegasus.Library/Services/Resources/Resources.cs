@@ -16,6 +16,8 @@
 
                 public static string InvalidRecoveryCode => "Invalid recovery code entered.";
 
+                
+                public static string NoCodeForPasswordReset => "A code must be supplied for password reset.";
             }
             public static class ManageController
             {

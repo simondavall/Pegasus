@@ -213,14 +213,14 @@ namespace Pegasus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                model.BaseUrl = Url.ResetPasswordBaseUrl(Request.Scheme);
-                await _accountsEndpoint.ForgotPassword(model);
-                return View("ForgotPasswordConfirmation");
+                return View();
             }
 
-            return View();
+            model.BaseUrl = Url.ResetPasswordBaseUrl(Request.Scheme);
+            await _accountsEndpoint.ForgotPassword(model);
+            return View("ForgotPasswordConfirmation");
         }
 
         [AllowAnonymous]
@@ -229,7 +229,7 @@ namespace Pegasus.Controllers
         {
             if (code == null)
             {
-                return BadRequest("A code must be supplied for password reset.");
+                return BadRequest(AccountControllerStrings.NoCodeForPasswordReset);
             }
 
             var resetPasswordViewModel = new ResetPasswordModel
@@ -258,7 +258,6 @@ namespace Pegasus.Controllers
                 return View("ResetPasswordConfirmation");
             }
 
-            //TODO Does this not leave us security vulnerable. i.e. Email/User exists?
             foreach (var error in response.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
