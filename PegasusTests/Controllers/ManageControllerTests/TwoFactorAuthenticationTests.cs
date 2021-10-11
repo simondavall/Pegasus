@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Pegasus.Controllers;
 using Pegasus.Library.Models.Manage;
 using Pegasus.Library.Services.Resources;
 
