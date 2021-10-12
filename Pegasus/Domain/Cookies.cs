@@ -7,9 +7,9 @@ namespace Pegasus.Domain
 {
     public interface ICookies
     {
-        void WriteCookie(HttpResponse response, string cookieName, string cookieData);
-        void WriteCookie(HttpResponse response, string cookieName, string cookieData, int expiryDays);
-        void DeleteCookie(HttpResponse response, string cookieName);
+        void WriteCookie(string cookieName, string cookieData);
+        void WriteCookie(string cookieName, string cookieData, int expiryDays);
+        void DeleteCookie(string cookieName);
     }
 
     public class Cookies : ICookies
@@ -23,23 +23,23 @@ namespace Pegasus.Domain
             _cookieExpiryDays = settings.Settings.CookieExpiryDays;
         }
 
-        public void WriteCookie(HttpResponse response, string cookieName, string cookieData)
+        public void WriteCookie(string cookieName, string cookieData)
         {
-            WriteCookie(response, cookieName, cookieData, _cookieExpiryDays);
+            WriteCookie(cookieName, cookieData, _cookieExpiryDays);
         }
 
-        public void WriteCookie(HttpResponse response, string cookieName, string cookieData, int expiryDays)
+        public void WriteCookie(string cookieName, string cookieData, int expiryDays)
         {
             if (expiryDays == 0)
                 expiryDays = _cookieExpiryDays;
             var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
-            response.Cookies.Append(cookieName, cookieData, options);
+            _httpContext.Response.Cookies.Append(cookieName, cookieData, options);
         }
 
-        public void DeleteCookie(HttpResponse response, string cookieName)
+        public void DeleteCookie(string cookieName)
         {
             if (_httpContext.Request.Cookies.ContainsKey(cookieName))
-                response.Cookies.Delete(cookieName);
+                _httpContext.Response.Cookies.Delete(cookieName);
         }
     }
 }

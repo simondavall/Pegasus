@@ -16,7 +16,7 @@ namespace Pegasus.Services
         private readonly IHttpContextWrapper _httpContext;
         private readonly IConfiguration _configuration;
         private const string ConfigSection = "PegasusSettings";
-        private readonly Cookies _cookies;
+        private readonly ICookies _cookies;
 
         public SettingsService()
         {
@@ -61,7 +61,7 @@ namespace Pegasus.Services
             }
 
             var cookieData = JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContext.Response, CookieConstants.UserSettings, cookieData, Settings.CookieExpiryDays);
+            _cookies.WriteCookie(CookieConstants.UserSettings, cookieData, Settings.CookieExpiryDays);
         }
 
         private void InitializeSettings()

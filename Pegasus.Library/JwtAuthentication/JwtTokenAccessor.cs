@@ -16,7 +16,7 @@ namespace Pegasus.Library.JwtAuthentication
 
         public JwtTokenAccessor(TokenOptions tokenOptions)
         {
-            this._tokenOptions = tokenOptions ??
+            _tokenOptions = tokenOptions ??
                 throw new ArgumentNullException(
                     $"An instance of valid {nameof(TokenOptions)} must be passed in order to generate a JWT!");
         }
@@ -31,6 +31,16 @@ namespace Pegasus.Library.JwtAuthentication
                 AccessToken = accessToken,
                 ClaimsPrincipal = claimsPrincipal,
                 AuthenticationProperties = CreateAuthenticationProperties(accessToken)
+            };
+        }
+
+        public TokenWithClaimsPrincipal GetEmptyAccessTokenWithClaimsPrincipal(ClaimsPrincipal principal)
+        {
+            return new TokenWithClaimsPrincipal()
+            {
+                AccessToken = "access-token",
+                ClaimsPrincipal = principal,
+                AuthenticationProperties = null
             };
         }
 

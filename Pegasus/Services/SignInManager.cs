@@ -128,7 +128,7 @@ namespace Pegasus.Services
                 }
                 else
                 {
-                    await HttpContext.SignInAsync(CookieConstants.TwoFactorUserIdScheme, StoreTwoFactorInfo(authenticatedUser.UserId, null));
+                    await HttpContext.SignInAsync(CookieConstants.TwoFactorUserIdScheme, StoreTwoFactorInfo(authenticatedUser.UserId));
                     signInResultModel.RequiresTwoFactor = true;
                     return signInResultModel;
                 }
@@ -235,14 +235,11 @@ namespace Pegasus.Services
             return new ClaimsPrincipal(rememberBrowserIdentity);
         }
 
-        private static ClaimsPrincipal StoreTwoFactorInfo(string userId, string loginProvider)
+        private static ClaimsPrincipal StoreTwoFactorInfo(string userId)
         {
             var identity = new ClaimsIdentity(CookieConstants.TwoFactorUserIdScheme);
             identity.AddClaim(new Claim(ClaimTypes.Name, userId));
-            if (loginProvider != null)
-            {
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, loginProvider));
-            }
+            
             return new ClaimsPrincipal(identity);
         }
     }

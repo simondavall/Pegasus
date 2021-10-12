@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Pegasus.Domain;
 using Pegasus.Library.JwtAuthentication.Constants;
@@ -28,13 +27,13 @@ namespace PegasusTests.ServiceTests
         {
             var settingsModel = new SettingsModel { AnalyticsCookieEnabled = true };
             _mockSettingsService.Setup(x => x.Settings).Returns(settingsModel);
-            _mockCookies.Setup(x => x.WriteCookie(It.IsAny<HttpResponse>(), CookieConstants.Analytics, It.IsAny<string>()));
+            _mockCookies.Setup(x => x.WriteCookie(CookieConstants.Analytics, It.IsAny<string>()));
 
             var sut = new TestableAnalyticsService(_mockHttpContextWrapper.Object, _mockSettingsService.Object, _mockCookies.Object);
             sut.SaveAnalyticsData("Some data");
 
             _mockCookies.Verify(
-                x => x.WriteCookie(It.IsAny<HttpResponse>(), CookieConstants.Analytics, It.IsAny<string>()),
+                x => x.WriteCookie(CookieConstants.Analytics, It.IsAny<string>()),
                 Times.Exactly(1));
         }
 
@@ -44,13 +43,13 @@ namespace PegasusTests.ServiceTests
             var settingsModel = new SettingsModel { AnalyticsCookieEnabled = false };
             _mockSettingsService.Setup(x => x.Settings).Returns(settingsModel);
 
-            _mockCookies.Setup(x => x.DeleteCookie(It.IsAny<HttpResponse>(), CookieConstants.Analytics));
+            _mockCookies.Setup(x => x.DeleteCookie(CookieConstants.Analytics));
 
             var sut = new TestableAnalyticsService(_mockHttpContextWrapper.Object, _mockSettingsService.Object, _mockCookies.Object);
             sut.SaveAnalyticsData("Some data");
 
             _mockCookies.Verify(
-                x => x.DeleteCookie(It.IsAny<HttpResponse>(), CookieConstants.Analytics),
+                x => x.DeleteCookie(CookieConstants.Analytics),
                 Times.Exactly(1));
         }
 

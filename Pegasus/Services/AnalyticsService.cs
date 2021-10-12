@@ -11,7 +11,6 @@ namespace Pegasus.Services
 
     public class AnalyticsService : IAnalyticsService
     {
-        private readonly IHttpContextWrapper _httpContext;
         private readonly ISettingsService _settingsService;
 
         // create a marketing cookie to simulate a marketing scenario (might actually be a third party tool/plugin)
@@ -19,20 +18,19 @@ namespace Pegasus.Services
 
         public AnalyticsService(IHttpContextWrapper httpContextWrapper, ISettingsService settingsService)
         {
-            _httpContext = httpContextWrapper;
             _settingsService = settingsService;
-            Cookies = new Cookies(_httpContext, settingsService);
+            Cookies = new Cookies(httpContextWrapper, settingsService);
         }
 
         public void SaveAnalyticsData(string data)
         {
             if (_settingsService.Settings.AnalyticsCookieEnabled)
             {
-                Cookies.WriteCookie(_httpContext.Response, CookieConstants.Analytics, data);
+                Cookies.WriteCookie(CookieConstants.Analytics, data);
                 return;
             }
             
-            Cookies.DeleteCookie(_httpContext.Response, CookieConstants.Analytics);
+            Cookies.DeleteCookie(CookieConstants.Analytics);
         }
     }
 }
