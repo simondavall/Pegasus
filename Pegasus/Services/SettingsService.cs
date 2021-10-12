@@ -3,39 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Pegasus.Domain;
 using Pegasus.Library.JwtAuthentication.Constants;
+using Pegasus.Library.Services.Http;
 using Pegasus.Services.Models;
 
 namespace Pegasus.Services
 {
     public class SettingsService : ISettingsService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextWrapper _httpContext;
         private readonly IConfiguration _configuration;
         private const string ConfigSection = "PegasusSettings";
-        private readonly Cookies _cookies;
+        private readonly ICookies _cookies;
 
         public SettingsService()
         {
             Settings = new SettingsModel();
         }
 
-        public SettingsService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public SettingsService(IHttpContextWrapper httpContextWrapper, IConfiguration configuration)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextWrapper;
             _configuration = configuration;
             InitializeSettings();
-            _cookies = new Cookies(httpContextAccessor, this);
+            _cookies = new Cookies(_httpContext, this);
         }
 
         public SettingsModel Settings { get; set; }
 
         public T GetSetting<T>(string settingName)
         {
-            var request = _httpContextAccessor.HttpContext.Request;
+            var request = _httpContext.Request;
             var property = GetProperty<T>(settingName);
             var currentValue = property.GetValue(Settings);
 
@@ -61,7 +61,7 @@ namespace Pegasus.Services
             }
 
             var cookieData = JsonSerializer.Serialize(propertyValues);
-            _cookies.WriteCookie(_httpContextAccessor.HttpContext.Response, CookieConstants.UserSettings, cookieData, Settings.CookieExpiryDays);
+            _cookies.WriteCookie(CookieConstants.UserSettings, cookieData, Settings.CookieExpiryDays);
         }
 
         private void InitializeSettings()
@@ -108,7 +108,7 @@ namespace Pegasus.Services
 
         private Dictionary<string, object> LoadSettingsFromCookies()
         {
-            var settingsJson = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.UserSettings];
+            var settingsJson = _httpContext.Request.Cookies[CookieConstants.UserSettings];
             if (!string.IsNullOrWhiteSpace(settingsJson))
             {
                 return JsonSerializer.Deserialize<Dictionary<string, object>>(settingsJson);

@@ -1,4 +1,6 @@
-﻿$(function() {
+﻿// ReSharper disable PossiblyUnassignedProperty
+// ReSharper disable UseOfImplicitGlobalInFunctionScope
+$(function() {
     $(window).on("load", function() {
         $("#cp-modalCookiePolicy").modal("show");
     });
@@ -43,4 +45,3 @@
         return false;
     });
 })
-

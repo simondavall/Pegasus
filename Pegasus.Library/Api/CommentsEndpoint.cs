@@ -8,7 +8,7 @@ namespace Pegasus.Library.Api
     {
         Task AddComment(TaskCommentModel taskComment);
         Task<List<TaskCommentModel>> GetComments(int taskId);
-        Task UpdateComments(IEnumerable<TaskCommentModel> taskComments);
+        Task UpdateComments(List<TaskCommentModel> taskComments);
     }
 
     public class CommentsEndpoint : ICommentsEndpoint
@@ -30,7 +30,7 @@ namespace Pegasus.Library.Api
             return await _apiHelper.GetListFromUri<TaskCommentModel>($"api/Comment/GetComments/{taskId}");
         }
 
-        public async Task UpdateComments(IEnumerable<TaskCommentModel> taskComments)
+        public async Task UpdateComments(List<TaskCommentModel> taskComments)
         {
             await _apiHelper.PostAsync(taskComments, "api/Comment/UpdateComments");
         }

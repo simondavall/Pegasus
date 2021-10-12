@@ -8,7 +8,7 @@ namespace Pegasus.Library.Api
     {
         Task<SetPasswordModel> AddPasswordAsync(SetPasswordModel model);
         Task<ChangePasswordModel> ChangePasswordAsync(ChangePasswordModel model);
-        Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model);
+        Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatusAsync(RecoveryCodeStatusModel model);
         Task<GenerateRecoveryCodesModel> GenerateNewRecoveryCodesAsync(string userId);
         Task<GetTwoFactorEnabledModel> GetTwoFactorEnabledAsync(string userId);
         Task<UserDetailsModel> GetUserDetails(string userId);
@@ -41,7 +41,7 @@ namespace Pegasus.Library.Api
             return await _apiHelper.PostAsync(model, "api/Account/Manage/ChangePassword");
         }
 
-        public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatus(RecoveryCodeStatusModel model)
+        public async Task<RecoveryCodeStatusModel> CheckRecoveryCodesStatusAsync(RecoveryCodeStatusModel model)
         {
             return await _apiHelper.PostAsync(model, "api/Account/Manage/CheckRecoveryCodesStatus");
         }

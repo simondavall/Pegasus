@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,11 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Pegasus.Domain.Cache;
+using Pegasus.Entities.Enumerations;
 using Pegasus.Services;
 using Pegasus.Services.Models;
 
-namespace PegasusTests
+namespace PegasusTests.ServiceTests
 {
     class TaskFilterServiceTests
     {
@@ -55,7 +57,6 @@ namespace PegasusTests
         [Test]
         public void GetAllFilters_CacheExpiryComesFromSettings()
         {
-
             var sut = new TaskFilterService(_cache, _configuration);
             sut.GetTaskFilters();
 
@@ -80,5 +81,25 @@ namespace PegasusTests
             Assert.AreEqual(1, cachedExpiryDays);
         }
 
+        [Test]
+        public void GetTaskFilters_ExistInCache_ReturnsCachedVersion()
+        {
+            var taskFilters = Enum.GetValues(typeof(TaskFilters));
+            var count = taskFilters.Length;
+
+            var sut = new TaskFilterService(_cache,_configuration);
+            var result = sut.GetTaskFilters();
+
+            Assert.AreEqual(count, result.Count());
+
+            var list = result.ToList();
+            list.RemoveAt(0);
+            // remove an item and save back to cache
+            _cache.Set(CacheKeys.TaskFilters, list);
+            // call the 'get' again to see if we get 4 or 5 items
+            var cachedResult = sut.GetTaskFilters();
+
+            Assert.AreEqual(count - 1, cachedResult.Count());
+        }
     }
 }

@@ -226,8 +226,7 @@ namespace PegasusApi.Controllers
             if (user == null)
                 return LogErrorReturnModel(model);
 
-            //TODO Check this is not a bug, as cannot update username at the moment (overwritten be stored username)
-            // Leave a comment to say this is intentional if it is.
+            //TODO Look at being able to change username(email)
             model.Username = user.UserName;
             
             var setPhoneNumber = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
@@ -263,6 +262,7 @@ namespace PegasusApi.Controllers
             model.HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
             model.Is2FaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             model.RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
+            model.UserId = userId;
 
             return model;
         }

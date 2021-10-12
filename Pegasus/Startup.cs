@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Pegasus.Library.Api;
 using Pegasus.Library.Api.Extensions;
 using Pegasus.Library.JwtAuthentication.Extensions;
+using Pegasus.Library.Services.Http;
 using Pegasus.Services;
 
 namespace Pegasus
@@ -27,10 +28,12 @@ namespace Pegasus
             services.AddApiEndpoints();
 
             services.AddHttpContextAccessor();
+            services.AddScoped<IHttpContextWrapper, HttpContextWrapper>();
             services.AddSingleton<IApiHelper, ApiHelper>();
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<IMarketingService, MarketingService>();
             services.AddScoped<IAnalyticsService, AnalyticsService>();
+
 
             services.AddJwtAuthenticationWithProtectedCookie(Configuration);
 

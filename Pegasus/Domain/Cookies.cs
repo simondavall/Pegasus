@@ -1,37 +1,45 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using Pegasus.Library.Services.Http;
 using Pegasus.Services;
 
 namespace Pegasus.Domain
 {
-    public class Cookies
+    public interface ICookies
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        void WriteCookie(string cookieName, string cookieData);
+        void WriteCookie(string cookieName, string cookieData, int expiryDays);
+        void DeleteCookie(string cookieName);
+    }
+
+    public class Cookies : ICookies
+    {
+        private readonly IHttpContextWrapper _httpContext;
         private readonly int _cookieExpiryDays;
 
-        public Cookies(IHttpContextAccessor httpContextAccessor, ISettingsService settings)
+        public Cookies(IHttpContextWrapper httpContextWrapper, ISettingsService settings)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextWrapper;
             _cookieExpiryDays = settings.Settings.CookieExpiryDays;
         }
 
-        public void WriteCookie(HttpResponse response, string cookieName, string cookieData)
+        public void WriteCookie(string cookieName, string cookieData)
         {
-            WriteCookie(response, cookieName, cookieData, _cookieExpiryDays);
+            WriteCookie(cookieName, cookieData, _cookieExpiryDays);
         }
 
-        public void WriteCookie(HttpResponse response, string cookieName, string cookieData, int expiryDays)
+        public void WriteCookie(string cookieName, string cookieData, int expiryDays)
         {
             if (expiryDays == 0)
                 expiryDays = _cookieExpiryDays;
             var options = new CookieOptions { Expires = new DateTimeOffset(DateTime.Now.AddDays(expiryDays)) };
-            response.Cookies.Append(cookieName, cookieData, options);
+            _httpContext.Response.Cookies.Append(cookieName, cookieData, options);
         }
 
-        public void DeleteCookie(HttpResponse response, string cookieName)
+        public void DeleteCookie(string cookieName)
         {
-            if (_httpContextAccessor.HttpContext.Request.Cookies.ContainsKey(cookieName))
-                response.Cookies.Delete(cookieName);
+            if (_httpContext.Request.Cookies.ContainsKey(cookieName))
+                _httpContext.Response.Cookies.Delete(cookieName);
         }
     }
 }

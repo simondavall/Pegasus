@@ -1,7 +1,5 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +10,7 @@ using Pegasus.Library.Api;
 using Pegasus.Library.Models.Account;
 using Pegasus.Models.Account;
 using Pegasus.Services;
+using AccountControllerStrings = Pegasus.Library.Services.Resources.Resources.ControllerStrings.AccountController;
 
 
 namespace Pegasus.Controllers
@@ -49,31 +48,30 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
-                var authenticatedUser = await _authenticationEndpoint.Authenticate(credentials);
-
-                if (authenticatedUser.Authenticated)
-                {
-                    var signInResult = await _signInManager.SignInOrTwoFactor(authenticatedUser);
-                    if (signInResult.Success)
-                    {
-                        _logger.LogInformation("User logged in.");
-                        returnUrl ??= Url.Content("~/");
-                        return RedirectToLocal(returnUrl);
-                    }
-                    if (signInResult.RequiresTwoFactor)
-                    {
-                        return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
-                    }
-                }
-                
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
 
-            // If we got this far, something failed, redisplay form
+            var credentials = new UserCredentials { Username = model.Email, Password = model.Password };
+            var authenticatedUser = await _authenticationEndpoint.Authenticate(credentials);
+
+            if (authenticatedUser.Authenticated)
+            {
+                var signInResult = await _signInManager.SignInOrTwoFactor(authenticatedUser);
+                if (signInResult.Success)
+                {
+                    _logger.LogInformation("User logged in.");
+                    returnUrl ??= Url.Content("~/");
+                    return RedirectToLocal(returnUrl);
+                }
+                if (signInResult.RequiresTwoFactor)
+                {
+                    return RedirectToAction(nameof(LoginWith2Fa), new { returnUrl });
+                }
+            }
+                
+            ModelState.AddModelError(string.Empty, AccountControllerStrings.InvalidLoginAttempt);
             return View(model);
         }
 
@@ -84,7 +82,10 @@ namespace Pegasus.Controllers
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                _logger.LogWarning(AccountControllerStrings.CannotFind2FaUser);
+                ModelState.AddModelError(string.Empty, AccountControllerStrings.CannotFind2FaUser);
+                ViewData["ReturnUrl"] = returnUrl;
+                return View();
             }
 
             var model = new LoginWith2FaViewModel
@@ -98,7 +99,7 @@ namespace Pegasus.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginWith2Fa(LoginWith2FaViewModel model, string returnUrl = null)
+        public async Task<IActionResult> LoginWith2Fa(LoginWith2FaViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -108,13 +109,15 @@ namespace Pegasus.Controllers
             var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (userId == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                _logger.LogWarning(AccountControllerStrings.CannotFind2FaUser);
+                ModelState.AddModelError(string.Empty, AccountControllerStrings.CannotFind2FaUser);
+                return View(model);
             }
 
             var verify2FaToken = new VerifyTwoFactorModel
             {
                 UserId = userId,
-                Code = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty),
+                Code = model.TwoFactorCode?.Replace(" ", string.Empty).Replace("-", string.Empty),
                 RememberMachine = model.RememberMachine
             };
 
@@ -124,12 +127,12 @@ namespace Pegasus.Controllers
                 await _signInManager.DoTwoFactorSignInAsync(userId, model.RememberMachine);
 
                 _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", userId);
-                returnUrl ??= Url.Content("~/");
-                return LocalRedirect(returnUrl);
+                model.ReturnUrl ??= Url.Content("~/");
+                return LocalRedirect(model.ReturnUrl);
             }
 
             _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  userId);
-            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+            ModelState.AddModelError(string.Empty, AccountControllerStrings.InvalidAuthenticationCode);
             return View(model);
         }
 
@@ -141,10 +144,15 @@ namespace Pegasus.Controllers
             var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (userId == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                _logger.LogWarning(AccountControllerStrings.CannotFind2FaUser);
+                ModelState.AddModelError(string.Empty, AccountControllerStrings.CannotFind2FaUser);
+                ViewData["ReturnUrl"] = returnUrl;
+                //TODO Check this return. Think it should return to standard login. i.e. View(nameof(Login))
+                //TODO Refactor code from here and above to reduce duplication
+                return View();
             }
             
-            var model = new LoginWithRecoveryCodeModel()
+            var model = new LoginWithRecoveryCodeModel
             {
                 ReturnUrl = returnUrl
             };
@@ -165,7 +173,9 @@ namespace Pegasus.Controllers
             var userId = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (userId == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                _logger.LogWarning(AccountControllerStrings.CannotFind2FaUser);
+                ModelState.AddModelError(string.Empty, AccountControllerStrings.CannotFind2FaUser);
+                return View(model);
             }
 
             var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(model.RecoveryCode);
@@ -177,18 +187,18 @@ namespace Pegasus.Controllers
             }
 
             _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", userId);
-            ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
+            ModelState.AddModelError(string.Empty, AccountControllerStrings.InvalidRecoveryCode);
             return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Logout(string returnUrl = null)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             _apiHelper.RemoveTokenFromHeaders();
             _logger.LogInformation("User logged out.");
             ViewData["ReturnUrl"] = returnUrl;
-            return RedirectToLocal("/Account/Login");
+            return LocalRedirect("/Account/Login");
         }
 
         [AllowAnonymous]
@@ -203,14 +213,14 @@ namespace Pegasus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                model.BaseUrl = Url.ResetPasswordBaseUrl(Request.Scheme);
-                await _accountsEndpoint.ForgotPassword(model);
-                return View("ForgotPasswordConfirmation");
+                return View();
             }
 
-            return View();
+            model.BaseUrl = Url.ResetPasswordBaseUrl(Request.Scheme);
+            await _accountsEndpoint.ForgotPassword(model);
+            return View("ForgotPasswordConfirmation");
         }
 
         [AllowAnonymous]
@@ -219,18 +229,16 @@ namespace Pegasus.Controllers
         {
             if (code == null)
             {
-                return BadRequest("A code must be supplied for password reset.");
+                return BadRequest(AccountControllerStrings.NoCodeForPasswordReset);
             }
-            else
-            {
-                var resetPasswordViewModel = new ResetPasswordModel
-                {
-                    UserId = userId,
-                    ResetCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                };
 
-                return View(resetPasswordViewModel);
-            }
+            var resetPasswordViewModel = new ResetPasswordModel
+            {
+                UserId = userId,
+                ResetCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
+            };
+
+            return View(resetPasswordViewModel);
         }
 
         [AllowAnonymous]
@@ -250,7 +258,6 @@ namespace Pegasus.Controllers
                 return View("ResetPasswordConfirmation");
             }
 
-            //TODO Does this not leave us security vulnerable. i.e. Email/User exists?
             foreach (var error in response.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
@@ -270,12 +277,10 @@ namespace Pegasus.Controllers
         {
             if (Url.IsLocalUrl(returnUrl))
             {
-                return Redirect(returnUrl);
+                return LocalRedirect(returnUrl);
             }
-            else
-            {
-                return RedirectToAction("Index", "TaskList");
-            }
+
+            return RedirectToAction("Index", "TaskList");
         }
     }
 }

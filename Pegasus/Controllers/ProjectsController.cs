@@ -30,13 +30,13 @@ namespace Pegasus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,ProjectPrefix")] ProjectModel project)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _projectsEndpoint.AddProject(project);
-                return RedirectToAction("Index");
+                return View(project);
             }
 
-            return View(project);
+            await _projectsEndpoint.AddProject(project);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -57,7 +57,7 @@ namespace Pegasus.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _projectsEndpoint.DeleteProject(id);
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -76,23 +76,22 @@ namespace Pegasus.Controllers
         {
             if (id != project.Id) return NotFound();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _projectsEndpoint.UpdateProject(project);
-                }
-                catch (Exception)
-                {
-                    if (!await ProjectExists(project.Id))
-                        return NotFound();
-                    throw;
-                }
+            if (!ModelState.IsValid) return View(project);
 
-                return RedirectToAction("Index");
+            try
+            {
+                await _projectsEndpoint.UpdateProject(project);
+            }
+            catch (Exception ex)
+            {
+                if (!await ProjectExists(project.Id))
+                    return NotFound();
+                //TODO Need to log this error
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(project);
             }
 
-            return View(project);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
