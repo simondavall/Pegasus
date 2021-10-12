@@ -55,6 +55,11 @@
 
                 public static string UserDetailsUpdated => "User details were updated.";
             }
+
+            public static class TaskListController
+            {
+                public static string CannotCloseWithOpenSubTasks => "Update Failed: Cannot complete a task that still has open sub tasks.";
+            }
         }
 
 
