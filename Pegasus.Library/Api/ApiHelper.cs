@@ -14,10 +14,10 @@ namespace Pegasus.Library.Api
     {
         HttpClient ApiClient { get; }
         void AddTokenToHeaders(string token);
-        Task<T> GetFromUri<T>(string requestUri) where T : class, new();
+        Task<T> GetFromUri<T>(string requestUri);
         Task<List<T>> GetListFromUri<T>(string requestUri);
-        Task<T> PostAsync<T>(T model, string requestUri) where T : class, new();
-        Task<TOut> PostAsync<T, TOut>(T model, string requestUri) where TOut : notnull;
+        Task<T> PostAsync<T>(T model, string requestUri);
+        Task<TOut> PostAsync<T, TOut>(T model, string requestUri);
         void RemoveTokenFromHeaders();
     }
 
@@ -41,14 +41,14 @@ namespace Pegasus.Library.Api
             ApiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
 
-        public async Task<T> GetFromUri<T>(string requestUri) where T : class, new()
+        public async Task<T> GetFromUri<T>(string requestUri)
         {
             using (var response = await ApiClient.GetAsync(requestUri))
             {
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 var result = await response.Content.ReadAsAsync<T>();
-                return result ?? new T();
+                return result;
             }
         }
 
@@ -63,7 +63,7 @@ namespace Pegasus.Library.Api
             }
         }
 
-        public async Task<T> PostAsync<T>(T model, string requestUri) where T : class, new()
+        public async Task<T> PostAsync<T>(T model, string requestUri)
         {
             HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
             using (var response = await ApiClient.PostAsync(requestUri, content))
@@ -71,11 +71,11 @@ namespace Pegasus.Library.Api
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"Error accessing {requestUri}. Error: {response.ReasonPhrase}");
                 var result = await response.Content.ReadAsAsync<T>();
-                return result ?? new T();
+                return result;
             }
         }
         
-        public async Task<TOut> PostAsync<T, TOut>(T model, string requestUri) where TOut : notnull
+        public async Task<TOut> PostAsync<T, TOut>(T model, string requestUri)
         {
             HttpContent content = new ObjectContent<T>(model, new JsonMediaTypeFormatter());
             using (var response = await ApiClient.PostAsync(requestUri, content))
