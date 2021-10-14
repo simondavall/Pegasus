@@ -9,33 +9,33 @@
             <span>Comments</span>
         </div>
 
-        @foreach(var comment in @Model.Comments)
+        @for (var i = 0; i < @Model.Comments.Count; i++)
         {
             <div class="comment-edit-section col-md-8">
-                <input type="hidden" asp-for="@comment.Id"/>
-                <input type="hidden" asp-for="@comment.TaskId"/>
-                <input type="hidden" asp-for="@comment.Created"/>
-                <input type="hidden" asp-for="@comment.DisplayName"/>
-                <input id="rollbackComment" type="hidden" value="@comment.Comment"/>
+                <input type="hidden" asp-for="@Model.Comments[i].Id"/>
+                <input type="hidden" asp-for="@Model.Comments[i].TaskId"/>
+                <input type="hidden" asp-for="@Model.Comments[i].Created"/>
+                <input type="hidden" asp-for="@Model.Comments[i].DisplayName"/>
+                <input id="rollbackComment" type="hidden" value="@Model.Comments[i].Comment"/>
                 <div class="comment-edit-buttons pull-right btn-group-xs">
                     <a class="btn btn-xs comment-edit-button"><i class="fa fa-pencil" data-toggle="tooltip" title="Edit comment"></i></a>
                     <a class="btn btn-xs comment-cancel-button hide"><i class="fa fa-times" data-toggle="tooltip" title="Cancel edit"></i></a>
-                    <input type="hidden" asp-for="@comment.IsDeleted"/>
+                    <input type="hidden" asp-for="@Model.Comments[i].IsDeleted"/>
                     <a class="btn btn-xs comment-delete-button"><i class="fa fa-trash" data-toggle="tooltip" title="Delete comment"></i></a>
                 </div>
-                <div class="task-comment-date" title="@comment.Created.FormattedDate()">
-                    <span>@comment.Created.LapsedTime()</span>
-                    <span>by @comment.DisplayName</span>
+                <div class="task-comment-date" title="@Model.Comments[i].Created.FormattedDate()">
+                    <span>@Model.Comments[i].Created.LapsedTime()</span>
+                    <span>by @Model.Comments[i].DisplayName</span>
                 </div>
                 <div class="task-comment">
-                    @if (comment.Comment != null)
+                    @if (Model.Comments[i]?.Comment != null)
                     {
-                        <p>@Html.Raw(comment.Comment.PreparedHtml())</p>
+                        <p>@Html.Raw(@Model.Comments[i].Comment.PreparedHtml())</p>
                     }
                 </div>
                 <div class="comment-task-edit hide">
-                    <textarea data-autoresize rows="1" asp-for="@comment.Comment" class="comment-task-text form-control form-no-max-control"></textarea>
-                    <span asp-validation-for="@comment.Comment" class="text-danger"></span>
+                    <textarea data-autoresize rows="1" asp-for="@Model.Comments[i].Comment" class="comment-task-text form-control form-no-max-control"></textarea>
+                    <span asp-validation-for="@Model.Comments[i].Comment" class="text-danger"></span>
                 </div>
             </div>
         }
