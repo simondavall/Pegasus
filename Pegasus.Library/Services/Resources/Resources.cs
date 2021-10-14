@@ -62,10 +62,12 @@
             }
         }
 
-
-
-
-
-
+        public static class ViewStrings
+        {
+            public static class TaskListStrings
+            {
+                public static string NoTasksFound => "No Tasks Found";
+            }
+        }
     }
 }
