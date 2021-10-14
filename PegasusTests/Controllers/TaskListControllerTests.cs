@@ -196,6 +196,7 @@ namespace PegasusTests.Controllers
 
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<TaskViewModel>(((ViewResult)result).Model);
+            Assert.NotZero(sut.ModelState.ErrorCount);
         }
 
         [Test]
