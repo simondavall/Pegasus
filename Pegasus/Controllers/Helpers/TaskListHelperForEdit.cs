@@ -4,38 +4,23 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pegasus.Extensions;
-using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 using Pegasus.Library.Services.Resources;
 using Pegasus.Models.TaskList;
-using Pegasus.Services;
 
 namespace Pegasus.Controllers.Helpers
 {
     public class TaskListHelperForEdit : TaskListHelperBase
     {
-        private readonly Controller _controller;
-        private readonly ICommentsEndpoint _commentsEndpoint;
-        private readonly ISettingsService _settingsService;
-        private readonly ITasksEndpoint _tasksEndpoint;
-        
-        public TaskListHelperForEdit(Controller controller,
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint,
-            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService)
-            : base(tasksEndpoint, projectsEndpoint, settingsService, commentsEndpoint)
-        {
-            _controller = controller;
-            _tasksEndpoint = tasksEndpoint;
-            _commentsEndpoint = commentsEndpoint;
-            _settingsService = settingsService;
-        }
+        public TaskListHelperForEdit(TaskListHelperArgs args) : base(args)
+        { }
 
         internal async Task<(bool isValid, IActionResult)> IsDataValid(TaskModel projectTask, TaskViewModelArgs taskViewModelArgs)
         {
-            if (!_controller.ModelState.IsValid)
+            if (!Controller.ModelState.IsValid)
             {
                 var model = await CreateTaskViewModel(taskViewModelArgs);
-                return (false, _controller.View(model));
+                return (false, Controller.View(model));
             }
 
             var (isValidClose, actionResult) = await IsClosingTaskWithOpenSubTasks(projectTask, taskViewModelArgs);
@@ -52,7 +37,7 @@ namespace Pegasus.Controllers.Helpers
                 taskViewModelArgs.BannerMessage = Resources.ControllerStrings.TaskListController.CannotCloseWithOpenSubTasks;
 
                 var model1 = await CreateTaskViewModel(taskViewModelArgs);
-                return (false, _controller.View(model1));
+                return (false, Controller.View(model1));
             }
 
             return (true, null);
@@ -60,7 +45,7 @@ namespace Pegasus.Controllers.Helpers
 
         private async Task<bool> HasIncompleteSubTasks(int taskId)
         {
-            var subTasks = await _tasksEndpoint.GetSubTasks(taskId);
+            var subTasks = await TasksEndpoint.GetSubTasks(taskId);
             return subTasks.Any(subTask => !subTask.IsClosed());
         }
 
@@ -68,8 +53,8 @@ namespace Pegasus.Controllers.Helpers
         {
             if (projectTask != null)
             {
-                _settingsService.Settings.ProjectId = projectTask.ProjectId;
-                _settingsService.SaveSettings();
+                SettingsService.Settings.ProjectId = projectTask.ProjectId;
+                SettingsService.SaveSettings();
             }
         }
 
@@ -83,16 +68,16 @@ namespace Pegasus.Controllers.Helpers
         
         private async Task UpdateComments(string newComment, IList<TaskCommentModel> comments, TaskModel projectTask)
         {
-            await _commentsEndpoint.UpdateComments(comments.ToList());
+            await CommentsEndpoint.UpdateComments(comments.ToList());
             if (!string.IsNullOrWhiteSpace(newComment))
-                await _commentsEndpoint.AddComment(new TaskCommentModel
+                await CommentsEndpoint.AddComment(new TaskCommentModel
                     {TaskId = projectTask.Id, Comment = newComment, UserId = projectTask.UserId});
         }
 
         internal async Task UpdateProjectTaskData(TaskModel projectTask, string newComment, IList<TaskCommentModel> comments)
         {
-            projectTask.UserId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            await _tasksEndpoint.UpdateTask(projectTask);
+            projectTask.UserId = Controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await TasksEndpoint.UpdateTask(projectTask);
             await UpdateComments(newComment, comments, projectTask);
         }
         
@@ -106,14 +91,14 @@ namespace Pegasus.Controllers.Helpers
             if (isClosed)
                 return closedActionResult;
                     
-            return _controller.RedirectToAction("Edit", "TaskList", new { id = (int?)projectTask.Id} );
+            return Controller.RedirectToAction("Edit", "TaskList", new { id = (int?)projectTask.Id} );
         }
 
         private (bool isSubTaskAdded, IActionResult actionResult) IsNewSubTaskToBeAdded(string addSubTask)
         {
             if (!string.IsNullOrWhiteSpace(addSubTask))
             {
-                return (true, _controller.RedirectToAction("Create", "TaskList", new { id = addSubTask}));
+                return (true, Controller.RedirectToAction("Create", "TaskList", new { id = addSubTask}));
             }
 
             return (false, null);
@@ -136,12 +121,12 @@ namespace Pegasus.Controllers.Helpers
 
         private IActionResult ReturnToParentTask(TaskModel projectTask)
         {
-            return _controller.RedirectToAction("Edit", "TaskList", new { id = projectTask.ParentTaskId });
+            return Controller.RedirectToAction("Edit", "TaskList", new { id = projectTask.ParentTaskId });
         } 
         
         private IActionResult ReturnToIndexPage()
         {
-            return _controller.RedirectToAction("Index", "TaskList");
+            return Controller.RedirectToAction("Index", "TaskList");
         } 
     }
 }

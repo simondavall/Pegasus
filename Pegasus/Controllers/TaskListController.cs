@@ -23,20 +23,24 @@ namespace Pegasus.Controllers
         private readonly TaskListHelperForEdit _helperForEdit;
         private readonly TaskListHelperForIndex _helperForIndex;
 
-        public TaskListController(ITaskFilterService taskFilterService,
-            IProjectsEndpoint projectsEndpoint, ITasksEndpoint tasksEndpoint,
-            ICommentsEndpoint commentsEndpoint, ISettingsService settingsService,
+        public TaskListController(ITaskFilterService taskFilterService, IProjectsEndpoint projectsEndpoint, 
+            ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService,
             IMarketingService marketingService, IAnalyticsService analyticsService)
         {
             _tasksEndpoint = tasksEndpoint;
+
+            var args = new TaskListHelperArgs(this, tasksEndpoint, settingsService, 
+                projectsEndpoint, commentsEndpoint, taskFilterService);
+            
+            _helperForCreate = new TaskListHelperForCreate(args);
+            _helperForEdit = new TaskListHelperForEdit(args);
+            _helperForIndex = new TaskListHelperForIndex(args);
+            
 #if DEBUG
             // this is here to simulate stored data, for cookie policy interaction.
             marketingService.SaveMarketingData("Some Marketing Data");
             analyticsService.SaveAnalyticsData("Some Analytics Data");
 #endif
-            _helperForCreate = new TaskListHelperForCreate(this, tasksEndpoint, settingsService, projectsEndpoint, commentsEndpoint);
-            _helperForEdit = new TaskListHelperForEdit(this, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService);
-            _helperForIndex = new TaskListHelperForIndex(this, taskFilterService, projectsEndpoint, tasksEndpoint, commentsEndpoint, settingsService);
         }
 
         [HttpGet]
