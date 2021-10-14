@@ -19,30 +19,26 @@ namespace Pegasus.Controllers
     public class TaskListController : Controller
     {
         private readonly ITasksEndpoint _tasksEndpoint;
-        private readonly TaskListHelperForCreate _helperForCreate;
-        private readonly TaskListHelperForEdit _helperForEdit;
-        private readonly TaskListHelperForIndex _helperForIndex;
+        private TaskListHelperForCreate _helperForCreate;
+        private TaskListHelperForEdit _helperForEdit;
+        private TaskListHelperForIndex _helperForIndex;
 
         public TaskListController(ITaskFilterService taskFilterService, IProjectsEndpoint projectsEndpoint, 
             ITasksEndpoint tasksEndpoint, ICommentsEndpoint commentsEndpoint, ISettingsService settingsService,
             IMarketingService marketingService, IAnalyticsService analyticsService)
         {
             _tasksEndpoint = tasksEndpoint;
-
-            var args = new TaskListHelperArgs(this, tasksEndpoint, settingsService, 
+            
+            var args = new TaskListHelperArgs(this, tasksEndpoint, settingsService,
                 projectsEndpoint, commentsEndpoint, taskFilterService);
-            
-            _helperForCreate = new TaskListHelperForCreate(args);
-            _helperForEdit = new TaskListHelperForEdit(args);
-            _helperForIndex = new TaskListHelperForIndex(args);
-            
+            CreateHelperFunctions(args);
 #if DEBUG
             // this is here to simulate stored data, for cookie policy interaction.
             marketingService.SaveMarketingData("Some Marketing Data");
             analyticsService.SaveAnalyticsData("Some Analytics Data");
 #endif
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
@@ -129,6 +125,13 @@ namespace Pegasus.Controllers
             }
 
             return View("../TaskList/Index", model);
+        }
+        
+        private void CreateHelperFunctions(TaskListHelperArgs args)
+        {
+            _helperForCreate = new TaskListHelperForCreate(args);
+            _helperForEdit = new TaskListHelperForEdit(args);
+            _helperForIndex = new TaskListHelperForIndex(args);
         }
     }
 }
