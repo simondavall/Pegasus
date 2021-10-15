@@ -18,12 +18,12 @@ namespace PegasusService
 
             try
             {
-                Log.Information("Starting up the service.");
+                Log.Information("Starting up the service");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "There was a problem starting the service.");
+                Log.Fatal(ex, "There was a problem starting the service");
             }
             finally
             {

@@ -14,7 +14,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public void GET_ResetPassword_NoCodeSupplied_ReturnsBadRequestObject()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = sut.ResetPassword();
 
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
@@ -23,7 +23,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public void GET_ResetPassword_CodeSupplied_ReturnsViewRequest()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = sut.ResetPassword(null, "testCode");
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -33,7 +33,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_ResetPassword_InvalidModel_ReturnsViewRequestWithModelErrors()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.ModelState.AddModelError(string.Empty, string.Empty);
             var result = await sut.ResetPassword(new ResetPasswordModel());
 
@@ -44,13 +44,13 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_ResetPassword_ResetFailed_ReturnsViewRequestWithModelErrors()
         {
-            _mockAccountsEndpoint.Setup(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()))
+            MockAccountsEndpoint.Setup(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()))
                 .ReturnsAsync(new ResetPasswordModel{Succeeded = false, Errors = new List<IdentityError> {new IdentityError {Code="Code", Description = "Description"}}});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.ResetPassword(new ResetPasswordModel());
 
-            _mockAccountsEndpoint.Verify(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()), Times.Exactly(1));
+            MockAccountsEndpoint.Verify(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<ResetPasswordModel>(((ViewResult)result).Model);
             Assert.NotZero(sut.ModelState.ErrorCount, "Failed error count.");
@@ -59,13 +59,13 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_ResetPassword_ResetSuccess_ReturnsViewRequestWithModelErrors()
         {
-            _mockAccountsEndpoint.Setup(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()))
+            MockAccountsEndpoint.Setup(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()))
                 .ReturnsAsync(new ResetPasswordModel{Succeeded = true});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.ResetPassword(new ResetPasswordModel());
 
-            _mockAccountsEndpoint.Verify(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()), Times.Exactly(1));
+            MockAccountsEndpoint.Verify(x => x.ResetPassword(It.IsAny<ResetPasswordModel>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.AreEqual("ResetPasswordConfirmation", ((ViewResult)result).ViewName);
             Assert.Zero(sut.ModelState.ErrorCount, "Failed error count.");

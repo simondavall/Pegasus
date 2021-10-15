@@ -21,13 +21,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task POST_ResetAuthenticator_HasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new ResetAuthenticatorModel {Errors = TestErrors, StatusMessage = "Error"});
 
             var sut = CreateManageController();
             var result = await sut.ResetAuthenticator(new ResetAuthenticatorModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<ResetAuthenticatorModel>(((ViewResult) result).Model);
             Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
@@ -36,13 +36,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task POST_ResetAuthenticator_Success_ReturnsRedirectToAction()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new ResetAuthenticatorModel { StatusMessage = "OK"});
 
             var sut = CreateManageController();
             var result = await sut.ResetAuthenticator(new ResetAuthenticatorModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<RedirectToActionResult>(result);
             Assert.AreEqual(nameof(ManageController.EnableAuthenticator),((RedirectToActionResult)result).ActionName);
             Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");

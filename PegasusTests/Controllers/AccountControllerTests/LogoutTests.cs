@@ -11,14 +11,14 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task GET_Logout_ReturnsRedirectToLogin()
         {
-            _mockSignInManager.Setup(x => x.SignOutAsync(It.IsAny<string>()));
-            _mockApiHelper.Setup(x => x.RemoveTokenFromHeaders());
+            MockSignInManager.Setup(x => x.SignOutAsync(It.IsAny<string>()));
+            MockApiHelper.Setup(x => x.RemoveTokenFromHeaders());
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.Logout("test-return-url");
 
-            _mockSignInManager.Verify(x => x.SignOutAsync(It.IsAny<string>()), Times.Exactly(1));
-            _mockApiHelper.Verify(x => x.RemoveTokenFromHeaders(), Times.Exactly(1));
+            MockSignInManager.Verify(x => x.SignOutAsync(It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.RemoveTokenFromHeaders(), Times.Exactly(1));
             Assert.IsInstanceOf<LocalRedirectResult>(result);
             Assert.AreEqual("/Account/Login", ((LocalRedirectResult)result).Url);
         }

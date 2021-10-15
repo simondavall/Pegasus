@@ -12,13 +12,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task GET_Index_HasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
                 .ReturnsAsync(new UserDetailsModel {Errors = TestErrors, StatusMessage = "Error"});
 
             var sut = CreateManageController();
             var result = await sut.Index();
 
-            _mockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
         }
@@ -26,13 +26,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task GET_Index_NoErrors_ReturnsViewResult()
         {
-            _mockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
                 .ReturnsAsync(new UserDetailsModel {StatusMessage = "OK"});
 
             var sut = CreateManageController();
             var result = await sut.Index();
 
-            _mockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");
         }
@@ -52,13 +52,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task POST_Index_SetUserDetailsHasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new UserDetailsModel {Errors = TestErrors, StatusMessage = "Error"});
 
             var sut = CreateManageController();
             var result = await sut.Index(new UserDetailsModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<UserDetailsModel>(((ViewResult) result).Model);
             Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
@@ -67,13 +67,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [Test]
         public async Task POST_Index_SetUserDetailsHasNoErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
+            MockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
                 .ReturnsAsync(new UserDetailsModel { StatusMessage = "OK"});
 
             var sut = CreateManageController();
             var result = await sut.Index(new UserDetailsModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
+            MockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<UserDetailsModel>(((ViewResult) result).Model);
             Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");

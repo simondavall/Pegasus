@@ -30,15 +30,15 @@ namespace PegasusService
                 {
                     var result = await KeepAlive(site, stoppingToken);
 #if DEBUG
-                    _logger.LogInformation("Debug: Worker running at: {time}, Site: {site}, Success: {status}", DateTimeOffset.Now, site, result);
+                    _logger.LogInformation("Debug: Worker running at: {Time}, Site: {Site}, Success: {Status}", DateTimeOffset.Now, site, result);
 #endif
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Pegasus Service running at: {time}, Error: {message}", DateTimeOffset.Now, ex.Message);
+                _logger.LogInformation("Pegasus Service running at: {Time}, Error: {Message}", DateTimeOffset.Now, ex.Message);
                 if (ex.InnerException != null)
-                    _logger.LogInformation("Pegasus Service running at: {time}, Error: {message}", DateTimeOffset.Now, ex.InnerException.Message);
+                    _logger.LogInformation("Pegasus Service running at: {Time}, Error: {Message}", DateTimeOffset.Now, ex.InnerException.Message);
             }
         }
 

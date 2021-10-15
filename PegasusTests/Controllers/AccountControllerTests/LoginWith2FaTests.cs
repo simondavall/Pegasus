@@ -15,10 +15,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task GET_LoginWith2Fa_UserIsNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync((string)null);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWith2Fa();
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -30,10 +30,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task GET_LoginWith2Fa_UserNotNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var returnUrl = "test-return-url";
             var result = await sut.LoginWith2Fa(returnUrl);
 
@@ -46,7 +46,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWith2Fa_InvalidModel_ReturnsViewResultWithErrorMessage()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.ModelState.AddModelError(string.Empty, string.Empty);
             var result = await sut.LoginWith2Fa(new LoginWith2FaViewModel());
 
@@ -57,10 +57,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWith2Fa_UserIsNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync((string)null);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWith2Fa(new LoginWith2FaViewModel());
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -72,12 +72,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWith2Fa_TokenVerificationFailed_ReturnsViewResultWithErrorMessage()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
-            _mockAccountsEndpoint.Setup(x => x.VerifyTwoFactorTokenAsync(It.IsAny<VerifyTwoFactorModel>()))
+            MockAccountsEndpoint.Setup(x => x.VerifyTwoFactorTokenAsync(It.IsAny<VerifyTwoFactorModel>()))
                 .ReturnsAsync(new VerifyTwoFactorModel {Verified = false});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWith2Fa(new LoginWith2FaViewModel());
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -90,13 +90,13 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWith2Fa_TokenVerificationSuccess_ReturnsRedirectToReturnUrl()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
-            _mockSignInManager.Setup(x => x.DoTwoFactorSignInAsync(It.IsAny<string>(), It.IsAny<bool>()));
-            _mockAccountsEndpoint.Setup(x => x.VerifyTwoFactorTokenAsync(It.IsAny<VerifyTwoFactorModel>()))
+            MockSignInManager.Setup(x => x.DoTwoFactorSignInAsync(It.IsAny<string>(), It.IsAny<bool>()));
+            MockAccountsEndpoint.Setup(x => x.VerifyTwoFactorTokenAsync(It.IsAny<VerifyTwoFactorModel>()))
                 .ReturnsAsync(new VerifyTwoFactorModel {Verified = true});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWith2Fa(new LoginWith2FaViewModel {ReturnUrl = "/"});
 
             Assert.IsInstanceOf<LocalRedirectResult>(result);

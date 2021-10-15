@@ -58,7 +58,7 @@ namespace PegasusTests.ExtensionTests
         {
             _page = 2;
 
-            var sut = _list.Paginated(_page, _pagesize, _paginationEnabled);
+            var sut = _list.Paginated(_page, _pagesize, _paginationEnabled).ToList();
 
             Assert.AreEqual(_pagesize, sut.Count());
             Assert.AreEqual(20, sut.ToList()[0]);

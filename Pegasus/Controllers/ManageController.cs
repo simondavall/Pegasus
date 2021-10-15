@@ -61,7 +61,7 @@ namespace Pegasus.Controllers
             var changePasswordResult = await _manageEndpoint.ChangePasswordAsync(model);
             if (!changePasswordResult.Succeeded)
             {
-                _logger.LogError("Failed to change password for User with ID '{UserId}'.", UserId);
+                _logger.LogError("Failed to change password for User with ID '{UserId}'", UserId);
                 LogErrors(changePasswordResult);
                 ModelState.AddModelError(string.Empty, ManageControllerStrings.FailedToChangePassword);
                 return View(model);
@@ -69,7 +69,7 @@ namespace Pegasus.Controllers
 
             await _signInManager.RefreshSignInAsync(UserId);
 
-            _logger.LogInformation("User with UserId {UserId} changed their password successfully.", UserId);
+            _logger.LogInformation("User with UserId {UserId} changed their password successfully", UserId);
             model = new ChangePasswordModel
             {
                 StatusMessage = ManageControllerStrings.PasswordChangedSuccess
@@ -109,13 +109,13 @@ namespace Pegasus.Controllers
             var disable2FaResult = await _manageEndpoint.SetTwoFactorEnabledAsync(setTwoFactorEnabled);
             if (!disable2FaResult.Succeeded)
             {
-                _logger.LogError("Failed to disable 2fa for User with ID '{UserId}'.", UserId);
+                _logger.LogError("Failed to disable 2fa for User with ID '{UserId}'", UserId);
                 LogErrors(disable2FaResult);
                 model.StatusMessage = ManageControllerStrings.FailedToDisable2Fa;
                 return View(model);
             }
             
-            _logger.LogTrace("User with ID '{UserId}' has disabled 2fa.", UserId);
+            _logger.LogTrace("User with ID '{UserId}' has disabled 2fa", UserId);
             return RedirectToAction("TwoFactorAuthentication", "Manage");
         }
 
@@ -152,7 +152,7 @@ namespace Pegasus.Controllers
             if (!enabled) 
                 return actionResult1;
 
-            _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", UserId);
+            _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app", UserId);
             model.StatusMessage = ManageControllerStrings.AuthenticatorAppVerified;
 
             var (isUpdated, actionResult2) = await CheckRecoveryCodesStatusAsync(model);
@@ -190,7 +190,7 @@ namespace Pegasus.Controllers
                 RecoveryCodes = generateCodesModel.RecoveryCodes?.ToArray()
             };
 
-            _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", UserId);
+            _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes", UserId);
 
             return RedirectToAction("ShowRecoveryCodes", showRecoveryCodes);
         }
@@ -237,7 +237,7 @@ namespace Pegasus.Controllers
             model = await _manageEndpoint.ResetAuthenticatorAsync(model);
             if (model.HasErrors) return HasErrors(model, nameof(ResetAuthenticator), ManageControllerStrings.FailedToResetAuthenticator, model);
 
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", model.UserId);
+            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key", model.UserId);
             var enableAuthenticatorModel = new EnableAuthenticatorModel
             {
                 StatusMessage = ManageControllerStrings.AuthenticatorResetSuccess

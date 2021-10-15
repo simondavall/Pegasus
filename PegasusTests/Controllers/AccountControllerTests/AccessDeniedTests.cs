@@ -9,7 +9,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public void GET_AccessDenied_ReturnsViewRequest()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = sut.AccessDenied();
 
             Assert.IsInstanceOf<ViewResult>(result);

@@ -20,13 +20,13 @@ namespace PegasusTests.Controllers.ManageControllerTests
     class ManageControllerTestsBase
     {
         protected const string UserId = "user-id";
-        protected ControllerContext _controllerContext;
-        protected Mock<IHttpContextWrapper> _mockHttpContextWrapper;
-        protected Mock<IAccountsEndpoint> _mockAccountsEndpoint;
-        protected Mock<IApiHelper> _mockApiHelper;
-        protected Mock<IJwtTokenAccessor> _mockTokenAccessor;
-        protected Mock<IAuthenticationEndpoint> _mockAuthenticationEndpoint;
-        protected Mock<ILogger<Pegasus.Controllers.ManageController>> _logger;
+        protected ControllerContext ControllerContext;
+        protected Mock<IHttpContextWrapper> MockHttpContextWrapper;
+        protected Mock<IAccountsEndpoint> MockAccountsEndpoint;
+        protected Mock<IApiHelper> MockApiHelper;
+        protected Mock<IJwtTokenAccessor> MockTokenAccessor;
+        protected Mock<IAuthenticationEndpoint> MockAuthenticationEndpoint;
+        protected Mock<ILogger<Pegasus.Controllers.ManageController>> Logger;
 
         protected static IEnumerable<IdentityError> TestErrors => new List<IdentityError>
             { new IdentityError { Code = "ErrorCode", Description = "Error Message" } };
@@ -34,53 +34,53 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _mockHttpContextWrapper = new Mock<IHttpContextWrapper>();
-            _mockTokenAccessor = new Mock<IJwtTokenAccessor>();
-            _mockAuthenticationEndpoint = new Mock<IAuthenticationEndpoint>();
-            _logger = new Mock<ILogger<Pegasus.Controllers.ManageController>>();
+            MockHttpContextWrapper = new Mock<IHttpContextWrapper>();
+            MockTokenAccessor = new Mock<IJwtTokenAccessor>();
+            MockAuthenticationEndpoint = new Mock<IAuthenticationEndpoint>();
+            Logger = new Mock<ILogger<Pegasus.Controllers.ManageController>>();
         }
 
         [SetUp]
         public void TestSetup()
         {
-            _mockApiHelper = new Mock<IApiHelper>();
-            _mockAccountsEndpoint = new Mock<IAccountsEndpoint>();
+            MockApiHelper = new Mock<IApiHelper>();
+            MockAccountsEndpoint = new Mock<IAccountsEndpoint>();
             SetupAuthenticationMock();
             SetupContextUser();
         }
 
         protected Pegasus.Controllers.ManageController CreateManageController()
         {
-            var manageEndpoint = new ManageEndpoint(_mockApiHelper.Object);
+            var manageEndpoint = new ManageEndpoint(MockApiHelper.Object);
 
-            var signInManager = new SignInManager(_mockHttpContextWrapper.Object, _mockAccountsEndpoint.Object,
-                _mockApiHelper.Object, _mockTokenAccessor.Object, _mockAuthenticationEndpoint.Object);
+            var signInManager = new SignInManager(MockHttpContextWrapper.Object, MockAccountsEndpoint.Object,
+                MockApiHelper.Object, MockTokenAccessor.Object, MockAuthenticationEndpoint.Object);
 
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, _logger.Object)
+            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, Logger.Object)
             {
-                ControllerContext = _controllerContext
+                ControllerContext = ControllerContext
             };
             return sut;
         }
 
         private void SetupAuthenticationMock()
         {
-            _mockHttpContextWrapper = new Mock<IHttpContextWrapper>();
-            _mockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
-            _mockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
-            _mockHttpContextWrapper.Setup(x => x.SignOutAsync(It.IsAny<string>()));
-            _mockHttpContextWrapper.Setup(x => x.SignOutAsync());
+            MockHttpContextWrapper = new Mock<IHttpContextWrapper>();
+            MockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
+            MockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
+            MockHttpContextWrapper.Setup(x => x.SignOutAsync(It.IsAny<string>()));
+            MockHttpContextWrapper.Setup(x => x.SignOutAsync());
         }
 
         protected void SetupSignInMocks()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<string>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<string>()))
                 .ReturnsAsync(new AuthenticatedUser { UserId = UserId });
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate2Fa(It.IsAny<string>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate2Fa(It.IsAny<string>()))
                 .ReturnsAsync(new AuthenticatedUser { UserId = UserId });
-            _mockTokenAccessor.Setup(x => x.GetAccessTokenWithClaimsPrincipal(It.IsAny<AuthenticatedUser>()))
+            MockTokenAccessor.Setup(x => x.GetAccessTokenWithClaimsPrincipal(It.IsAny<AuthenticatedUser>()))
                 .Returns(new TokenWithClaimsPrincipal());
-            _mockAccountsEndpoint.Setup(x => x.RememberClientAsync(It.IsAny<string>())).ReturnsAsync(new RememberClientModel
+            MockAccountsEndpoint.Setup(x => x.RememberClientAsync(It.IsAny<string>())).ReturnsAsync(new RememberClientModel
                 { SupportsUserSecurityStamp = true, SecurityStamp = "security-stamp" });
         }
 
@@ -96,7 +96,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
             userMock.Setup(p => p.Claims).Returns(claims);
 
             var context = new DefaultHttpContext {User = userMock.Object};
-            _controllerContext = new ControllerContext
+            ControllerContext = new ControllerContext
             {
                 HttpContext = context
             };
