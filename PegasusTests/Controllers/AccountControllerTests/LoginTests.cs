@@ -14,7 +14,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public void GET_Login_ReturnsViewResult()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = sut.Login();
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -23,7 +23,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_ModelInvalid_ReturnsViewResult()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.ModelState.AddModelError(string.Empty, string.Empty);
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
@@ -35,10 +35,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_NotAuthenticated_ReturnsViewResultWithErrorMessage()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = false });
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -49,12 +49,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_SignInFailed_ReturnsViewResultWithErrorMessage()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = false });
-            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+            MockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
                 .ReturnsAsync(new SignInResultModel { Success = false, RequiresTwoFactor = false});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -66,13 +66,13 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_AuthenticateSuccessWithLocalUrl_ReturnsLocalRedirectToReturnUrl()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = true });
-            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+            MockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
                 .ReturnsAsync(new SignInResultModel { Success = true });
 
             var returnUrl = "/";
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.Url = GetUrl();
             var result = await sut.Login(new LoginViewModel(), returnUrl);
 
@@ -84,12 +84,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_AuthenticateSuccessWithEmptyReturnUrl_ReturnsRedirectToAction()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = true });
-            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+            MockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
                 .ReturnsAsync(new SignInResultModel { Success = true });
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.Url = GetUrl();
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
@@ -101,12 +101,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_AuthenticateRequiresTwoFactor_ReturnsRedirectToAction()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = true });
-            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+            MockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
                 .ReturnsAsync(new SignInResultModel { Success = false, RequiresTwoFactor = true});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<RedirectToActionResult>(result);
@@ -117,12 +117,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_Login_SignInFailsAndNo2FaRequestRequired_ReturnsViewRequestWithErrors()
         {
-            _mockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
+            MockAuthenticationEndpoint.Setup(x => x.Authenticate(It.IsAny<UserCredentials>()))
                 .ReturnsAsync(new AuthenticatedUser { Authenticated = true });
-            _mockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
+            MockSignInManager.Setup(x => x.SignInOrTwoFactor(It.IsAny<AuthenticatedUser>()))
                 .ReturnsAsync(new SignInResultModel { Success = false, RequiresTwoFactor = false});
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.Login(new LoginViewModel(), string.Empty);
 
             Assert.IsInstanceOf<ViewResult>(result);

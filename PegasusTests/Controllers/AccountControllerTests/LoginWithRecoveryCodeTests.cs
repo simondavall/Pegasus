@@ -15,10 +15,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task GET_LoginWithRecoveryCode_UserIsNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync((string)null);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWithRecoveryCode();
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -30,10 +30,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task GET_LoginWithRecoveryCode_UserNotNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var returnUrl = "test-return-url";
             var result = await sut.LoginWithRecoveryCode(returnUrl);
 
@@ -46,7 +46,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWithRecoveryCode_InvalidModel_ReturnsViewResultWithErrorMessage()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.ModelState.AddModelError(string.Empty, string.Empty);
             var result = await sut.LoginWithRecoveryCode(new LoginWithRecoveryCodeModel());
 
@@ -57,10 +57,10 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWithRecoveryCode_UserIsNull_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync((string)null);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWithRecoveryCode(new LoginWithRecoveryCodeModel());
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -71,12 +71,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWithRecoveryCode_LoginFailed_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
-            _mockSignInManager.Setup(x => x.TwoFactorRecoveryCodeSignInAsync(It.IsAny<string>()))
+            MockSignInManager.Setup(x => x.TwoFactorRecoveryCodeSignInAsync(It.IsAny<string>()))
                 .ReturnsAsync(SignInResult.Failed);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWithRecoveryCode(new LoginWithRecoveryCodeModel());
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -87,12 +87,12 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_LoginWithRecoveryCode_LoginSuccess_ReturnsViewResult()
         {
-            _mockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            MockSignInManager.Setup(x => x.GetTwoFactorAuthenticationUserAsync())
                 .ReturnsAsync("test-user");
-            _mockSignInManager.Setup(x => x.TwoFactorRecoveryCodeSignInAsync(It.IsAny<string>()))
+            MockSignInManager.Setup(x => x.TwoFactorRecoveryCodeSignInAsync(It.IsAny<string>()))
                 .ReturnsAsync(SignInResult.Success);
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = await sut.LoginWithRecoveryCode(new LoginWithRecoveryCodeModel { RecoveryCode = "test-recovery-code", ReturnUrl = "/"});
 
             Assert.IsInstanceOf<LocalRedirectResult>(result);

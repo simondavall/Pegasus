@@ -88,7 +88,7 @@ namespace PegasusTests.ServiceTests
             var count = taskFilters.Length;
 
             var sut = new TaskFilterService(_cache,_configuration);
-            var result = sut.GetTaskFilters();
+            var result = sut.GetTaskFilters().ToList();
 
             Assert.AreEqual(count, result.Count());
 

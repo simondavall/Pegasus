@@ -1,40 +1,39 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Pegasus.Library.Models.Manage;
-using Pegasus.Library.Services.Resources;
+using ManageControllerStrings = Pegasus.Library.Services.Resources.Resources.ControllerStrings.ManageController;
 
 namespace PegasusTests.Controllers.ManageControllerTests
 {
-    class IndexTests : ManageControllerTestsBase
+    internal class IndexTests : ManageControllerTestsBase
     {
         [Test]
         public async Task GET_Index_HasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
-                .ReturnsAsync(new UserDetailsModel {Errors = TestErrors, StatusMessage = "Error"});
+            MockManageEndpoint.Setup(x => x.GetUserDetails(It.IsAny<string>()))
+                .ReturnsAsync(new UserDetailsModel { Errors = TestErrors, StatusMessage = "Error" });
 
             var sut = CreateManageController();
             var result = await sut.Index();
 
-            _mockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<ViewResult>();
+            sut.ModelState.ErrorCount.Should().Be(1);
         }
 
         [Test]
         public async Task GET_Index_NoErrors_ReturnsViewResult()
         {
-            _mockApiHelper.Setup(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()))
-                .ReturnsAsync(new UserDetailsModel {StatusMessage = "OK"});
+            MockManageEndpoint.Setup(x => x.GetUserDetails(It.IsAny<string>()))
+                .ReturnsAsync(new UserDetailsModel { StatusMessage = "OK" });
 
             var sut = CreateManageController();
             var result = await sut.Index();
 
-            _mockApiHelper.Verify(x => x.GetFromUri<UserDetailsModel>(It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<ViewResult>();
+            sut.ModelState.ErrorCount.Should().Be(0);
         }
 
         [Test]
@@ -44,40 +43,39 @@ namespace PegasusTests.Controllers.ManageControllerTests
             sut.ModelState.AddModelError("ErrorCode", "ErrorDescription");
             var result = await sut.Index(new UserDetailsModel());
 
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.IsInstanceOf<UserDetailsModel>(((ViewResult) result).Model);
-            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<ViewResult>();
+            ((ViewResult)result).Model.Should().BeOfType<UserDetailsModel>();
+            sut.ModelState.ErrorCount.Should().Be(1);
         }
 
         [Test]
         public async Task POST_Index_SetUserDetailsHasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new UserDetailsModel {Errors = TestErrors, StatusMessage = "Error"});
+            MockManageEndpoint.Setup(x => x.SetUserDetails(It.IsAny<UserDetailsModel>()))
+                .ReturnsAsync(new UserDetailsModel { Errors = TestErrors, StatusMessage = "Error" });
 
             var sut = CreateManageController();
             var result = await sut.Index(new UserDetailsModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.IsInstanceOf<UserDetailsModel>(((ViewResult) result).Model);
-            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<ViewResult>();
+            ((ViewResult)result).Model.Should().BeOfType<UserDetailsModel>();
+            sut.ModelState.ErrorCount.Should().Be(2);
         }
 
         [Test]
         public async Task POST_Index_SetUserDetailsHasNoErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new UserDetailsModel { StatusMessage = "OK"});
+            MockManageEndpoint.Setup(x => x.SetUserDetails(It.IsAny<UserDetailsModel>()))
+                .ReturnsAsync(new UserDetailsModel { StatusMessage = "OK" });
 
             var sut = CreateManageController();
             var result = await sut.Index(new UserDetailsModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<UserDetailsModel>(), It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.IsInstanceOf<UserDetailsModel>(((ViewResult) result).Model);
-            Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");
-            Assert.AreEqual(Resources.ControllerStrings.ManageController.UserDetailsUpdated, ((UserDetailsModel)((ViewResult)result).Model).StatusMessage);
+            result.Should().BeOfType<ViewResult>();
+            ((ViewResult)result).Model.Should().BeOfType<UserDetailsModel>();
+            sut.ModelState.ErrorCount.Should().Be(0);
+            var userDetailsModel = (UserDetailsModel)((ViewResult)result).Model;
+            userDetailsModel.StatusMessage.Should().Be(ManageControllerStrings.UserDetailsUpdated);
         }
     }
 }

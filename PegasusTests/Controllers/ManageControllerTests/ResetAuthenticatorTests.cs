@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -7,7 +8,7 @@ using Pegasus.Library.Models.Manage;
 
 namespace PegasusTests.Controllers.ManageControllerTests
 {
-    class ResetAuthenticatorTests : ManageControllerTestsBase
+    internal class ResetAuthenticatorTests : ManageControllerTestsBase
     {
         [Test]
         public void GET_ResetAuthenticator_Called_ReturnsViewResult()
@@ -15,37 +16,35 @@ namespace PegasusTests.Controllers.ManageControllerTests
             var sut = CreateManageController();
             var result = sut.ResetAuthenticator();
 
-            Assert.IsInstanceOf<ViewResult>(result);
+            result.Should().BeOfType<ViewResult>();
         }
 
         [Test]
         public async Task POST_ResetAuthenticator_HasErrors_ReturnsViewResultWithErrorMessage()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new ResetAuthenticatorModel {Errors = TestErrors, StatusMessage = "Error"});
+            MockManageEndpoint.Setup(x => x.ResetAuthenticatorAsync(It.IsAny<ResetAuthenticatorModel>()))
+                .ReturnsAsync(new ResetAuthenticatorModel { Errors = TestErrors, StatusMessage = "Error" });
 
             var sut = CreateManageController();
             var result = await sut.ResetAuthenticator(new ResetAuthenticatorModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<ViewResult>(result);
-            Assert.IsInstanceOf<ResetAuthenticatorModel>(((ViewResult) result).Model);
-            Assert.NotZero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<ViewResult>();
+            ((ViewResult)result).Model.Should().BeOfType<ResetAuthenticatorModel>();
+            sut.ModelState.ErrorCount.Should().Be(2);
         }
 
         [Test]
         public async Task POST_ResetAuthenticator_Success_ReturnsRedirectToAction()
         {
-            _mockApiHelper.Setup(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()))
-                .ReturnsAsync(new ResetAuthenticatorModel { StatusMessage = "OK"});
+            MockManageEndpoint.Setup(x => x.ResetAuthenticatorAsync(It.IsAny<ResetAuthenticatorModel>()))
+                .ReturnsAsync(new ResetAuthenticatorModel { StatusMessage = "OK" });
 
             var sut = CreateManageController();
             var result = await sut.ResetAuthenticator(new ResetAuthenticatorModel());
 
-            _mockApiHelper.Verify(x => x.PostAsync(It.IsAny<ResetAuthenticatorModel>(), It.IsAny<string>()), Times.Exactly(1));
-            Assert.IsInstanceOf<RedirectToActionResult>(result);
-            Assert.AreEqual(nameof(ManageController.EnableAuthenticator),((RedirectToActionResult)result).ActionName);
-            Assert.Zero(sut.ModelState.ErrorCount, "Error count failed.");
+            result.Should().BeOfType<RedirectToActionResult>();
+            ((RedirectToActionResult)result).ActionName.Should().Be(nameof(ManageController.EnableAuthenticator));
+            sut.ModelState.ErrorCount.Should().Be(0);
         }
     }
 }

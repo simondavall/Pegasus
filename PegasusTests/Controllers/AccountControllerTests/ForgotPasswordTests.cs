@@ -14,7 +14,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public void GET_ForgotPassword_ReturnsViewResult()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             var result = sut.ForgotPassword();
 
             Assert.IsInstanceOf<ViewResult>(result);
@@ -23,7 +23,7 @@ namespace PegasusTests.Controllers.AccountControllerTests
         [Test]
         public async Task POST_ForgotPassword_InvalidModel_ReturnsViewResult()
         {
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object, _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object);
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object, MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object);
             sut.ModelState.AddModelError(string.Empty, string.Empty);
             var result = await sut.ForgotPassword(new ForgotPasswordModel());
 
@@ -43,8 +43,8 @@ namespace PegasusTests.Controllers.AccountControllerTests
             };
             // end mock
 
-            var sut = new AccountController(_mockLogger.Object, _mockApiHelper.Object, _mockSignInManager.Object,
-                _mockAccountsEndpoint.Object, _mockAuthenticationEndpoint.Object)
+            var sut = new AccountController(MockLogger.Object, MockApiHelper.Object, MockSignInManager.Object,
+                MockAccountsEndpoint.Object, MockAuthenticationEndpoint.Object)
             {
                 ControllerContext = controllerContext
             };

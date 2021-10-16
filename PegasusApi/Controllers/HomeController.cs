@@ -22,7 +22,7 @@ namespace PegasusApi.Controllers
 
         public IActionResult Privacy()
         {
-            _logger.LogInformation("Viewed privacy page.");
+            _logger.LogInformation("Viewed privacy page");
 
             return View();
         }

@@ -14,21 +14,19 @@ using Pegasus.Library.JwtAuthentication.Models;
 using Pegasus.Library.Models.Account;
 using Pegasus.Library.Services.Http;
 using Pegasus.Services;
-using ManageControllerStrings = Pegasus.Library.Services.Resources.Resources.ControllerStrings.ManageController;
 
-namespace PegasusTests.Controllers.ManageControllerTests
+namespace Pegasus.Integration.Tests.Controllers.ManageControllerTests
 {
-    internal class ManageControllerTestsBase
+    class ManageControllerTestsBase
     {
         protected const string UserId = "user-id";
-        private ControllerContext _controllerContext;
+        protected ControllerContext ControllerContext;
         protected Mock<IHttpContextWrapper> MockHttpContextWrapper;
-        private Mock<IAccountsEndpoint> _mockAccountsEndpoint;
-        private Mock<IApiHelper> _mockApiHelper;
+        protected Mock<IAccountsEndpoint> MockAccountsEndpoint;
+        protected Mock<IApiHelper> MockApiHelper;
         protected Mock<IJwtTokenAccessor> MockTokenAccessor;
         protected Mock<IAuthenticationEndpoint> MockAuthenticationEndpoint;
-        private Mock<ILogger<Pegasus.Controllers.ManageController>> _logger;
-        protected Mock<IManageEndpoint> MockManageEndpoint;
+        protected Mock<ILogger<Pegasus.Controllers.ManageController>> Logger;
 
         protected static IEnumerable<IdentityError> TestErrors => new List<IdentityError>
             { new IdentityError { Code = "ErrorCode", Description = "Error Message" } };
@@ -39,27 +37,28 @@ namespace PegasusTests.Controllers.ManageControllerTests
             MockHttpContextWrapper = new Mock<IHttpContextWrapper>();
             MockTokenAccessor = new Mock<IJwtTokenAccessor>();
             MockAuthenticationEndpoint = new Mock<IAuthenticationEndpoint>();
-            _logger = new Mock<ILogger<Pegasus.Controllers.ManageController>>();
+            Logger = new Mock<ILogger<Pegasus.Controllers.ManageController>>();
         }
 
         [SetUp]
         public void TestSetup()
         {
-            MockManageEndpoint = new Mock<IManageEndpoint>();
-            _mockApiHelper = new Mock<IApiHelper>();
-            _mockAccountsEndpoint = new Mock<IAccountsEndpoint>();
+            MockApiHelper = new Mock<IApiHelper>();
+            MockAccountsEndpoint = new Mock<IAccountsEndpoint>();
             SetupAuthenticationMock();
             SetupContextUser();
         }
 
         protected Pegasus.Controllers.ManageController CreateManageController()
         {
-            var signInManager = new SignInManager(MockHttpContextWrapper.Object, _mockAccountsEndpoint.Object,
-                _mockApiHelper.Object, MockTokenAccessor.Object, MockAuthenticationEndpoint.Object);
+            var manageEndpoint = new ManageEndpoint(MockApiHelper.Object);
 
-            var sut = new Pegasus.Controllers.ManageController(MockManageEndpoint.Object, signInManager, _logger.Object)
+            var signInManager = new SignInManager(MockHttpContextWrapper.Object, MockAccountsEndpoint.Object,
+                MockApiHelper.Object, MockTokenAccessor.Object, MockAuthenticationEndpoint.Object);
+
+            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, Logger.Object)
             {
-                ControllerContext = _controllerContext
+                ControllerContext = ControllerContext
             };
             return sut;
         }
@@ -67,10 +66,8 @@ namespace PegasusTests.Controllers.ManageControllerTests
         private void SetupAuthenticationMock()
         {
             MockHttpContextWrapper = new Mock<IHttpContextWrapper>();
-            MockHttpContextWrapper.Setup(x =>
-                x.SignInAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
-            MockHttpContextWrapper.Setup(x =>
-                x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
+            MockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
+            MockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
             MockHttpContextWrapper.Setup(x => x.SignOutAsync(It.IsAny<string>()));
             MockHttpContextWrapper.Setup(x => x.SignOutAsync());
         }
@@ -83,9 +80,8 @@ namespace PegasusTests.Controllers.ManageControllerTests
                 .ReturnsAsync(new AuthenticatedUser { UserId = UserId });
             MockTokenAccessor.Setup(x => x.GetAccessTokenWithClaimsPrincipal(It.IsAny<AuthenticatedUser>()))
                 .Returns(new TokenWithClaimsPrincipal());
-            _mockAccountsEndpoint.Setup(x => x.RememberClientAsync(It.IsAny<string>()))
-                .ReturnsAsync(new RememberClientModel
-                    { SupportsUserSecurityStamp = true, SecurityStamp = "security-stamp" });
+            MockAccountsEndpoint.Setup(x => x.RememberClientAsync(It.IsAny<string>())).ReturnsAsync(new RememberClientModel
+                { SupportsUserSecurityStamp = true, SecurityStamp = "security-stamp" });
         }
 
         private void SetupContextUser()
@@ -99,8 +95,8 @@ namespace PegasusTests.Controllers.ManageControllerTests
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, UserId) };
             userMock.Setup(p => p.Claims).Returns(claims);
 
-            var context = new DefaultHttpContext { User = userMock.Object };
-            _controllerContext = new ControllerContext
+            var context = new DefaultHttpContext {User = userMock.Object};
+            ControllerContext = new ControllerContext
             {
                 HttpContext = context
             };
@@ -110,16 +106,14 @@ namespace PegasusTests.Controllers.ManageControllerTests
         {
             var testScheme = "FakeScheme";
             var principal = new ClaimsPrincipal();
-            principal.AddIdentity(new ClaimsIdentity(new[]
-            {
+            principal.AddIdentity(new ClaimsIdentity(new[] {
                 new Claim("amr", "access-token"),
                 new Claim("Manager", "yes"),
                 new Claim(ClaimTypes.Role, "Administrator"),
                 new Claim(ClaimTypes.NameIdentifier, "John")
             }, testScheme));
 
-            return AuthenticateResult.Success(new AuthenticationTicket(principal, new AuthenticationProperties(),
-                testScheme));
+            return AuthenticateResult.Success(new AuthenticationTicket(principal, new AuthenticationProperties(), testScheme));
         }
     }
 }

@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusApi.Tests", "Pegasus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusApi.Library", "PegasusApi.Library\PegasusApi.Library.csproj", "{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{DC0A22A2-E0CB-454C-9400-57CB05485A72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegasus.Integration.Tests", "Pegasus.Integration.Tests\Pegasus.Integration.Tests.csproj", "{A151558B-14BC-4D39-9719-79504CD4E9BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +71,10 @@ Global
 		{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +88,7 @@ Global
 		{7FCE316C-849E-4035-A62B-437BC8E3B01A} = {06CF6EF2-637A-4DC4-95A8-555A713A6386}
 		{C3C35E03-184F-4214-A9CC-E9691FBCCF36} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
 		{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
+		{A151558B-14BC-4D39-9719-79504CD4E9BD} = {DC0A22A2-E0CB-454C-9400-57CB05485A72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A88CDAC7-AF12-41D8-B2A8-9F9EC58A5053}

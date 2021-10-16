@@ -39,12 +39,12 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByEmailAsync(username);
             if (user == null)
             {
-                _logger.LogWarning("Failed to find user {username}.", username);
+                _logger.LogWarning("Failed to find user {Username}", username);
                 return NotFound();
             }
             if (! await _userManager.CheckPasswordAsync(user, password))
             {
-                _logger.LogWarning("Failed login attempt by {username}.", username);
+                _logger.LogWarning("Failed login attempt by {Username}", username);
                 return BadRequest();
             }
 
@@ -59,7 +59,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                _logger.LogWarning("Failed to find user {userid}.", userId);
+                _logger.LogWarning("Failed to find user {Userid}", userId);
                 return NotFound();
             }
 
@@ -74,7 +74,7 @@ namespace PegasusApi.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                _logger.LogWarning("Failed to find user {userid}.", userId);
+                _logger.LogWarning("Failed to find user {Userid}", userId);
                 return NotFound();
             }
 
@@ -106,7 +106,7 @@ namespace PegasusApi.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogCritical(ex, "Failed to generate access token for user {username} with userid {userid}. TokenOptions not setup correctly.",
+                _logger.LogCritical(ex, "Failed to generate access token for user {Username} with userid {Userid}. TokenOptions not setup correctly",
                     user.UserName, user.Id);
                 ModelState.AddModelError("TokenError", $"Unable to login to the system at the moment. Please try later.");
                 return new TokenModel();

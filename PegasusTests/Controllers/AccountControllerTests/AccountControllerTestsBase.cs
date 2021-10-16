@@ -9,25 +9,25 @@ namespace PegasusTests.Controllers.AccountControllerTests
 {
     class AccountControllerTestsBase
     {
-        protected Mock<ILogger<AccountController>> _mockLogger;
-        protected Mock<IApiHelper> _mockApiHelper;
-        protected Mock<IAccountsEndpoint> _mockAccountsEndpoint;
-        protected Mock<IAuthenticationEndpoint> _mockAuthenticationEndpoint;
-        protected Mock<ISignInManager> _mockSignInManager;
+        protected Mock<ILogger<AccountController>> MockLogger;
+        protected Mock<IApiHelper> MockApiHelper;
+        protected Mock<IAccountsEndpoint> MockAccountsEndpoint;
+        protected Mock<IAuthenticationEndpoint> MockAuthenticationEndpoint;
+        protected Mock<ISignInManager> MockSignInManager;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _mockAuthenticationEndpoint = new Mock<IAuthenticationEndpoint>();
-            _mockLogger = new Mock<ILogger<AccountController>>();
-            _mockSignInManager = new Mock<ISignInManager>();
+            MockAuthenticationEndpoint = new Mock<IAuthenticationEndpoint>();
+            MockLogger = new Mock<ILogger<AccountController>>();
+            MockSignInManager = new Mock<ISignInManager>();
         }
 
         [SetUp]
         public void EachTestSetup()
         {
-            _mockAccountsEndpoint = new Mock<IAccountsEndpoint>();
-            _mockApiHelper = new Mock<IApiHelper>();
+            MockAccountsEndpoint = new Mock<IAccountsEndpoint>();
+            MockApiHelper = new Mock<IApiHelper>();
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Pegasus.Controllers;
 using Pegasus.Library.Models.Manage;
 
-namespace PegasusTests.Controllers.ManageControllerTests
+namespace Pegasus.Integration.Tests.Controllers.ManageControllerTests
 {
-    internal class ShowRecoveryCodesTests : ManageControllerTestsBase
+    class ShowRecoveryCodesTests : ManageControllerTestsBase
     {
         [Test]
         public void GET_ShowRecoveryCodes_NoRecoveryCodes_ReturnsRedirectToAction()
@@ -14,8 +13,8 @@ namespace PegasusTests.Controllers.ManageControllerTests
             var sut = CreateManageController();
             var result = sut.ShowRecoveryCodes(new ShowRecoveryCodesModel());
 
-            result.Should().BeOfType<RedirectToActionResult>();
-            ((RedirectToActionResult)result).ActionName.Should().Be(nameof(ManageController.TwoFactorAuthentication));
+            Assert.IsInstanceOf<RedirectToActionResult>(result);
+            Assert.AreEqual(nameof(ManageController.TwoFactorAuthentication), ((RedirectToActionResult)result).ActionName);
         }
 
         [Test]
@@ -26,8 +25,8 @@ namespace PegasusTests.Controllers.ManageControllerTests
             var sut = CreateManageController();
             var result = sut.ShowRecoveryCodes(model);
 
-            result.Should().BeOfType<ViewResult>();
-            ((ViewResult)result).Model.Should().BeOfType<ShowRecoveryCodesModel>();
+            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.IsInstanceOf<ShowRecoveryCodesModel>(((ViewResult)result).Model);
         }
     }
 }

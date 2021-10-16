@@ -61,7 +61,7 @@ namespace Pegasus.Controllers
                 var signInResult = await _signInManager.SignInOrTwoFactor(authenticatedUser);
                 if (signInResult.Success)
                 {
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation("User logged in");
                     returnUrl ??= Url.Content("~/");
                     return RedirectToLocal(returnUrl);
                 }
@@ -126,12 +126,12 @@ namespace Pegasus.Controllers
             {
                 await _signInManager.DoTwoFactorSignInAsync(userId, model.RememberMachine);
 
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", userId);
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa", userId);
                 model.ReturnUrl ??= Url.Content("~/");
                 return LocalRedirect(model.ReturnUrl);
             }
 
-            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.",  userId);
+            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'",  userId);
             ModelState.AddModelError(string.Empty, AccountControllerStrings.InvalidAuthenticationCode);
             return View(model);
         }
@@ -182,7 +182,7 @@ namespace Pegasus.Controllers
             
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", userId);
+                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code", userId);
                 return LocalRedirect(model.ReturnUrl ?? Url.Content("~/"));
             }
 
@@ -196,7 +196,7 @@ namespace Pegasus.Controllers
         {
             await _signInManager.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             _apiHelper.RemoveTokenFromHeaders();
-            _logger.LogInformation("User logged out.");
+            _logger.LogInformation("User logged out");
             ViewData["ReturnUrl"] = returnUrl;
             return LocalRedirect("/Account/Login");
         }

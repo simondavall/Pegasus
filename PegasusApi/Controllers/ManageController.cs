@@ -92,7 +92,7 @@ namespace PegasusApi.Controllers
                 model.RecoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
                 if (model.RecoveryCodes is null || !model.RecoveryCodes.Any())
                 {
-                    _logger.LogError("Failed to return recovery codes for userId {UserId}.", model.UserId);
+                    _logger.LogError("Failed to return recovery codes for userId {UserId}", model.UserId);
                 }
             }
 
@@ -349,7 +349,7 @@ namespace PegasusApi.Controllers
         {
             foreach (var identityError in model.Errors)
             {
-                _logger.LogError("{ErrorMessage} for userId {UserId}. Error - {Error}", errorMessage, model.UserId, identityError);
+                _logger.LogError("{ErrorMessage} for userId {UserId}. Error - {Error}", errorMessage, model.UserId, identityError.Description);
             }
         }
 
