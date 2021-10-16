@@ -62,8 +62,8 @@ namespace Pegasus.Controllers
             if (!changePasswordResult.Succeeded)
             {
                 _logger.LogError("Failed to change password for User with ID '{UserId}'", UserId);
-                LogErrors(changePasswordResult);
                 ModelState.AddModelError(string.Empty, ManageControllerStrings.FailedToChangePassword);
+                LogErrors(changePasswordResult);
                 return View(model);
             }
 

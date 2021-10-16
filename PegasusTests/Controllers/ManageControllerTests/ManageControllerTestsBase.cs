@@ -27,7 +27,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         protected Mock<IJwtTokenAccessor> MockTokenAccessor;
         protected Mock<IAuthenticationEndpoint> MockAuthenticationEndpoint;
         protected Mock<ILogger<Pegasus.Controllers.ManageController>> Logger;
-
+        protected Mock<IManageEndpoint> MockManageEndpoint;
         protected static IEnumerable<IdentityError> TestErrors => new List<IdentityError>
             { new IdentityError { Code = "ErrorCode", Description = "Error Message" } };
 
@@ -43,6 +43,7 @@ namespace PegasusTests.Controllers.ManageControllerTests
         [SetUp]
         public void TestSetup()
         {
+            MockManageEndpoint = new Mock<IManageEndpoint>();
             MockApiHelper = new Mock<IApiHelper>();
             MockAccountsEndpoint = new Mock<IAccountsEndpoint>();
             SetupAuthenticationMock();
@@ -51,12 +52,10 @@ namespace PegasusTests.Controllers.ManageControllerTests
 
         protected Pegasus.Controllers.ManageController CreateManageController()
         {
-            var manageEndpoint = new ManageEndpoint(MockApiHelper.Object);
-
             var signInManager = new SignInManager(MockHttpContextWrapper.Object, MockAccountsEndpoint.Object,
                 MockApiHelper.Object, MockTokenAccessor.Object, MockAuthenticationEndpoint.Object);
 
-            var sut = new Pegasus.Controllers.ManageController(manageEndpoint, signInManager, Logger.Object)
+            var sut = new Pegasus.Controllers.ManageController(MockManageEndpoint.Object, signInManager, Logger.Object)
             {
                 ControllerContext = ControllerContext
             };
