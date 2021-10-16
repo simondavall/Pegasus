@@ -61,8 +61,6 @@ namespace Pegasus.Controllers
             var changePasswordResult = await _manageEndpoint.ChangePasswordAsync(model);
             if (!changePasswordResult.Succeeded)
             {
-                _logger.LogError("Failed to change password for User with ID '{UserId}'", UserId);
-                ModelState.AddModelError(string.Empty, ManageControllerStrings.FailedToChangePassword);
                 LogErrors(changePasswordResult);
                 return View(model);
             }
@@ -126,8 +124,8 @@ namespace Pegasus.Controllers
             var enableAuthenticatorModel = await GetEnableAuthenticatorModel(UserId);
             if (enableAuthenticatorModel.HasErrors)
             {
-                LogErrors(enableAuthenticatorModel);
                 ModelState.AddModelError(string.Empty,  ManageControllerStrings.CannotEnableAuthenticator);
+                LogErrors(enableAuthenticatorModel);
             }
 
             return View(enableAuthenticatorModel);
