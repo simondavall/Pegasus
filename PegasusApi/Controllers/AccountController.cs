@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PegasusApi.Models.Account;
 
@@ -43,7 +43,7 @@ namespace PegasusApi.Controllers
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            var queryStringParams = new Dictionary<string, string>()
+            var queryStringParams = new Dictionary<string, string>
             {
                 {"userId", user.Id},
                 {"code", code}
@@ -64,6 +64,11 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<RedeemTwoFactorRecoveryCodeModel> RedeemTwoFactorRecoveryCode(RedeemTwoFactorRecoveryCodeModel model)
         {
+            if (model?.UserId is null)
+            {
+                return new RedeemTwoFactorRecoveryCodeModel { Succeeded = false } ;
+            }
+            
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
@@ -71,6 +76,7 @@ namespace PegasusApi.Controllers
                 return model;
             }
             var result = await _userManager.RedeemTwoFactorRecoveryCodeAsync(user, model.RecoveryCode);
+            //TODO Log any errors here
             model.Succeeded = result.Succeeded;
 
             return model;
@@ -82,6 +88,10 @@ namespace PegasusApi.Controllers
         public async Task<RememberClientModel> RememberClient(RememberClientModel model)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user is null)
+            {
+                return model;
+            }
             model.SupportsUserSecurityStamp = _userManager.SupportsUserSecurityStamp;
             model.SecurityStamp = user.SecurityStamp;
             return model;
@@ -92,6 +102,12 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<ResetPasswordModel> ResetPassword(ResetPasswordModel model)
         {
+            if (model?.Email is null)
+            {
+                IdentityError[] errors = { new IdentityError { Code = string.Empty, Description = "Email not supplied" } } ;
+                return new ResetPasswordModel { Errors = errors };
+            }
+            
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || user.Id != model.UserId)
             {
@@ -113,7 +129,16 @@ namespace PegasusApi.Controllers
         [HttpPost]
         public async Task<VerifyTwoFactorModel> VerifyTwoFactorToken(VerifyTwoFactorModel model)
         {
+            if (model is null)
+            {
+                return new VerifyTwoFactorModel();
+            }
             var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null || user.Id != model.UserId)
+            {
+                // Don't reveal that the user does not exist
+                return model;
+            }
             var tokenOptions = new TokenOptions();
             model.Verified = await _userManager.VerifyTwoFactorTokenAsync(user, tokenOptions.AuthenticatorTokenProvider, model.Code);
             return model;
