@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PegasusApi.Models.Account;
+using ControllerStrings = PegasusApi.Library.Services.Resources.Resources.ControllerStrings.AccountController;
 
 namespace PegasusApi.Controllers
 {
@@ -54,8 +55,7 @@ namespace PegasusApi.Controllers
                 model.Email,
                 "Reset Password",
                 $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl.ToString())}'>clicking here</a>.");
-
-            //TODO Probably don't need to send anything back
+            
             return model;
         }
 
@@ -104,7 +104,7 @@ namespace PegasusApi.Controllers
         {
             if (model?.Email is null)
             {
-                IdentityError[] errors = { new IdentityError { Code = string.Empty, Description = "Email not supplied" } } ;
+                IdentityError[] errors = { new IdentityError { Code = string.Empty, Description = ControllerStrings.EmailNotSupplied } } ;
                 return new ResetPasswordModel { Errors = errors };
             }
             
@@ -134,7 +134,7 @@ namespace PegasusApi.Controllers
                 return new VerifyTwoFactorModel();
             }
             var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null || user.Id != model.UserId)
+            if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return model;
