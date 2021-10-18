@@ -97,7 +97,7 @@ namespace PegasusApi.Tests
         [Test]
         public void Create2FaToken_CorrectCredentials_CreatesToken()
         {
-            var sut = _tokenController.RefreshToken(UserId).Result;
+            var sut = _tokenController.Create2FaToken(UserId).Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
 
@@ -117,7 +117,7 @@ namespace PegasusApi.Tests
         private static Mock<IApplicationDbContext> MockApplicationDbContext()
         {
             var context = new Mock<IApplicationDbContext>();
-            context.Setup(x => x.GetRolesForUser(It.IsAny<IdentityUser>())).Returns(new List<string>());
+            context.Setup(x => x.GetRolesForUser(It.IsAny<IdentityUser>())).Returns(new List<string> {"admin", "manager"});
             return context;
         }
     }
