@@ -27,6 +27,7 @@ namespace PegasusApi.Controllers
         [Route("Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
         {
+            //TODO This code should not be here. Refactor away to a separate EF library
             var output = new List<ApplicationUserModel>();
 
             var users = _context.Users.ToList();
@@ -63,6 +64,7 @@ namespace PegasusApi.Controllers
         public async Task AddRole(UserRolePairModel pairing)
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+            //TODO Check for null user here
             await _userManager.AddToRoleAsync(user, pairing.RoleName);
         }
 
@@ -71,6 +73,7 @@ namespace PegasusApi.Controllers
         public async Task RemoveRole(UserRolePairModel pairing)
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+            //TODO Check for null user here
             await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
         }
     }

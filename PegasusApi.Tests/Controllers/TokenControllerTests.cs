@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,7 @@ using PegasusApi.Library.JwtAuthentication;
 using PegasusApi.Models;
 using TokenOptions = PegasusApi.Library.JwtAuthentication.Models.TokenOptions;
 
-namespace PegasusApi.Tests
+namespace PegasusApi.Tests.Controllers
 {
     public class TokenControllerTests : BaseControllerTest
     {
@@ -25,26 +24,24 @@ namespace PegasusApi.Tests
         private readonly string _signingKey = "MySecretKeyIsSecretSoDoNotTell";
         private readonly string _tokenExpiryInMinute = "720";
 
-        [OneTimeSetUp]
-        public override void OneTimeSetup()
+        [SetUp]
+        public void EachTestSetup()
         {
-            base.OneTimeSetup();
-
             var tokenOptions = new TokenOptions(_issuer, _audience, _signingKey, _tokenExpiryInMinute);
             _tokenGenerator = new JwtTokenGenerator(tokenOptions);
 
             _applicationDbContext = MockApplicationDbContext().Object;
             _logger = new Mock<ILogger<TokenController>>().Object;
-            _tokenController = new TokenController(_applicationDbContext, UserManager, _tokenGenerator, _logger);
+            _tokenController = new TokenController(_applicationDbContext, MockUserManager.Object, _tokenGenerator, _logger);
         }
 
         [Test]
         public void CreateToken_CorrectCredentials_CreatesToken()
         {
+            MockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<IdentityUser>(), Password)).ReturnsAsync(true);
             var sut = _tokenController.CreateToken(Username, Password, "password").Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
-
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
             Assert.AreEqual(Username, tokenObject.Username);
@@ -77,17 +74,17 @@ namespace PegasusApi.Tests
         [Test]
         public void RefreshToken_CorrectCredentials_CreatesToken()
         {
+            MockUserManager.Setup(x => x.FindByIdAsync(UserId)).ReturnsAsync(User);
             var sut = _tokenController.RefreshToken(UserId).Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
-
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
             Assert.AreEqual(Username, tokenObject.Username);
         }
         
         [Test]
-        public void RefreshToken_BadCredentials_CreatesToken()
+        public void RefreshToken_BadCredentials_ReturnsNotFoundResult()
         {
             var sut = _tokenController.RefreshToken(BadUserId).Result;
 
@@ -97,10 +94,9 @@ namespace PegasusApi.Tests
         [Test]
         public void Create2FaToken_CorrectCredentials_CreatesToken()
         {
-            var sut = _tokenController.RefreshToken(UserId).Result;
+            var sut = _tokenController.Create2FaToken(UserId).Result;
 
             Assert.IsInstanceOf<ObjectResult>(sut);
-
             dynamic tokenObject = ((ObjectResult)sut).Value;
             Assert.IsInstanceOf<TokenModel>(tokenObject);
             Assert.AreEqual(Username, tokenObject.Username);
@@ -117,7 +113,7 @@ namespace PegasusApi.Tests
         private static Mock<IApplicationDbContext> MockApplicationDbContext()
         {
             var context = new Mock<IApplicationDbContext>();
-            context.Setup(x => x.GetRolesForUser(It.IsAny<IdentityUser>())).Returns(new List<string>());
+            context.Setup(x => x.GetRolesForUser(It.IsAny<IdentityUser>())).Returns(new List<string> {"admin", "manager"});
             return context;
         }
     }
