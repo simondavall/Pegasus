@@ -80,7 +80,7 @@ namespace PegasusApi.Tests.Controllers
             var sut = CreateUserController();
             var result = sut.GetAllRoles();
 
-            result.Should().BeOfType<Dictionary<string, string>>(); ;
+            result.Should().BeOfType<Dictionary<string, string>>();
         }
         
         [Test]
@@ -89,7 +89,7 @@ namespace PegasusApi.Tests.Controllers
             var sut = CreateUserController();
             var result = sut.GetAllUsers();
 
-            result.Should().BeOfType<List<ApplicationUserModel>>(); ;
+            result.Should().BeOfType<List<ApplicationUserModel>>();
         }
 
     }
