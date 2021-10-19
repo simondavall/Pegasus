@@ -108,6 +108,8 @@ namespace PegasusApi.Controllers
             {
                 _logger.LogCritical(ex, "Failed to generate access token for user {Username} with userid {Userid}. TokenOptions not setup correctly",
                     user.UserName, user.Id);
+                //TODO Need to return this error to the caller. ModelState does nothing here.
+                // ManageBaseModel should probably be more generic, say ApiModelBase (Errors, Success, + other generic values)
                 ModelState.AddModelError("TokenError", $"Unable to login to the system at the moment. Please try later.");
                 return new TokenModel();
             }

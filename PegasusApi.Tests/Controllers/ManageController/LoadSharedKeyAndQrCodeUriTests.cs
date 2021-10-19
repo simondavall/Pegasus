@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;

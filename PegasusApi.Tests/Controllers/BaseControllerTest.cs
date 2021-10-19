@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -65,19 +64,19 @@ namespace PegasusApi.Tests.Controllers
         }
 
         //TODO Currently there is no error handling for database interaction. Need to add some to all database calls. Add to logging to.
-        protected static SqlException MakeSqlException() {
-            SqlException exception = null;
-            try 
-            {
-                var conn = new SqlConnection(@"Data Source=.;Database=GUARANTEED_TO_FAIL;Connection Timeout=1");
-                conn.Open();
-            } 
-            catch(SqlException ex) 
-            {
-                exception = ex;
-            }
-            return(exception);
-        }
+        // protected static SqlException MakeSqlException() {
+        //     SqlException exception = null;
+        //     try 
+        //     {
+        //         var conn = new SqlConnection(@"Data Source=.;Database=GUARANTEED_TO_FAIL;Connection Timeout=1");
+        //         conn.Open();
+        //     } 
+        //     catch(SqlException ex) 
+        //     {
+        //         exception = ex;
+        //     }
+        //     return(exception);
+        // }
         
         protected void VerifyErrorLogged(Times times)
         {
@@ -87,7 +86,7 @@ namespace PegasusApi.Tests.Controllers
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), times);
         }
-        
+
         protected static void AssertHasErrors<T>(T result, int count) where T : ManageBaseModel
         {
             result.Should().NotBeNull();
@@ -95,9 +94,8 @@ namespace PegasusApi.Tests.Controllers
             result.Errors.Count.Should().Be(count);
         }
         
-        protected async Task CaseModelIsNull<T, TModel>(Func<TModel, Task<T>> methodToTest) 
-            where T : ManageBaseModel 
-            where TModel : class
+        protected async Task CaseModelIsNull<T>(Func<T, Task<T>> methodToTest) 
+            where T : ManageBaseModel
         {
             MockLogger.Invocations.Clear();
             var result1 = await methodToTest(null);
@@ -117,12 +115,11 @@ namespace PegasusApi.Tests.Controllers
             AssertHasErrors(result1, 1);
         }
 
-        protected async Task CaseUserIdIsNull<T, TModel>(Func<TModel, Task<T>> methodToTest) 
-            where T : ManageBaseModel 
-            where TModel : ManageBaseModel, new()
+        protected async Task CaseUserIdIsNull<T>(Func<T, Task<T>> methodToTest) 
+            where T : ManageBaseModel, new()
         {
             MockLogger.Invocations.Clear();
-            var result1 = await methodToTest(new TModel { UserId = null });
+            var result1 = await methodToTest(new T { UserId = null });
 
             VerifyErrorLogged(Times.Once());
             result1.Should().BeOfType<T>();
@@ -139,12 +136,11 @@ namespace PegasusApi.Tests.Controllers
             AssertHasErrors(result1, 1);
         }
         
-        protected async Task CaseUserNotFound<T, TModel>(Func<TModel, Task<T>> methodToTest) 
-            where T : ManageBaseModel 
-            where TModel : ManageBaseModel, new()
+        protected async Task CaseUserNotFound<T>(Func<T, Task<T>> methodToTest) 
+            where T : ManageBaseModel, new()
         {
             MockLogger.Invocations.Clear();
-            var result1 = await methodToTest(new TModel { UserId = BadUserId });
+            var result1 = await methodToTest(new T { UserId = BadUserId });
 
             VerifyErrorLogged(Times.Once());
             result1.Should().BeOfType<T>();

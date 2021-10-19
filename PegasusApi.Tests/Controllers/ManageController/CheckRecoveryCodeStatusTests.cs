@@ -28,36 +28,11 @@ namespace PegasusApi.Tests.Controllers.ManageController
         public async Task CheckRecoveryCodesStatus_ModelNullOrUserIdNullOrUserNotFound_ReturnsModelWithError()
         {
             var sut = CreateManageController();
-            await CaseModelIsNull<RecoveryCodeStatusModel, RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
-            await CaseUserIdIsNull<RecoveryCodeStatusModel, RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
-            await CaseUserNotFound<RecoveryCodeStatusModel, RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
+            await CaseModelIsNull<RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
+            await CaseUserIdIsNull<RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
+            await CaseUserNotFound<RecoveryCodeStatusModel>(sut.CheckRecoveryCodesStatus);
         }
         
-        // [Test]
-        // public async Task CheckRecoveryCodesStatus_ModelNull_ReturnsModelWithError()
-        // {
-        //     var sut = CreateManageController();
-        //     
-        //     var result = await sut.CheckRecoveryCodesStatus(null);
-        //
-        //     VerifyErrorLogged(Times.Never());
-        //     result.Should().BeOfType<RecoveryCodeStatusModel>();
-        //     result.IsUpdated.Should().BeFalse();
-        //     AssertHasErrors(result, 1);
-        // }
-        //
-        // [Test]
-        // public async Task CheckRecoveryCodesStatus_UserIsNull_ReturnsModelWithError()
-        // {
-        //     var sut = CreateManageController();
-        //     var result = await sut.CheckRecoveryCodesStatus(new RecoveryCodeStatusModel {UserId = BadUserId});
-        //
-        //     VerifyErrorLogged(Times.Once());
-        //     result.Should().BeOfType<RecoveryCodeStatusModel>();
-        //     result.IsUpdated.Should().BeFalse();
-        //     AssertHasErrors(result, 1);
-        // }
-
         [Test]
         public async Task CheckRecoveryCodesStatus_RecoveryCodesExist_ReturnsModelIsUpdatedFalse()
         {

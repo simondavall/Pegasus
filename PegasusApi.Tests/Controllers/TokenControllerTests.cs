@@ -84,7 +84,7 @@ namespace PegasusApi.Tests.Controllers
         }
         
         [Test]
-        public void RefreshToken_BadCredentials_CreatesToken()
+        public void RefreshToken_BadCredentials_ReturnsNotFoundResult()
         {
             var sut = _tokenController.RefreshToken(BadUserId).Result;
 

@@ -27,9 +27,9 @@ namespace PegasusApi.Tests.Controllers.ManageController
         public async Task ChangePassword_ModelNullOrUserIdNullOrUserNotFound_ReturnsModelWithError()
         {
             var sut = CreateManageController();
-            await CaseModelIsNull<ChangePasswordModel, ChangePasswordModel>(sut.ChangePassword);
-            await CaseUserIdIsNull<ChangePasswordModel, ChangePasswordModel>(sut.ChangePassword);
-            await CaseUserNotFound<ChangePasswordModel, ChangePasswordModel>(sut.ChangePassword);
+            await CaseModelIsNull<ChangePasswordModel>(sut.ChangePassword);
+            await CaseUserIdIsNull<ChangePasswordModel>(sut.ChangePassword);
+            await CaseUserNotFound<ChangePasswordModel>(sut.ChangePassword);
         }
 
         [Test]

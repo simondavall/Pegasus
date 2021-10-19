@@ -27,9 +27,9 @@ namespace PegasusApi.Tests.Controllers.ManageController
         public async Task ResetAuthenticator_ModelNullOrUserIdNullOrUserNotFound_ReturnsModelWithError()
         {
             var sut = CreateManageController();
-            await CaseModelIsNull<ResetAuthenticatorModel, ResetAuthenticatorModel>(sut.ResetAuthenticator);
-            await CaseUserIdIsNull<ResetAuthenticatorModel, ResetAuthenticatorModel>(sut.ResetAuthenticator);
-            await CaseUserNotFound<ResetAuthenticatorModel, ResetAuthenticatorModel>(sut.ResetAuthenticator);
+            await CaseModelIsNull<ResetAuthenticatorModel>(sut.ResetAuthenticator);
+            await CaseUserIdIsNull<ResetAuthenticatorModel>(sut.ResetAuthenticator);
+            await CaseUserNotFound<ResetAuthenticatorModel>(sut.ResetAuthenticator);
         }
         
         [Test]

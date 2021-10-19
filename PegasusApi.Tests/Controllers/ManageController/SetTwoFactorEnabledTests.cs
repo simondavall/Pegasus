@@ -27,9 +27,9 @@ namespace PegasusApi.Tests.Controllers.ManageController
         public async Task SetTwoFactorEnabled_ModelNullOrUserIdNullOrUserNotFound_ReturnsModelWithError()
         {
             var sut = CreateManageController();
-            await CaseModelIsNull<SetTwoFactorEnabledModel, SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
-            await CaseUserIdIsNull<SetTwoFactorEnabledModel, SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
-            await CaseUserNotFound<SetTwoFactorEnabledModel, SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
+            await CaseModelIsNull<SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
+            await CaseUserIdIsNull<SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
+            await CaseUserNotFound<SetTwoFactorEnabledModel>(sut.SetTwoFactorEnabled);
         }
         
         [Test]

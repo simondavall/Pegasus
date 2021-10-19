@@ -28,9 +28,9 @@ namespace PegasusApi.Tests.Controllers.ManageController
         public async Task SetUserDetails_ModelNullOrUserIdNullOrUserNotFound_ReturnsModelWithError()
         {
             var sut = CreateManageController();
-            await CaseModelIsNull<UserDetailsModel, UserDetailsModel>(sut.SetUserDetails);
-            await CaseUserIdIsNull<UserDetailsModel, UserDetailsModel>(sut.SetUserDetails);
-            await CaseUserNotFound<UserDetailsModel, UserDetailsModel>(sut.SetUserDetails);
+            await CaseModelIsNull<UserDetailsModel>(sut.SetUserDetails);
+            await CaseUserIdIsNull<UserDetailsModel>(sut.SetUserDetails);
+            await CaseUserNotFound<UserDetailsModel>(sut.SetUserDetails);
         }
         
         [Test]
