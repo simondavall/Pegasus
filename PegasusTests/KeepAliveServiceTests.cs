@@ -37,7 +37,7 @@ namespace PegasusTests
             _client = FakeHttpClient(new[] {"https://www.google.com/", "http://example.org/test"}, HttpStatusCode.OK);
 
             // setup configuration from json string
-            var myJsonConfig = "{\"KeepAlive\": {\"Sites\": \"https://pegasus2.local;https://google.com\",\"TaskDelay\": \"5000\"}}";
+            var myJsonConfig = "{\"KeepAlive\": {\"Sites\": \"https://pegasus.local;https://google.com\",\"TaskDelay\": \"5000\"}}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(myJsonConfig));
 
             _configuration = new ConfigurationBuilder()

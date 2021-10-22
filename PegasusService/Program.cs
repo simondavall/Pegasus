@@ -13,7 +13,7 @@ namespace PegasusService
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .WriteTo.File(@"c:\Windows\Pegasus2\LogFile.txt")
+                .WriteTo.File(@"c:\Windows\System32\Pegasus\LogFile.txt")
                 .CreateLogger();
 
             try
