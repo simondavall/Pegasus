@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using PegasusApi.Models.Account;
 using ControllerStrings = PegasusApi.Library.Services.Resources.Resources.ControllerStrings.AccountController;
 
@@ -20,11 +21,13 @@ namespace PegasusApi.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager, IEmailSender emailSender)
+        public AccountController(UserManager<IdentityUser> userManager, IEmailSender emailSender, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -51,11 +54,19 @@ namespace PegasusApi.Controllers
             };
             var callbackUrl = new Uri(QueryHelpers.AddQueryString(model.BaseUrl, queryStringParams));
 
-            await _emailSender.SendEmailAsync(
-                model.Email,
-                "Reset Password",
-                $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl.ToString())}'>clicking here</a>.");
-            
+            try
+            {
+                await _emailSender.SendEmailAsync(
+                    model.Email,
+                    "Reset Password",
+                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl.ToString())}'>clicking here</a>.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,"Exception sending forgot password email");
+                return new ForgotPasswordModel() {IsSuccess = false, Errors = new[] {e.Message}};
+            }
+
             return model;
         }
 

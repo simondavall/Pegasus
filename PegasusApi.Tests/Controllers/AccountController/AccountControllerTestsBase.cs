@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -9,6 +10,7 @@ namespace PegasusApi.Tests.Controllers.AccountController
     {
         protected Mock<IEmailSender> MockEmailSender;
         protected Mock<UserManager<IdentityUser>> MockUserManager;
+        private Mock<ILogger<PegasusApi.Controllers.AccountController>> _mockLogger;
         protected const string EmailAddressGood = "test-good@email.com";
         protected const string EmailAddressNotFound = "test-bad@email.com";
         protected const string UserId = "user-id";
@@ -17,6 +19,7 @@ namespace PegasusApi.Tests.Controllers.AccountController
         [SetUp]
         public void EachTestSetup()
         {
+            _mockLogger = new Mock<ILogger<PegasusApi.Controllers.AccountController>>();
             var store = new Mock<IUserStore<IdentityUser>>();
             MockUserManager = new Mock<UserManager<IdentityUser>>(store.Object, null, null, null, null, null, null, null, null);
             MockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
@@ -28,7 +31,7 @@ namespace PegasusApi.Tests.Controllers.AccountController
         
         internal PegasusApi.Controllers.AccountController CreateAccountController()
         {
-            return new PegasusApi.Controllers.AccountController(MockUserManager.Object, MockEmailSender.Object);
+            return new PegasusApi.Controllers.AccountController(MockUserManager.Object, MockEmailSender.Object, _mockLogger.Object);
         }
 
     }

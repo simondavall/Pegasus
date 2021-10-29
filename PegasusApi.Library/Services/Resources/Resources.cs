@@ -9,5 +9,10 @@
                 public const string EmailNotSupplied = "Email not supplied";
             }
         }
+
+        public static class ErrorStrings
+        {
+            public const string NoEmailApiKeyFound = "Could not find email api key";
+        }
     }
 }
