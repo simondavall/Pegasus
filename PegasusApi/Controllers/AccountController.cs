@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using PegasusApi.Library.Exceptions;
 using PegasusApi.Models.Account;
 using ControllerStrings = PegasusApi.Library.Services.Resources.Resources.ControllerStrings.AccountController;
 
