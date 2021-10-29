@@ -99,7 +99,7 @@ namespace PegasusTests.ExtensionTests
         [Test]
         public void TimeLapsed_For12months()
         {
-            var sut = DateTime.Now.AddMonths(-12).AddDays(-0).AddHours(-0).AddMinutes(-0);
+            var sut = DateTime.Now.AddMonths(-12).AddDays(-1).AddHours(-0).AddMinutes(-0);
 
             Assert.AreEqual("1 yr ago", sut.LapsedTime());
         }
