@@ -22,23 +22,27 @@ namespace PegasusService
 
         public async Task Execute(CancellationToken stoppingToken)
         {
-            try
+            var configSites = _configuration["KeepAlive:Sites"];
+            if (string.IsNullOrEmpty(configSites))
             {
-                var sites = _configuration[$"KeepAlive:Sites"].Split(";", StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (var site in sites)
-                {
-                    var result = await KeepAlive(site, stoppingToken);
-#if DEBUG
-                    _logger.LogInformation("Debug: Worker running at: {Time}, Site: {Site}, Success: {Status}", DateTimeOffset.Now, site, result);
-#endif
-                }
+                _logger.LogError("Cannot find sites in config for key: 'KeepAlive:Sites'");
+                return;
             }
-            catch (Exception ex)
+
+            var sites = configSites.Split(";", StringSplitOptions.RemoveEmptyEntries);
+            foreach (var site in sites)
             {
-                _logger.LogInformation("Pegasus Service running at: {Time}, Error: {Message}", DateTimeOffset.Now, ex.Message);
-                if (ex.InnerException != null)
-                    _logger.LogInformation("Pegasus Service running at: {Time}, Error: {Message}", DateTimeOffset.Now, ex.InnerException.Message);
+                try
+                {
+                    _logger.LogDebug("Worker running at: {Time}, Site: {Site}", DateTimeOffset.Now, site);
+                    var result = await KeepAlive(site, stoppingToken);
+                    _logger.LogDebug("Result for Site: {Site}, Success: {Status}", site, result);
+
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Pegasus Service running at: {Time}, Error: {Message}", DateTimeOffset.Now, e.Message);
+                }
             }
         }
 

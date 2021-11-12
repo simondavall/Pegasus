@@ -4,12 +4,9 @@ namespace PegasusService.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static int FromConfig(this IConfiguration self, string key, int defaultValue)
+        public static int FromConfig(this IConfiguration config, string key, int defaultValue)
         {
-            int value = int.TryParse(self[key], out value)
-                ? value
-                : defaultValue;
-            return value;
+            return int.TryParse(config[key], out var value) ? value : defaultValue;
         }
     }
 }

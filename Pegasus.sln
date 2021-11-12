@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PegasusApi.Library", "Pegas
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{DC0A22A2-E0CB-454C-9400-57CB05485A72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegasus.Integration.Tests", "Pegasus.Integration.Tests\Pegasus.Integration.Tests.csproj", "{A151558B-14BC-4D39-9719-79504CD4E9BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pegasus.Integration.Tests", "Pegasus.Integration.Tests\Pegasus.Integration.Tests.csproj", "{A151558B-14BC-4D39-9719-79504CD4E9BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PegasusService.Tests", "PegasusService.Tests\PegasusService.Tests.csproj", "{701E21D4-A38A-4C36-9BC2-DFF70773DC6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A151558B-14BC-4D39-9719-79504CD4E9BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701E21D4-A38A-4C36-9BC2-DFF70773DC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701E21D4-A38A-4C36-9BC2-DFF70773DC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701E21D4-A38A-4C36-9BC2-DFF70773DC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701E21D4-A38A-4C36-9BC2-DFF70773DC6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{C3C35E03-184F-4214-A9CC-E9691FBCCF36} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
 		{4898EE83-9EE1-4C9F-BF8C-CDA17828E6F2} = {6C713411-21AA-4932-A3DC-B876B5CB1A3B}
 		{A151558B-14BC-4D39-9719-79504CD4E9BD} = {DC0A22A2-E0CB-454C-9400-57CB05485A72}
+		{701E21D4-A38A-4C36-9BC2-DFF70773DC6F} = {EE3438E0-9987-4EEA-8339-9F52D60DE9EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A88CDAC7-AF12-41D8-B2A8-9F9EC58A5053}

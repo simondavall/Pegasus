@@ -10,20 +10,17 @@ namespace PegasusService
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.File(@"c:\Windows\System32\Pegasus\LogFile.txt")
+                .WriteTo.Console()
                 .CreateLogger();
 
             try
             {
-                Log.Information("Starting up the service");
+                Log.Logger.Information("Starting up the service");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "There was a problem starting the service");
+                Log.Logger.Fatal(ex, "There was a problem starting the service");
             }
             finally
             {
@@ -36,7 +33,11 @@ namespace PegasusService
             return Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
                 .ConfigureServices((hostContext, services) => { services.AddHostedService<Worker>(); })
-                .UseSerilog();
+                .UseSerilog((context, services, configuration) => configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console());
         }
     }
 }

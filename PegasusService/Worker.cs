@@ -39,7 +39,12 @@ namespace PegasusService
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            _client = new HttpClient();
+            var httpClientHandler = new HttpClientHandler
+            {
+                // bypasses ssl certificate authentication. Only use locally.
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+            _client = new HttpClient(httpClientHandler);
             _keepAliveService = new KeepAliveService(_client, _configuration, _logger);
             _taskDelay = SetTaskDelay();
             return base.StartAsync(cancellationToken);
