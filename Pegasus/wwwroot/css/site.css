@@ -217,17 +217,21 @@ html {
     flex-direction: column;
 }
 
-.project-list {
-    font-size: 0.90rem;
-    font-weight: 100;
+#selectionPanel {
+    margin-top: 10px;
+}
+
+.selection-panel {
+    font-size: 1rem;
+    font-weight: normal;
     line-height: 1.4;
 }
 
-.project-list i {
-    padding-right: 4px;
+.project-filter-item i, .task-filter-item i {
+    padding-right: 5px;
 }
 
-.project-list-item, .project-list-form, .task-filter, .taskfilter-list, .project-task-form,
+.project-list-form, .project-task-form,
 .navbar-content, .btn-default, .recovery-code {
 }
 
