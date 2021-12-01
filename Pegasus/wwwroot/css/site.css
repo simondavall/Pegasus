@@ -451,6 +451,10 @@ a.settings-close i {
     min-width: 10%;
 }
 
+.task-list-subtask-link {
+    padding-left: 10px; 
+}
+
 .task-time {
     min-width: 15%;
     float: right;
