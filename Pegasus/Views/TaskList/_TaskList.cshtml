@@ -27,8 +27,12 @@ else
 
                             <div class="list-row-condensed @task.TaskProfile().TaskTextStyle">
                                 <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile().TaskIcon)@task.Name</a>
+                                @if (task.SubTaskCount > 0)
+                                {
+                                    <a style="padding-left:10px" href="#">(@task.SubTaskCount)</a>
+                                }
                             </div>
-                            
+
                             <div class="@task.TaskProfile().TaskTimeStyle">
                                 @task.Modified.LapsedTime()
                             </div>
