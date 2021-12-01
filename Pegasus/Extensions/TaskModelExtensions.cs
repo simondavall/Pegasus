@@ -17,13 +17,13 @@ namespace Pegasus.Extensions
 
         public static string PriorityIconClass(this TaskModel model)
         {
-            if (model.TaskPriorityId > (int) TaskPriorityEnum.Normal)
+            if (model.TaskPriorityId <= (int) TaskPriorityEnum.Normal)
             {
-                if (model.IsClosed()) return "priority-icon-closed";
-                return $"priority-icon-{model.TaskPriorityId}";
+                return string.Empty;
             }
-
-            return string.Empty;
+            
+            return model.IsClosed() ? "fa fa-bolt priority-icon-closed" 
+                : $"fa fa-bolt priority-icon-{model.TaskPriorityId}";
         }
 
         public static bool HasParentTask(this TaskModel model)

@@ -177,6 +177,35 @@ html {
     display: none !important;
 }
 
+.list-font-sm {
+    font-size: 0.8em
+}
+
+.list-narrow-lined li {
+    padding: 0.35rem;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.list-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.list-row-condensed {
+    height: 20px;
+    display: inline-flex;
+    width: 100%;
+    overflow: hidden;
+}
+
+.list-striped li:nth-of-type(odd) {
+    background-color: rgba(0,0,0,.03);
+}
+
 .nav-link svg {
     fill: currentColor;
 }
@@ -217,16 +246,6 @@ html {
     flex-direction: column;
 }
 
-#selectionPanel {
-    margin-top: 10px;
-}
-
-.selection-panel {
-    font-size: 1rem;
-    font-weight: normal;
-    line-height: 1.4;
-}
-
 .project-filter-item i, .task-filter-item i {
     padding-right: 5px;
 }
@@ -237,6 +256,16 @@ html {
 
 .project-task-list {
     min-height: 400px;
+}
+
+#selectionPanel {
+    margin-top: 10px;
+}
+
+.selection-panel {
+    font-size: 1rem;
+    font-weight: normal;
+    line-height: 1.4;
 }
 
 .settings-checkbox {
@@ -357,20 +386,7 @@ a.settings-close i {
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #000000;
     background-color: rgba(0,0,0,.03);
-}
-
-.task-description {
-    font-size: 0.9rem;
-    padding-left: 12px;
-}
-
-.task-description-cancel-button,
-.task-description-edit
-.task-description-edit-button,
-.task-description-section
-.task-description-text {
 }
 
 .task-comment {
@@ -402,6 +418,18 @@ a.settings-close i {
     color: lightgrey;
 }
 
+.task-description {
+    font-size: 0.9rem;
+    padding-left: 12px;
+}
+
+.task-description-cancel-button,
+.task-description-edit
+.task-description-edit-button,
+.task-description-section
+.task-description-text {
+}
+
 .task-in-progress a {
     color: #337ab7;
 }
@@ -410,7 +438,22 @@ a.settings-close i {
     padding-right: 6px;
 }
 
+.task-list ul {
+    list-style-type: none;
+    padding-inline-start: 0;
+}
+
+.task-list-icon {
+    width: 8%;
+}
+
+.task-list-ref {
+    min-width: 10%;
+}
+
 .task-time {
+    min-width: 15%;
+    float: right;
     text-align: right;
 }
 
