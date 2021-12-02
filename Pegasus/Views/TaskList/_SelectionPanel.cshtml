@@ -1,26 +1,27 @@
 ﻿@model Pegasus.Models.TaskList.SelectionPanelViewModel
 
-<div class="card card-default card-expand-md">
+<div class="accordion" id="selectionPanel">
     <input id="page" type="hidden" asp-for="Page" />
     <input id="projectId" type="hidden" asp-for="ProjectId" />
     <input id="taskFilterId" type="hidden" asp-for="TaskFilterId"/>
 
-    <div id="project-list">
-        <div class="card-header stretch-limit">
-            <div>
-                <h5>Projects</h5>
-                <a class="card-toggler stretched-link" data-toggle="collapse" href="#project-list-items" aria-label="Toggle projects list"></a>
-            </div>
+    <div class="card">
+        <div class="card-header stretch-limit" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#projectFilter" aria-expanded="true" aria-controls="projectFilter">
+                    <h5>Projects</h5>
+                </button>
+            </h2>
         </div>
-        <div id="project-list-items" class="collapse d-sm-inline-flex project-flex" data-parent="#project-list">
-            <div class="card-body project-list">
+        <div id="projectFilter" class="collapse project-flex show" aria-labelledby="headingOne" data-parent="#selectionPanel">
+            <div class="card-body selection-panel">
                 <div>
-                    <a class="project-list-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
+                    <a class="project-filter-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
                 </div>
                 @foreach (var project in Model.Projects)
                 {
                     <div>
-                        <a class="project-list-item" asp-action="Index" value="@project.Id">
+                        <a class="project-filter-item" asp-action="Index" value="@project.Id">
                             <i class="fa fa-angle-right"></i>@project.Name
                         </a>
                     </div>
@@ -28,19 +29,20 @@
             </div>
         </div>
     </div>
-</div>
-<div class="card card-default card-expand-md">
-    <div id="taskfilter-list">
-        <div class="card-header stretch-limit">
-            <h5>Task Filters</h5>
-            <a class="card-toggler stretched-link" data-toggle="collapse" href="#taskfilter-list-items" aria-label="Toggle task filter list"></a>
+    <div class="card">
+        <div class="card-header stretch-limit" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#taskFilter" aria-expanded="false" aria-controls="taskFilter">
+                    <h5>Filters</h5>
+                </button>
+            </h2>
         </div>
-        <div id="taskfilter-list-items" class="collapse d-sm-inline-flex" data-parent="#taskfilter-list">
-            <div class="card-body taskfilter-list">
+        <div id="taskFilter" class="collapse" aria-labelledby="headingTwo" data-parent="#selectionPanel">
+            <div class="card-body selection-panel">
                 @foreach (var taskFilter in Model.TaskFilters)
                 {
                     <div>
-                        <a class="task-filter" asp-action="Index" value="@taskFilter.Value">
+                        <a class="task-filter-item" asp-action="Index" value="@taskFilter.Value">
                             <i class="fa fa-angle-right"></i>@taskFilter.Name
                         </a>
                     </div>

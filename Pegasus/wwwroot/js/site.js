@@ -27,15 +27,16 @@ $(function () {
     });
 
     // hide all sidebar icons, then show the selected sidebar icon
-    var projectListItems = $(".project-list-item");
-    var taskFilterList = $(".task-filter");
+    var projectFilterItems = $(".project-filter-item");
+    var taskFilterItems = $(".task-filter-item");
     $(function () {
-        $(projectListItems).find("i").addClass("hide");
-        $(projectListItems).filter(function () {
+        $(projectFilterItems).find("i").addClass("hide");
+        $(projectFilterItems).filter(function () {
             return $(this).attr("value") === currentSettings.projectId;
         }).find("i").removeClass("hide");
-        $(taskFilterList).find("i").addClass("hide");
-        $(taskFilterList[currentSettings.taskFilterId]).find("i").removeClass("hide");
+
+        $(taskFilterItems).find("i").addClass("hide");
+        $(taskFilterItems[currentSettings.taskFilterId]).find("i").removeClass("hide");
     });
 
     var updateList = function (form) {
@@ -66,17 +67,17 @@ $(function () {
         return false;
     });
 
-    $(".body-content").on("click", ".project-list-item", function () {
+    $(".body-content").on("click", ".project-filter-item", function () {
         $("#page").val(1); // reset display back to page 1
-        currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectListItems));
+        currentSettings.projectId = sidebarAction($(this), $("#projectId"), $(projectFilterItems));
         // need to disable Create button if All projects selected
         setCreateTaskButton();
         return false;
     });
 
-    $(".body-content").on("click", ".task-filter", function () {
+    $(".body-content").on("click", ".task-filter-item", function () {
         $("#page").val(1); // reset display back to page 1
-        sidebarAction($(this), $("#taskFilterId"), $(taskFilterList));
+        sidebarAction($(this), $("#taskFilterId"), $(taskFilterItems));
         return false;
     });
 

@@ -79,7 +79,7 @@ namespace PegasusTests.ExtensionTests
                 TaskStatusId = (int)TaskStatusEnum.Completed
             };
 
-            Assert.AreEqual("priority-icon-closed", model.PriorityIconClass());
+            Assert.AreEqual("fa fa-bolt priority-icon-closed", model.PriorityIconClass());
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace PegasusTests.ExtensionTests
                 TaskStatusId = (int)TaskStatusEnum.InProgress
             };
 
-            Assert.AreEqual("priority-icon-4", model.PriorityIconClass());
+            Assert.AreEqual("fa fa-bolt priority-icon-4", model.PriorityIconClass());
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace PegasusTests.ExtensionTests
                 TaskStatusId = (int)TaskStatusEnum.InProgress
             };
 
-            Assert.AreEqual("priority-icon-5", model.PriorityIconClass());
+            Assert.AreEqual("fa fa-bolt priority-icon-5", model.PriorityIconClass());
         }
 
         [TestCaseSource(typeof(TestData), nameof(TestData.TaskProfileData))]

@@ -17,5 +17,6 @@ namespace PegasusApi.Library.Models
         public string UserId { get; set; }
         public DateTime Modified { get; set; }
         public DateTime Created { get; set; }
+        public int SubTaskCount { get; set; }
     }
 }
