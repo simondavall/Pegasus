@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using Pegasus.Extensions;
 using Pegasus.Library.Api;
 using Pegasus.Library.Models;
 
@@ -26,6 +28,19 @@ namespace Pegasus.Api
         public async Task<string> GetSubTasks(int taskId)
         {
             var result = await _tasksEndpoint.GetSubTasks(taskId);
+            if (result is null)
+            {
+                return string.Empty;
+            }
+
+            foreach (var taskModel in result)
+            {
+                taskModel.TaskRefStyle = taskModel.TaskProfile().TaskRefStyle;
+                taskModel.TaskNameStyle = taskModel.TaskProfile().TaskTextStyle;
+                taskModel.TaskTimeStyle = taskModel.TaskProfile().TaskTimeStyle;
+                taskModel.TaskIcon = taskModel.TaskProfile().TaskIcon;
+            }
+
             return FormatToJson(result);
         }
 

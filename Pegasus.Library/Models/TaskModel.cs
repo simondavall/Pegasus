@@ -25,6 +25,11 @@ namespace Pegasus.Library.Models
         public DateTime Modified { get; set; }
         public DateTime Created { get; set; }
         public int SubTaskCount { get; set; }
+        public string TaskLink { get; set; }
+        public string TaskRefStyle { get; set; }
+        public string TaskNameStyle { get; set; }
+        public string TaskTimeStyle { get; set; }
+        public string TaskIcon { get; set; }
     }
 
 }

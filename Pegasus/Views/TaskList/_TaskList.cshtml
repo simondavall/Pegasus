@@ -14,7 +14,7 @@ else
                 @foreach (var task in Model)
                 {
                     <li>
-                        <div class="clearfix list-row-condensed">
+                        <div class="list-row-condensed">
 
                             <div class="task-list-ref @task.TaskProfile().TaskRefStyle">
                                 <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@task.TaskRef</a>
@@ -29,7 +29,7 @@ else
                                 <a asp-controller="TaskList" asp-action="Edit" asp-route-id="@task.Id">@Html.Raw(task.TaskProfile().TaskIcon)@task.Name</a>
                                 @if (task.SubTaskCount > 0)
                                 {
-                                    <a class="task-list-subtask-link" data-subtask-target="subTasks-@task.Id" data-route-id="@task.Id">(@task.SubTaskCount)</a>
+                                    <a tabindex="0" class="task-list-subtask-link" data-subtask-target="subTasks-@task.Id" data-route-id="@task.Id">(@task.SubTaskCount)</a>
                                 }
                             </div>
 

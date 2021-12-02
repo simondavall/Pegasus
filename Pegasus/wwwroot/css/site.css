@@ -367,6 +367,26 @@ a.settings-close i {
     position: relative;
 }
 
+.sub-task-list-row {
+    padding-left: 50px;
+    height: 20px;
+    display: inline-flex;
+    width: 100%;
+    overflow: hidden;
+}
+
+.sub-task-list-ref {
+    min-width: 10%;
+}
+
+.sub-task-list-name {
+    margin-left: 15px;
+}
+
+.sub-task-list-time {
+    margin-left: 10px;
+}
+
 .table-row-condensed {
     height: 20px;
     overflow: hidden;
@@ -405,16 +425,12 @@ a.settings-close i {
     color: red;
 }
 
-.task-completed-strike a {
+.task-completed-strike, .task-completed-strike a {
     color: lightgrey;
     text-decoration: line-through;
 }
 
-.task-completed a {
-    color: lightgrey;
-}
-
-.task-completed {
+.task-completed, .task-completed a {
     color: lightgrey;
 }
 
@@ -452,7 +468,8 @@ a.settings-close i {
 }
 
 .task-list-subtask-link {
-    padding-left: 10px; 
+    padding-left: 10px;
+    cursor: pointer;
 }
 
 .task-time {
