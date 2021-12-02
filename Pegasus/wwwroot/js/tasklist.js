@@ -44,7 +44,7 @@
 
         for (var i in subTasks) {
             subTasksStr += "<li class=\"no-border\">";
-            subTasksStr += `<a href=\"/TaskList/Edit/${subTasks[i].id}\" class=\"sub-task-list-row\">`;
+            subTasksStr += `<a href=\"/TaskList/Edit/${subTasks[i].taskRef}\" class=\"sub-task-list-row\">`;
             subTasksStr += formatTaskRef(subTasks[i].taskRef, subTasks[i].taskRefStyle);
             subTasksStr += formatTaskName(subTasks[i].name, subTasks[i].taskNameStyle, subTasks[i].taskIcon);
             subTasksStr += formatTime(subTasks[i].lapsedTime, subTasks[i].taskNameStyle);
