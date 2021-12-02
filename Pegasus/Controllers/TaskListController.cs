@@ -64,9 +64,19 @@ namespace Pegasus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string id)
         {
-            var projectTask = await _tasksEndpoint.GetTask(id);
+            TaskModel projectTask;
+            if (int.TryParse(id, out var taskId))
+            {
+                projectTask = await _tasksEndpoint.GetTask(taskId);
+            }
+            else
+            {
+                var taskRef = id; // for clarity
+                projectTask = await _tasksEndpoint.GetTaskByRef(taskRef);
+            }
+            //var projectTask = await _tasksEndpoint.GetTask(id);
             if (projectTask == null)
             {
                 return RedirectToAction("Index", "TaskList");

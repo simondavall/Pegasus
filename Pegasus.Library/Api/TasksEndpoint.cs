@@ -13,6 +13,7 @@ namespace Pegasus.Library.Api
         Task<List<TaskTypeModel>> GetAllTaskTypes();
         Task<List<TaskModel>> GetSubTasks(int taskId);
         Task<TaskModel> GetTask(int taskId);
+        Task<TaskModel> GetTaskByRef(string taskRef);
         Task<List<TaskModel>> GetTasks(int projectId);
         Task UpdateTask(TaskModel taskModel);
     }
@@ -59,6 +60,11 @@ namespace Pegasus.Library.Api
         public async Task<TaskModel> GetTask(int taskId)
         {
             return await _apiHelper.GetFromUri<TaskModel>($"api/Task/GetTask/{taskId}");
+        }
+
+        public async Task<TaskModel> GetTaskByRef(string taskRef)
+        {
+            return await _apiHelper.GetFromUri<TaskModel>($"api/Task/GetTaskByRef/{taskRef}");
         }
 
         public async Task<List<TaskModel>> GetTasks(int projectId)
