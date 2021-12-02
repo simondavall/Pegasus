@@ -39,6 +39,7 @@ namespace Pegasus.Api
                 taskModel.TaskNameStyle = taskModel.TaskProfile().TaskTextStyle;
                 taskModel.TaskTimeStyle = taskModel.TaskProfile().TaskTimeStyle;
                 taskModel.TaskIcon = taskModel.TaskProfile().TaskIcon;
+                taskModel.LapsedTime = taskModel.Modified.LapsedTime();
             }
 
             return FormatToJson(result);

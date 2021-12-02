@@ -43,11 +43,11 @@
         var subTasksStr = "";
 
         for (var i in subTasks) {
-            subTasksStr += "<li>";
+            subTasksStr += "<li class=\"no-border\">";
             subTasksStr += `<a href=\"/TaskList/Edit/${subTasks[i].id}\" class=\"sub-task-list-row\">`;
             subTasksStr += formatTaskRef(subTasks[i].taskRef, subTasks[i].taskRefStyle);
             subTasksStr += formatTaskName(subTasks[i].name, subTasks[i].taskNameStyle, subTasks[i].taskIcon);
-            subTasksStr += formatTime("2 days ago", subTasks[i].taskNameStyle);
+            subTasksStr += formatTime(subTasks[i].lapsedTime, subTasks[i].taskNameStyle);
             subTasksStr += "</a>";
             subTasksStr += "</li>";
         }

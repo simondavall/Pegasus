@@ -30,6 +30,7 @@ namespace Pegasus.Library.Models
         public string TaskNameStyle { get; set; }
         public string TaskTimeStyle { get; set; }
         public string TaskIcon { get; set; }
+        public string LapsedTime { get; set; }
     }
 
 }

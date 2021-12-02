@@ -206,12 +206,16 @@ html {
     background-color: rgba(0,0,0,.03);
 }
 
+.list-unstriped li:nth-of-type(odd) {
+    background-color: transparent;
+}
+
 .nav-link svg {
     fill: currentColor;
 }
 
 .no-border {
-    border: 0;
+    border: 0 !important;
 }
 
 .no-background {
