@@ -7,6 +7,7 @@ namespace PegasusApi.Library.DataAccess
     public interface ITasksData
     {
         Task<TaskModel> GetTask(int id);
+        Task<TaskModel> GetTaskByRef(string taskRef);
         Task<List<TaskModel>> GetTasks(int projectId);
         Task<List<TaskModel>> GetAllTasks();
         Task<List<TaskModel>> GetSubTasks(int taskId);

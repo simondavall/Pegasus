@@ -99,6 +99,13 @@ namespace PegasusApi.Controllers
             return await _taskData.GetTask(taskId);
         }
 
+        [Route("GetTaskByRef/{taskRef}")]
+        [HttpGet]
+        public async Task<TaskModel> GetTaskByRef(string taskRef)
+        {
+            return await _taskData.GetTaskByRef(taskRef);
+        }
+
         [Route("GetTasks/{projectId}")]
         [HttpGet]
         public async Task<IEnumerable<TaskModel>> GetTasks(int projectId)
