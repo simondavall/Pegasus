@@ -13,7 +13,7 @@
                 </button>
             </h2>
         </div>
-        <div id="projectFilter" class="collapse project-flex show" aria-labelledby="headingOne" data-parent="#selectionPanel">
+        <div id="projectFilter" class="collapse project-flex show" aria-labelledby="headingOne">
             <div class="card-body selection-panel">
                 <div>
                     <a class="project-filter-item" asp-action="Index" value="0"><i class="fa fa-angle-right"></i>All</a>
@@ -32,12 +32,12 @@
     <div class="card">
         <div class="card-header stretch-limit" id="headingTwo">
             <h2 class="mb-0">
-                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#taskFilter" aria-expanded="false" aria-controls="taskFilter">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#taskFilter" aria-expanded="true" aria-controls="taskFilter">
                     <h5>Filters</h5>
                 </button>
             </h2>
         </div>
-        <div id="taskFilter" class="collapse" aria-labelledby="headingTwo" data-parent="#selectionPanel">
+        <div id="taskFilter" class="collapse show" aria-labelledby="headingTwo">
             <div class="card-body selection-panel">
                 @foreach (var taskFilter in Model.TaskFilters)
                 {
