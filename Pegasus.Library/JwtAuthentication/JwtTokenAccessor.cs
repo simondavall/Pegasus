@@ -34,16 +34,6 @@ namespace Pegasus.Library.JwtAuthentication
             };
         }
 
-        public TokenWithClaimsPrincipal GetEmptyAccessTokenWithClaimsPrincipal(ClaimsPrincipal principal)
-        {
-            return new TokenWithClaimsPrincipal()
-            {
-                AccessToken = "access-token",
-                ClaimsPrincipal = principal,
-                AuthenticationProperties = null
-            };
-        }
-
         private ClaimsPrincipal ValidateToken(string jwtToken, TokenValidationParameters validationParameters)
         {
             IdentityModelEventSource.ShowPII = true;
