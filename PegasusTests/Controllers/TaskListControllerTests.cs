@@ -59,7 +59,7 @@ namespace PegasusTests.Controllers
             var name = "test-project";
             var prefix = "tst";
 
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
 
             _mockSettingsService.Setup(x => x.GetSetting<int>("ProjectId")).Returns(projectId);
             _mockProjectsEndpoint.Setup(x => x.GetProject(It.IsAny<int>())).ReturnsAsync(new ProjectModel {Id = projectId, Name=name, ProjectPrefix = prefix});
@@ -85,7 +85,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Create_InvalidModel_ReturnsViewResult()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
 
             var sut = GetController();
             sut.ModelState.AddModelError(string.Empty, string.Empty);
@@ -102,7 +102,7 @@ namespace PegasusTests.Controllers
             var taskId = 543;
             var list = new List<ClaimsIdentity> { new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.NameIdentifier, "user-id") }) };
 
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.AddTask(It.IsAny<TaskModel>())).ReturnsAsync(taskId);
 
             var sut = GetController();
@@ -122,7 +122,7 @@ namespace PegasusTests.Controllers
             _mockTasksEndpoint.Setup(x => x.GetTask(It.IsAny<int>())).ReturnsAsync((TaskModel)null);
 
             var sut = GetController();
-            var result = await sut.Edit(0);
+            var result = await sut.Edit("0");
 
             _mockTasksEndpoint.Verify(x => x.GetTask(It.IsAny<int>()), Times.Exactly(1));
             Assert.IsInstanceOf<RedirectToActionResult>(result);
@@ -132,12 +132,12 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task GET_Edit_IsAjaxRequest_ReturnsPartialView()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockSettingsService.Setup(x => x.SaveSettings());
 
             var sut = GetController();
             sut.HttpContext.Request.Headers.Add("X-Requested-With", "XMLHttpRequest");
-            var result = await sut.Edit(0);
+            var result = await sut.Edit("0");
 
             _mockTasksEndpoint.Verify(x => x.GetTask(It.IsAny<int>()), Times.Exactly(2));
             _mockSettingsService.Verify(x => x.SaveSettings(), Times.Exactly(1));
@@ -146,13 +146,13 @@ namespace PegasusTests.Controllers
         }
 
         [Test]
-        public async Task GET_Edit_IsNotAjaxRequest_ReturnsViewResult()
+        public async Task GET_EditWithIntString_IsNotAjaxRequest_ReturnsViewResult()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockSettingsService.Setup(x => x.SaveSettings());
 
             var sut = GetController();
-            var result = await sut.Edit(0);
+            var result = await sut.Edit("0");
 
             _mockTasksEndpoint.Verify(x => x.GetTask(It.IsAny<int>()), Times.Exactly(2));
             _mockSettingsService.Verify(x => x.SaveSettings(), Times.Exactly(1));
@@ -160,8 +160,24 @@ namespace PegasusTests.Controllers
             Assert.IsInstanceOf<TaskViewModel>(((ViewResult)result).Model);
         }
 
-        
-        
+        [Test]
+        public async Task GET_EditWithString_IsNotAjaxRequest_ReturnsViewResult()
+        {
+            SetupMockMethodCalls();
+            _mockSettingsService.Setup(x => x.SaveSettings());
+
+            var sut = GetController();
+            var result = await sut.Edit("TST-01");
+
+            _mockTasksEndpoint.Verify(x => x.GetTask(It.IsAny<int>()), Times.Exactly(1));
+            _mockTasksEndpoint.Verify(x => x.GetTaskByRef(It.IsAny<string>()), Times.Exactly(1));
+            _mockSettingsService.Verify(x => x.SaveSettings(), Times.Exactly(1));
+            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.IsInstanceOf<TaskViewModel>(((ViewResult)result).Model);
+        }
+
+
+
         [TestCaseSource(typeof(TestData), nameof(TestData.CommentSortOrder))]
         public async Task<int?> GET_Edit_CommentSortOrder_ReturnsViewResultCorrectOrder(int sortOrder)
         {
@@ -172,13 +188,13 @@ namespace PegasusTests.Controllers
                 new TaskCommentModel {Id = 3, Created = DateTime.Now}
             };
 
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _settingsModel.CommentSortOrder = sortOrder;
             _mockSettingsService.Setup(x => x.SaveSettings());
             _mockCommentsEndpoint.Setup(x => x.GetComments(It.IsAny<int>())).ReturnsAsync(list);
 
             var sut = GetController();
-            var result = await sut.Edit(0);
+            var result = await sut.Edit("0");
 
             Assert.IsInstanceOf<ViewResult>(result);
             Assert.IsInstanceOf<TaskViewModel>(((ViewResult)result).Model);
@@ -188,7 +204,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_InvalidModel_ReturnsViewResultWithErrors()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
 
             var sut = GetController();
             sut.ModelState.AddModelError(string.Empty, string.Empty);
@@ -202,7 +218,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_UpdateTask_ReturnsRedirectToAction()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
 
@@ -219,7 +235,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_HasNewComment_ExecutesAddNewComment()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
             _mockCommentsEndpoint.Setup(x => x.AddComment(It.IsAny<TaskCommentModel>()));
@@ -233,7 +249,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_HasNoNewComment_DoesNotExecuteAddNewComment()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
             _mockCommentsEndpoint.Setup(x => x.AddComment(It.IsAny<TaskCommentModel>()));
@@ -247,7 +263,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_AddNewTask_ReturnsRedirectToActionCreate()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
 
@@ -261,7 +277,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_IsClosedWithParent_ReturnsRedirectToActionParentTask()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
 
@@ -276,7 +292,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_IsClosedWithoutParent_ReturnsRedirectToActionParentTask()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
 
@@ -290,7 +306,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task POST_Edit_IsClosedWithOpenSubTasks_ReturnsViewResultWithBannerWarning()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.UpdateTask(It.IsAny<TaskModel>()));
             _mockCommentsEndpoint.Setup(x => x.UpdateComments(It.IsAny <List<TaskCommentModel>>()));
             _mockTasksEndpoint.Setup(x => x.GetSubTasks(It.IsAny<int>())).ReturnsAsync(new List<TaskModel>()
@@ -316,7 +332,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task GET_Index_IsAjaxRequest_ReturnsPartialViewResult()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.GetTasks(It.IsAny<int>())).ReturnsAsync(new List<TaskModel>());
             _mockTasksEndpoint.Setup(x => x.GetAllTasks()).ReturnsAsync(new List<TaskModel>());
 
@@ -332,7 +348,7 @@ namespace PegasusTests.Controllers
         [Test]
         public async Task GET_Index_IsNotAjaxRequest_ReturnsPartialViewResult()
         {
-            MockDefaultCreateTaskViewModelArg();
+            SetupMockMethodCalls();
             _mockTasksEndpoint.Setup(x => x.GetTasks(It.IsAny<int>())).ReturnsAsync(new List<TaskModel>());
             _mockTasksEndpoint.Setup(x => x.GetAllTasks()).ReturnsAsync(new List<TaskModel>());
 
@@ -344,18 +360,13 @@ namespace PegasusTests.Controllers
             Assert.AreEqual("../TaskList/Index", ((ViewResult)result).ViewName);
         }
 
-
-
-
-
-
-
-        private void MockDefaultCreateTaskViewModelArg()
+        private void SetupMockMethodCalls()
         {
             _mockTasksEndpoint.Setup(x=>x.GetAllTaskPriorities()).ReturnsAsync(new List<TaskPriorityModel>());
             _mockTasksEndpoint.Setup(x=>x.GetAllTaskStatuses()).ReturnsAsync(new List<TaskStatusModel>());
             _mockTasksEndpoint.Setup(x=>x.GetAllTaskTypes()).ReturnsAsync(new List<TaskTypeModel>());
             _mockTasksEndpoint.Setup(x => x.GetTask(It.IsAny<int>())).ReturnsAsync(new TaskModel());
+            _mockTasksEndpoint.Setup(x => x.GetTaskByRef(It.IsAny<string>())).ReturnsAsync(new TaskModel());
             _mockTasksEndpoint.Setup(x => x.GetSubTasks(It.IsAny<int>())).ReturnsAsync(new List<TaskModel>());
             _mockCommentsEndpoint.Setup(x => x.GetComments(It.IsAny<int>())).ReturnsAsync(new List<TaskCommentModel>());
             _mockProjectsEndpoint.Setup(x => x.GetProject(It.IsAny<int>())).ReturnsAsync(new ProjectModel());
