@@ -129,9 +129,12 @@ namespace PegasusTests.ServiceTests
         public async Task SignInOrTwoFactor_GoodCredentialsTwoFactorRequiredRemembered_ReturnsSuccess()
         {
             SetupSignInMocks();
-            var tokenOptions = new Pegasus.Library.JwtAuthentication.Models.TokenOptions("issuer", "audience", "singInKey", 0);
-            var testTokenAccessor = new JwtTokenAccessor(tokenOptions);
-            var testTokenWithClaimsPrincipal = testTokenAccessor.GetEmptyAccessTokenWithClaimsPrincipal(TestClaimsPrincipal);
+            var testTokenWithClaimsPrincipal = new TokenWithClaimsPrincipal()
+            {
+                AccessToken = "access-token",
+                ClaimsPrincipal = TestClaimsPrincipal,
+                AuthenticationProperties = null
+            };
 
             _mockHttpContextWrapper.Setup(x => x.AuthenticateAsync(It.IsAny<string>())).ReturnsAsync(GetSuccessAuthenticateResult());
             _mockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
@@ -150,9 +153,13 @@ namespace PegasusTests.ServiceTests
         public async Task SignInOrTwoFactor_GoodCredentialsTwoFactorRequired_ReturnsRequiresTwoFactor()
         {
             SetupSignInMocks();
-            var tokenOptions = new Pegasus.Library.JwtAuthentication.Models.TokenOptions("issuer", "audience", "singInKey", 0);
-            var testTokenAccessor = new JwtTokenAccessor(tokenOptions);
-            var testTokenWithClaimsPrincipal = testTokenAccessor.GetEmptyAccessTokenWithClaimsPrincipal(TestClaimsPrincipal);
+            var testTokenWithClaimsPrincipal = new TokenWithClaimsPrincipal()
+            {
+                AccessToken = "access-token",
+                ClaimsPrincipal = TestClaimsPrincipal,
+                AuthenticationProperties = null
+            };
+
 
             _mockHttpContextWrapper.Setup(x => x.AuthenticateAsync(It.IsAny<string>())).ReturnsAsync(AuthenticateResult.Fail(string.Empty));
             _mockHttpContextWrapper.Setup(x => x.SignInAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()));
